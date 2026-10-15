@@ -7,7 +7,7 @@
 <title>Геннадий Андреев · AI Creator</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: NLE-воркспейс из 4 панелей — инспектор (обо мне) | программный монитор (шоурил), проект-бин (AI-работы) | таймлайн последовательности */
 :root{
@@ -21,9 +21,9 @@
   --marker:#48b36b;
   --offline:#a3161c;
   --c1:#7b72d4; --c2:#2a9d98; --c3:#d18f34; --c4:#c45f8b; --c5:#5a9748; --c6:#3c7cc4;
-  --f-display:"Archivo", "Arial Narrow", system-ui, sans-serif;
-  --f-ui:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --f-display:"Unbounded", "Nunito", system-ui, sans-serif;
+  --f-ui:"Nunito", "SF Pro Rounded", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 *{box-sizing:border-box}
 /* живой фон: цветные пятна, как блики на грейдинге, медленно плывут за панелями */
@@ -39,7 +39,7 @@ body::after{background:
   opacity:.45;animation:drift2 46s ease-in-out infinite alternate}
 @keyframes drift1{to{transform:translate(4%,6%) rotate(8deg) scale(1.08)}}
 @keyframes drift2{to{transform:translate(-6%,-4%) rotate(-10deg) scale(1.12)}}
-body{background:var(--bg);color:var(--fg);font:13px/1.45 var(--f-ui);
+body{background:var(--bg);color:var(--fg);font:500 14px/1.5 var(--f-ui);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 16px}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 a{color:var(--tc)}
@@ -51,7 +51,7 @@ a{color:var(--tc)}
   background:color-mix(in srgb, var(--bg) 70%, transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:6px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .logo{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--panel-2);border:1px solid var(--line-2);
-  font:700 12px var(--f-display);font-stretch:110%;color:var(--tc)}
+  font:600 11px var(--f-display);color:var(--tc)}
 .proj{color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .proj b{color:var(--fg);font-weight:500}
 .workspaces{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
@@ -84,7 +84,7 @@ a{color:var(--tc)}
 /* inspector */
 .insp{padding:10px 0 14px;overflow:auto}
 .hero-name{padding:6px 14px 14px;border-bottom:1px solid var(--line)}
-.hero-name h1{margin:0;font:700 clamp(30px,4.2vw,44px)/.95 var(--f-display);font-stretch:118%;letter-spacing:-.01em;text-wrap:balance}
+.hero-name h1{margin:0;font:600 clamp(26px,2.6vw,34px)/1.1 var(--f-display);letter-spacing:-.02em;text-wrap:balance}
 .hero-role{font:500 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--tc);margin-bottom:8px}
 .hero-name p{margin:8px 0 0;color:var(--mute);max-width:42ch}
 .fx{border-bottom:1px solid var(--line)}
@@ -135,7 +135,7 @@ a{color:var(--tc)}
   linear-gradient(90deg,#00214c 0 17.8%,#fff 0 35.7%,#32006a 0 53.5%,#131313 0 71.4%,#090909 0 76.2%,#131313 0 81%,#1d1d1d 0 85.7%,#131313 0) bottom/100% 25% no-repeat;
   display:grid;place-items:center}
 .slate{background:rgba(0,0,0,.82);color:#fff;padding:14px 22px;text-align:center;border-radius:14px;max-width:80%}
-.slate b{display:block;font:700 clamp(16px,3vw,28px)/1 var(--f-display);font-stretch:120%;letter-spacing:.02em}
+.slate b{display:block;font:600 clamp(16px,3vw,26px)/1.1 var(--f-display);letter-spacing:.01em}
 .slate span{font:11px var(--f-mono);opacity:.75}
 .offline{background:var(--offline);color:#fff;display:grid;place-items:center;text-align:center}
 .offline b{display:block;font:600 clamp(18px,3.4vw,32px)/1.1 var(--f-ui)}
