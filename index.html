@@ -44,7 +44,10 @@ body::after{background:
 @keyframes drift1{to{transform:translate(4%,6%) rotate(8deg) scale(1.08)}}
 @keyframes drift2{to{transform:translate(-6%,-4%) rotate(-10deg) scale(1.12)}}
 body{background:var(--bg);color:var(--fg);font:500 14px/1.5 var(--f-ui);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 16px}
+  --gl:max(var(--gut),env(safe-area-inset-left,0px));--gr:max(var(--gut),env(safe-area-inset-right,0px));
+  padding-left:var(--gl);padding-right:var(--gr);padding-block:0 16px}
+:root{--gut:16px}
+@media (max-width:560px){:root{--gut:8px}}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{-webkit-tap-highlight-color:transparent}
@@ -53,7 +56,8 @@ a{color:var(--tc)}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 
 /* menubar */
-.menubar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+/* шапка во всю ширину экрана, без полос по краям */
+.menubar{margin-left:calc(-1 * var(--gl));margin-right:calc(-1 * var(--gr));padding-left:var(--gl);padding-right:var(--gr);position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
   background:color-mix(in srgb, var(--bg) 94%, transparent);padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:6px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .logo{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--panel-2);border:1px solid var(--line-2);
