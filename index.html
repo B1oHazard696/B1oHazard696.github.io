@@ -79,7 +79,16 @@ a{color:var(--tc)}
 .lang button:not([aria-pressed="true"]):hover{opacity:1;background:color-mix(in srgb, var(--accent) 22%, transparent)}
 
 /* workspace grid */
-.ws{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:8px;align-items:start}
+/* ≥1200: инспектор | монитор+таймлайн | проект (бин) колонкой справа, как в Premiere */
+.ws{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr) minmax(240px,300px);grid-template-areas:"insp mid bin";gap:8px;align-items:start}
+.p-inspector{grid-area:insp}.col-r{grid-area:mid}.p-bin{grid-area:bin}
+.p-bin{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);max-height:calc(100vh - 72px)}
+.p-bin .bin{grid-template-columns:minmax(0,1fr);overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+@media (max-width:1199px){
+  .ws{grid-template-columns:minmax(280px,340px) minmax(0,1fr);grid-template-areas:"insp mid" "insp bin"}
+  .p-bin{position:static;max-height:none}
+  .p-bin .bin{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));overflow:visible}
+}
 .col-r{display:flex;flex-direction:column;gap:8px;min-width:0}
 
 .panel{background:color-mix(in srgb, var(--panel) 88%, transparent);box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);border:1px solid color-mix(in srgb, var(--line) 80%, transparent);border-radius:16px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
@@ -94,6 +103,8 @@ a{color:var(--tc)}
 @media (max-width:900px){
   .ws{grid-template-columns:minmax(0,1fr)}
   /* на телефоне: шоурил → работы → обо мне и контакты → таймлайн */
+  .ws{grid-template-areas:none}
+  .p-inspector,.col-r,.p-bin{grid-area:auto}
   .col-r{display:contents}
   .p-program{order:1}.p-bin{order:2}.p-inspector{order:3}.p-timeline{order:4}
   .fmt{display:none}
@@ -203,7 +214,7 @@ a{color:var(--tc)}
 .filt{padding:4px 12px;border-radius:999px;font-size:11.5px;color:var(--mute);border:1px solid transparent}
 .filt[aria-pressed="true"]{color:var(--fg);border-color:var(--line-2);background:var(--panel-2)}
 .bin{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:12px;align-content:start}
-@media (max-width:560px){.bin{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px}}
+@media (max-width:560px){.p-bin .bin{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px}}
 .item{display:grid;gap:5px;text-align:left;padding:6px;border-radius:14px;border:1px solid transparent}
 .item:hover{background:var(--panel-2)}
 .item.sel{border-color:var(--accent);background:var(--panel-2)}
@@ -339,8 +350,10 @@ a{color:var(--tc)}
     <div class="tl-foot"><span data-t="tlHint">Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.</span><span class="mono">30 fps</span></div>
   </section>
 
+  </div>
+
   <section class="panel p-bin" id="works" aria-label="AI-работы" data-ta="navWorks">
-    <div class="tabs"><span class="tab on"><span data-t="project">Проект:</span> AI_works</span><span class="spacer"></span><span class="aux mono" id="binCount"></span></div>
+    <div class="tabs"><span class="tab on"><span data-t="project">Проект:</span><span style="margin-left:.35em">AI_works</span></span><span class="spacer"></span><span class="aux mono" id="binCount"></span></div>
     <div class="bin-tools" role="group" aria-label="Фильтр" data-ta="filter">
       <button class="filt" data-f="all" aria-pressed="true" data-t="fAll">Все</button>
       <button class="filt" data-f="video" aria-pressed="false" data-t="fVideo">Видео</button>
@@ -348,7 +361,6 @@ a{color:var(--tc)}
     </div>
     <div class="bin" id="bin"></div>
   </section>
-  </div>
 </main>
 
 <footer class="status" id="contact">
