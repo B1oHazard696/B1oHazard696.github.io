@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>[hidden]{display:none!important}img{max-width:100%}body{margin:0}</style>
-<title>Геннадий Андреев · монтаж</title>
+<title>Геннадий Андреев · AI Creator</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -83,6 +83,7 @@ a{color:var(--tc)}
 .insp{padding:10px 0 14px;overflow:auto}
 .hero-name{padding:6px 14px 14px;border-bottom:1px solid var(--line)}
 .hero-name h1{margin:0;font:700 clamp(30px,4.2vw,44px)/.95 var(--f-display);font-stretch:118%;letter-spacing:-.01em;text-wrap:balance}
+.hero-role{font:500 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--tc);margin-bottom:8px}
 .hero-name p{margin:8px 0 0;color:var(--mute);max-width:42ch}
 .fx{border-bottom:1px solid var(--line)}
 .fx-h{width:calc(100% - 12px);margin:0 6px;border-radius:10px;display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px;color:var(--fg);text-align:left}
@@ -318,9 +319,10 @@ const CFG = {
   name: "Геннадий Андреев",
   initials: "ГА",
   project: "Andreev_Portfolio_2026",
-  summary: "Режиссёр монтажа с 18-летним опытом в кино, на ТВ и в digital. Монтировал передачи для «Пятницы», шесть лет работал в Viacom. С 2025 года делаю AI-продакшн: монтаж и постпродакшн материала из Kling, Seedance, Higgsfield и Krea.",
+  role: "AI Creator · режиссёр монтажа",
+  summary: "Создаю AI-видео и визуал в Kling, Seedance, Higgsfield и Krea и довожу их до готового ролика. За плечами 18 лет режиссёром монтажа в кино, на ТВ и в digital: передачи для «Пятницы», шесть лет в Viacom.",
   props: [
-    ["Роль", "Режиссёр монтажа · Video Editor"],
+    ["Роль", "AI Creator, режиссёр монтажа"],
     ["Опыт", "18 лет в постпродакшне"],
     ["Город", "Москва, готов к командировкам"],
     ["Языки", "Русский, English B2"]
@@ -373,7 +375,7 @@ function section(title, badge, open, body) {
 }
 function renderInspector() {
   const root = $("#inspector");
-  const hero = el("div", "hero-name"); hero.append(el("h1", "", CFG.name), el("p", "", CFG.summary));
+  const hero = el("div", "hero-name"); hero.append(el("div", "hero-role", CFG.role), el("h1", "", CFG.name), el("p", "", CFG.summary));
   const props = CFG.props.map(([k, v]) => { const r = el("div", "prop"); r.append(el("span", "sw", "◷"), el("span", "k", k), el("span", "v", v)); return r; });
   const skillGroups = CFG.skills.map(([g, items]) => { const w = el("div", "sk"), c = el("div", "chips");
     items.forEach(s => c.append(el("span", "chip", s))); w.append(el("div", "sk-h", g), c); return w; });
