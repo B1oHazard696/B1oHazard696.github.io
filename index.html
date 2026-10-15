@@ -707,12 +707,11 @@ const navLinks = [...document.querySelectorAll(".workspaces a")];
 navLinks.forEach(a => a.addEventListener("click", e => {
   navLinks.forEach(x => x.classList.toggle("on", x === a));
   const h = a.getAttribute("href");
-  /* «Шоурил» и «AI-работы» ведут в монитор и ставят плейхед на нужный клип */
+  /* «Шоурил» и «AI-работы» без прокрутки открывают клип в мониторе и ставят на него плейхед */
   if (h === "#reel" || h === "#works") {
     e.preventDefault();
     const target = h === "#works" ? seq.find(c => c.kind === "work") : seq[0];
     if (target) setTime(target.start, true);
-    $("#reel").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   }
 }));
 
