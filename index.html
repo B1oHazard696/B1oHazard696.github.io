@@ -62,11 +62,9 @@ a{color:var(--tc)}
 .fmt{color:var(--dim);font-size:11px}
 
 /* workspace grid */
-.ws{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);grid-template-rows:auto 1fr auto;grid-template-areas:"insp prog" "insp tl" "bin bin";gap:6px;align-items:start}
-.p-inspector{grid-area:insp;align-self:stretch}
-.p-program{grid-area:prog}
-.p-timeline{grid-area:tl}
-.p-bin{grid-area:bin}
+.ws{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:8px;align-items:start}
+.col-r{display:flex;flex-direction:column;gap:8px;min-width:0}
+
 .panel{background:color-mix(in srgb, var(--panel) 80%, transparent);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);border:1px solid color-mix(in srgb, var(--line) 80%, transparent);border-radius:16px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .tabs{display:flex;align-items:center;gap:2px;padding:0 8px;height:32px;border-bottom:1px solid var(--line);flex:none}
 .tab{padding:0 10px;height:100%;display:flex;align-items:center;color:var(--dim);font-size:12px;white-space:nowrap}
@@ -74,9 +72,13 @@ a{color:var(--tc)}
 .tab.on::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}
 .tabs .spacer{flex:1}
 .tabs .aux{color:var(--dim);font-size:11px;white-space:nowrap}
-.p-inspector{grid-row:span 1}
 @media (max-width:900px){
-  .ws{grid-template-columns:minmax(0,1fr);grid-template-rows:auto;grid-template-areas:"prog" "insp" "tl" "bin"}
+  .ws{grid-template-columns:minmax(0,1fr)}
+  .col-r{order:-1}
+  .fmt{display:none}
+  .menubar{gap:8px 16px}
+  .workspaces{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap}
+  .workspaces a.on::after{bottom:-6px}
 }
 
 /* inspector */
@@ -107,8 +109,8 @@ a{color:var(--tc)}
 .career .yr span:first-child{transform:none}
 .career .yr span:last-child{transform:translateX(-100%)}
 .career .lane{position:relative;height:30px;background:var(--well);border-radius:10px}
-.career .job{position:absolute;top:2px;bottom:2px;border-radius:8px;padding:2px 8px;overflow:hidden;font-size:11px;line-height:1.2;color:#fff;white-space:nowrap}
-.career .job small{display:block;opacity:.75;font-size:10px}
+.career .lane{height:24px}
+.career .job{position:absolute;top:2px;bottom:2px;border-radius:999px;padding:0 8px;overflow:hidden;font-size:11px;line-height:20px;color:#fff;white-space:nowrap;text-overflow:ellipsis}
 .career-list{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:4px;color:var(--mute);font-size:12px}
 .career-list b{color:var(--fg);font-weight:500}
 .export{padding:14px;display:grid;gap:8px}
@@ -118,6 +120,8 @@ a{color:var(--tc)}
 .btn-ghost{border:1px solid var(--line-2);color:var(--fg);background:var(--panel-2)}
 .btn-ghost:hover{border-color:var(--mute)}
 .copy-row{display:flex;gap:6px;align-items:center;min-width:0}
+.ib.cp{flex:none;width:36px;height:36px;background:var(--panel-2);border:1px solid var(--line-2)}
+.ib.cp:hover{border-color:var(--mute)}
 .copy-row .val{flex:1;min-width:0;height:34px;display:flex;align-items:center;padding:0 14px;border-radius:999px;background:var(--well);border:1px solid var(--line);font:12px var(--f-mono);user-select:all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* program monitor */
@@ -162,8 +166,8 @@ a{color:var(--tc)}
 .bin-tools{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .filt{padding:4px 12px;border-radius:999px;font-size:11.5px;color:var(--mute);border:1px solid transparent}
 .filt[aria-pressed="true"]{color:var(--fg);border-color:var(--line-2);background:var(--panel-2)}
-.bin{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:10px;overflow:auto;max-height:520px;align-content:start}
-@media (max-width:900px){.bin{max-height:none}}
+.bin{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:12px;align-content:start}
+@media (max-width:560px){.bin{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px}}
 .item{display:grid;gap:5px;text-align:left;padding:6px;border-radius:14px;border:1px solid transparent}
 .item:hover{background:var(--panel-2)}
 .item.sel{border-color:var(--accent);background:var(--panel-2)}
@@ -242,6 +246,7 @@ a{color:var(--tc)}
     <div class="insp" id="inspector"></div>
   </section>
 
+  <div class="col-r">
   <section class="panel p-program" id="reel" aria-label="Шоурил">
     <div class="tabs"><span class="tab on">Программа: <span id="progName" style="margin-left:.35em">&nbsp;Showreel</span></span><span class="spacer"></span>
       <button class="tab" id="safeBtn" aria-pressed="false" title="Рамки безопасной зоны">Safe</button></div>
@@ -273,16 +278,6 @@ a{color:var(--tc)}
     <div class="keys"><span><kbd>Пробел</kbd> плей/пауза</span><span><kbd>J</kbd> <kbd>L</kbd> пред./след. клип</span><span><kbd>←</kbd> <kbd>→</kbd> по кадрам</span></div>
   </section>
 
-  <section class="panel p-bin" id="works" aria-label="AI-работы">
-    <div class="tabs"><span class="tab on">Проект: AI_works</span><span class="spacer"></span><span class="aux mono" id="binCount"></span></div>
-    <div class="bin-tools" role="group" aria-label="Фильтр">
-      <button class="filt" data-f="all" aria-pressed="true">Все</button>
-      <button class="filt" data-f="video" aria-pressed="false">Видео</button>
-      <button class="filt" data-f="image" aria-pressed="false">Изображения</button>
-    </div>
-    <div class="bin" id="bin"></div>
-  </section>
-
   <section class="panel p-timeline" aria-label="Таймлайн">
     <div class="tabs"><span class="tab on">Последовательность 01</span><span class="spacer"></span><span class="aux mono" id="seqLen"></span></div>
     <div class="tl-wrap">
@@ -304,6 +299,17 @@ a{color:var(--tc)}
     </div>
     <div class="tl-foot"><span>Клик по таймлайну перемещает плейхед. Клик по клипу открывает работу в мониторе.</span><span class="mono">30 fps</span></div>
   </section>
+
+  <section class="panel p-bin" id="works" aria-label="AI-работы">
+    <div class="tabs"><span class="tab on">Проект: AI_works</span><span class="spacer"></span><span class="aux mono" id="binCount"></span></div>
+    <div class="bin-tools" role="group" aria-label="Фильтр">
+      <button class="filt" data-f="all" aria-pressed="true">Все</button>
+      <button class="filt" data-f="video" aria-pressed="false">Видео</button>
+      <button class="filt" data-f="image" aria-pressed="false">Изображения</button>
+    </div>
+    <div class="bin" id="bin"></div>
+  </section>
+  </div>
 </main>
 
 <footer class="status" id="contact">
@@ -385,7 +391,7 @@ function renderInspector() {
   [y0, Math.round((y0 + y1) / 2), y1].forEach((y, i) => { const s = el("span", "", y); s.style.left = ((y - y0) / span * 100) + "%"; yr.append(s); });
   CFG.career.forEach((c, i) => {
     const j = el("div", "job"); j.style.left = ((c.from - y0) / span * 100) + "%"; j.style.width = `calc(${(c.to - c.from) / span * 100}% - 2px)`;
-    j.style.background = `var(${COLORS[i % COLORS.length]})`; j.append(c.place, el("small", "", `${c.from}–${c.to}`)); lane.append(j);
+    j.style.background = `var(${COLORS[i % COLORS.length]})`; j.title = `${c.place} · ${c.from}–${c.to}`; if ((c.to - c.from) / span >= 0.18) j.textContent = c.place; lane.append(j);
   });
   const list = el("ul", "career-list");
   [...CFG.career].reverse().forEach(c => { const li = el("li"); li.append(el("b", "", c.place), ` · ${c.role} · ${c.from}–${c.to}`); list.append(li); });
@@ -395,7 +401,8 @@ function renderInspector() {
   const tg = el("a", "btn btn-primary", CFG.primary.label); tg.href = CFG.primary.href; tg.target = "_blank"; tg.rel = "noopener";
   exp.append(tg);
   CFG.copy.forEach(v => {
-    const row = el("div", "copy-row"), val = el("span", "val", v), cp = el("button", "btn btn-ghost", "Копировать");
+    const row = el("div", "copy-row"), val = el("span", "val", v), cp = el("button", "ib cp"); cp.title = "Копировать"; cp.setAttribute("aria-label", "Копировать " + v);
+    cp.innerHTML = '<svg viewBox="0 0 16 16"><path d="M5 1.5h7.5A1.5 1.5 0 0 1 14 3v8h-1.5V3H5zM2 5.5A1.5 1.5 0 0 1 3.5 4h6A1.5 1.5 0 0 1 11 5.5v8A1.5 1.5 0 0 1 9.5 15h-6A1.5 1.5 0 0 1 2 13.5z"/></svg>';
     cp.onclick = () => {
       const ok = () => toast("Скопировано");
       try { navigator.clipboard.writeText(v).then(ok, () => selectText(val)); } catch { selectText(val); }
@@ -455,7 +462,7 @@ function layout() {
     if (c.kind === "reel") b.append(el("span", "fxb", "fx"));
     b.title = c.name; v1.append(b);
   });
-  const title = el("div", "clip v2"); title.style.left = "0"; title.style.width = `calc(${pct(Math.min(4, T))} - 2px)`;
+  const title = el("div", "clip v2"); title.style.left = "0"; title.style.width = `calc(${pct(Math.min(12, T))} - 2px)`;
   title.style.setProperty("--cc", "var(--c4)"); title.append(el("span", "cn", "Титр: " + CFG.name)); v2.append(title);
   const adj = el("div", "clip v2"); adj.style.left = pct(seq[1] ? seq[1].start : 0); adj.style.right = "0";
   adj.style.setProperty("--cc", "#4a4d55"); adj.append(el("span", "cn", "Корректирующий слой · Grade")); v2.append(adj);
@@ -465,7 +472,7 @@ function layout() {
   requestAnimationFrame(() => drawWave(cv));
 
   const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300], step = steps.find(s => T / s <= 9) || 600;
-  for (let x = 0; x < T; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
+  for (let x = 0; x < T - step * 0.6; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
   seq.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.name; ru.append(m); });
 
   const sc = $("#scrub"); sc.querySelectorAll(".tick").forEach(n => n.remove());
