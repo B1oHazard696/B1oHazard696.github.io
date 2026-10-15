@@ -126,16 +126,16 @@ a{color:var(--tc)}
 .sk-h{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .slate .btn{margin-top:10px}
 .chip{border:1px solid var(--line-2);border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--fg);background:var(--panel-2)}
-.career{display:grid;gap:4px}
-.career .yr{position:relative;height:16px;font:10px var(--f-mono);color:var(--dim)}
-.career .yr span{position:absolute;transform:translateX(-50%)}
-.career .yr span:first-child{transform:none}
-.career .yr span:last-child{transform:translateX(-100%)}
-.career .lane{position:relative;height:30px;background:var(--well);border-radius:10px}
-.career .lane{height:24px}
-.career .job{position:absolute;top:2px;bottom:2px;border-radius:999px;padding:0 8px;overflow:hidden;font-size:11px;line-height:20px;color:#fff;white-space:nowrap;text-overflow:ellipsis}
-.career-list{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:4px;color:var(--mute);font-size:12px}
-.career-list b{color:var(--fg);font-weight:500}
+.career{display:grid;gap:12px}
+.job-row{display:grid;gap:6px}
+.job-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
+.job-yrs{font:600 11px/1 var(--f-mono);color:#fff;background:var(--cc);padding:5px 9px;border-radius:999px;white-space:nowrap;font-variant-numeric:tabular-nums;min-width:86px;text-align:center}
+.job-txt{display:grid;gap:1px;min-width:0;font-size:12.5px;line-height:1.35}
+.job-txt b{color:var(--fg);font-weight:700}
+.job-txt span{color:var(--mute)}
+.job-track{position:relative;height:4px;border-radius:4px;background:var(--well)}
+.job-track span{position:absolute;top:0;bottom:0;border-radius:4px}
+.job-scale{display:flex;justify-content:space-between;font:10px var(--f-mono);color:var(--dim);margin-top:-6px}
 .export{padding:14px;display:grid;gap:8px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:999px;font-size:12.5px;font-weight:500;text-decoration:none}
 .btn-primary{background:var(--accent);color:#fff}
@@ -467,16 +467,21 @@ function renderInspector() {
   const skillGroups = CFG.skills.map(([g, items]) => { const w = el("div", "sk"), c = el("div", "chips");
     items.forEach(s => c.append(el("span", "chip", s))); w.append(el("div", "sk-h", tr(g)), c); return w; });
 
+  /* опыт: каждая работа — своя строка с цветной меткой лет и мини-дорожкой в масштабе 2005–2026 */
   const y0 = Math.min(...CFG.career.map(c => c.from)), y1 = Math.max(...CFG.career.map(c => c.to)), span = Math.max(1, y1 - y0);
-  const car = el("div", "career"), yr = el("div", "yr"), lane = el("div", "lane");
-  [y0, Math.round((y0 + y1) / 2), y1].forEach((y, i) => { const s = el("span", "", y); s.style.left = ((y - y0) / span * 100) + "%"; yr.append(s); });
-  CFG.career.forEach((c, i) => {
-    const j = el("div", "job"); j.style.left = ((c.from - y0) / span * 100) + "%"; j.style.width = `calc(${(c.to - c.from) / span * 100}% - 2px)`;
-    j.style.background = `var(${COLORS[i % COLORS.length]})`; j.title = `${tr(c.place)} · ${c.from}–${c.to}`; if ((c.to - c.from) / span >= 0.18) j.textContent = tr(c.place); lane.append(j);
+  const car = el("div", "career");
+  CFG.career.map((c, i) => ({ c, col: `var(${COLORS[i % COLORS.length]})` })).reverse().forEach(({ c, col }) => {
+    const row = el("div", "job-row"), head = el("div", "job-head"), yrs = el("span", "job-yrs", `${c.from}–${c.to}`);
+    yrs.style.setProperty("--cc", col);
+    const txt = el("div", "job-txt"); txt.append(el("b", "", tr(c.place)), el("span", "", tr(c.role)));
+    head.append(yrs, txt);
+    const track = el("div", "job-track"), seg = el("span", "");
+    seg.style.left = ((c.from - y0) / span * 100) + "%"; seg.style.width = `max(6px, ${(c.to - c.from) / span * 100}%)`; seg.style.background = col;
+    track.append(seg); track.title = `${c.from}–${c.to}`;
+    row.append(head, track); car.append(row);
   });
-  const list = el("ul", "career-list");
-  [...CFG.career].reverse().forEach(c => { const li = el("li"); li.append(el("b", "", tr(c.place)), ` · ${tr(c.role)} · ${c.from}–${c.to}`); list.append(li); });
-  car.append(yr, lane);
+  const scale = el("div", "job-scale"); [y0, Math.round((y0 + y1) / 2), y1].forEach(y => scale.append(el("span", "", y))); car.append(scale);
+
 
   const exp = el("div", "export");
   const tg = el("a", "btn btn-primary", tr(CFG.primary.label)); tg.href = CFG.primary.href; tg.target = "_blank"; tg.rel = "noopener";
@@ -497,7 +502,7 @@ function renderInspector() {
   root.append(hero,
     section(L("secProfile"), "fx", true, props),
     section(L("secTools"), "fx", true, skillGroups),
-    section(L("secExp"), "fx", true, [car, list]),
+    section(L("secExp"), "fx", true, [car]),
     section(L("secContact"), "▶", true, [exp]));
 }
 function selectText(n) { const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast(L("selected")); }
