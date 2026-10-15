@@ -70,6 +70,10 @@ a{color:var(--tc)}
 .workspaces a.on{color:var(--fg)}
 .workspaces a.on::after{content:"";position:absolute;left:10px;right:10px;bottom:-11px;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}
 .fmt{color:var(--dim);font-size:11px}
+.lang{display:flex;padding:3px;border-radius:999px;background:var(--panel);border:1px solid var(--line-2);flex:none}
+.lang button{font:600 11px var(--f-mono);letter-spacing:.06em;padding:4px 10px;border-radius:999px;color:var(--mute)}
+.lang button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.lang button:not([aria-pressed="true"]):hover{color:var(--fg)}
 
 /* workspace grid */
 .ws{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:8px;align-items:start}
@@ -91,7 +95,9 @@ a{color:var(--tc)}
   .p-program{order:1}.p-bin{order:2}.p-inspector{order:3}.p-timeline{order:4}
   .fmt{display:none}
   .menubar{gap:8px 16px}
-  .workspaces{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap}
+  .workspaces{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap;order:3}
+  .brand{flex:1}
+  .lang{order:2}
   .workspaces a.on::after{bottom:-6px}
 }
 
@@ -258,29 +264,32 @@ a{color:var(--tc)}
     <span class="logo" id="initials">ИФ</span>
     <span class="proj"><b id="projName">Portfolio_2026</b>.prproj</span>
   </div>
-  <nav class="workspaces" aria-label="Разделы">
-    <a href="#reel" class="on">Шоурил</a>
-    <a href="#works">AI-работы</a>
-    <a href="#about">Обо мне</a>
-    <a href="#contact">Контакты</a>
+  <nav class="workspaces" aria-label="Разделы" data-ta="nav">
+    <a href="#reel" class="on" data-t="navReel">Шоурил</a>
+    <a href="#works" data-t="navWorks">AI-работы</a>
+    <a href="#about" data-t="navAbout">Обо мне</a>
+    <a href="#contact" data-t="navContact">Контакты</a>
   </nav>
+  <div class="lang" role="group" aria-label="Язык / Language">
+    <button data-lang="ru" aria-pressed="true">RU</button><button data-lang="en" aria-pressed="false">EN</button>
+  </div>
   <span class="fmt mono">1920×1080 · 30 fps</span>
 </header>
 
 <main class="ws">
-  <section class="panel p-inspector" id="about" aria-label="Обо мне">
-    <div class="tabs"><span class="tab on">Инспектор</span><span class="tab">Метаданные</span></div>
+  <section class="panel p-inspector" id="about" aria-label="Обо мне" data-ta="navAbout">
+    <div class="tabs"><span class="tab on" data-t="tabInspector">Инспектор</span><span class="tab" data-t="tabMeta">Метаданные</span></div>
     <div class="insp" id="inspector"></div>
   </section>
 
   <div class="col-r">
-  <section class="panel p-program" id="reel" aria-label="Шоурил">
-    <div class="tabs"><span class="tab on">Программа: <span id="progName" style="margin-left:.35em">&nbsp;Showreel</span></span><span class="spacer"></span>
-      <button class="tab" id="safeBtn" aria-pressed="false" title="Рамки безопасной зоны">Safe</button></div>
+  <section class="panel p-program" id="reel" aria-label="Шоурил" data-ta="navReel">
+    <div class="tabs"><span class="tab on"><span data-t="program">Программа:</span> <span id="progName" style="margin-left:.35em">&nbsp;Showreel</span></span><span class="spacer"></span>
+      <button class="tab" id="safeBtn" aria-pressed="false" title="Рамки безопасной зоны" data-tt="safe">Safe</button></div>
     <div class="monitor">
       <div class="screen" id="screen">
-        <div class="bars" id="lBars"><div class="slate"><b id="slateT">SHOWREEL</b><span id="slateS">видео ещё не загружено</span><br><a class="btn btn-primary" id="slateLink" target="_blank" rel="noopener" hidden>Смотреть на YouTube ↗</a></div></div>
-        <div class="offline" id="lOff" hidden><div><b>Медиаданные в автономном режиме</b><span id="offName">file.mp4</span></div></div>
+        <div class="bars" id="lBars"><div class="slate"><b id="slateT">SHOWREEL</b><span id="slateS"></span><br><a class="btn btn-primary" id="slateLink" target="_blank" rel="noopener" hidden>Смотреть на YouTube ↗</a></div></div>
+        <div class="offline" id="lOff" hidden><div><b data-t="offline">Медиаданные в автономном режиме</b><span id="offName">file.mp4</span></div></div>
         <img id="lImg" alt="" hidden>
         <video id="lVid" playsinline preload="metadata" hidden></video>
         <div class="safe" id="safe" hidden></div>
@@ -290,30 +299,30 @@ a{color:var(--tc)}
     <div class="transport">
       <span class="tc mono" id="tc">00:00:00:00</span>
       <div class="tbtns">
-        <button class="ib" id="bStart" title="К началу (Home)" aria-label="К началу"><svg viewBox="0 0 16 16"><path d="M3 3h2v10H3zM13 3v10L6 8z"/></svg></button>
-        <button class="ib" id="bBack" title="Кадр назад (←)" aria-label="Кадр назад"><svg viewBox="0 0 16 16"><path d="M10 3v10L3 8zM11 3h2v10h-2z"/></svg></button>
-        <button class="ib play" id="bPlay" title="Воспроизведение (пробел)" aria-label="Воспроизвести"><svg viewBox="0 0 16 16" id="playIco"><path d="M4 2.5v11L13.5 8z"/></svg></button>
-        <button class="ib" id="bFwd" title="Кадр вперёд (→)" aria-label="Кадр вперёд"><svg viewBox="0 0 16 16"><path d="M3 3h2v10H3zM6 3v10l7-5z"/></svg></button>
-        <button class="ib" id="bNext" title="Следующий клип (L)" aria-label="Следующий клип"><svg viewBox="0 0 16 16"><path d="M3 3v10l7-5zM11 3h2v10h-2z"/></svg></button>
+        <button class="ib" id="bStart" title="К началу (Home)" aria-label="К началу" data-tt="tStart"><svg viewBox="0 0 16 16"><path d="M3 3h2v10H3zM13 3v10L6 8z"/></svg></button>
+        <button class="ib" id="bBack" title="Кадр назад (←)" aria-label="Кадр назад" data-tt="tBack"><svg viewBox="0 0 16 16"><path d="M10 3v10L3 8zM11 3h2v10h-2z"/></svg></button>
+        <button class="ib play" id="bPlay" title="Воспроизведение (пробел)" aria-label="Воспроизвести" data-tt="tPlay"><svg viewBox="0 0 16 16" id="playIco"><path d="M4 2.5v11L13.5 8z"/></svg></button>
+        <button class="ib" id="bFwd" title="Кадр вперёд (→)" aria-label="Кадр вперёд" data-tt="tFwd"><svg viewBox="0 0 16 16"><path d="M3 3h2v10H3zM6 3v10l7-5z"/></svg></button>
+        <button class="ib" id="bNext" title="Следующий клип (L)" aria-label="Следующий клип" data-tt="tNext"><svg viewBox="0 0 16 16"><path d="M3 3v10l7-5zM11 3h2v10h-2z"/></svg></button>
       </div>
       <span class="dur mono">
         <span id="durTc">00:00:00:00</span>
-        <button class="ib" id="bMute" title="Звук" aria-label="Звук"><svg viewBox="0 0 16 16" id="muteIco"><path d="M2 6h3l4-3v10L5 10H2z M11 5.5a3.5 3.5 0 0 1 0 5 M12.5 4a5.5 5.5 0 0 1 0 8" stroke="currentColor" stroke-width="1.3" fill="currentColor"/></svg></button>
-        <button class="ib" id="bFull" title="Во весь экран" aria-label="Во весь экран"><svg viewBox="0 0 16 16"><path d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"/></svg></button>
+        <button class="ib" id="bMute" title="Звук" aria-label="Звук" data-tt="tMute"><svg viewBox="0 0 16 16" id="muteIco"><path d="M2 6h3l4-3v10L5 10H2z M11 5.5a3.5 3.5 0 0 1 0 5 M12.5 4a5.5 5.5 0 0 1 0 8" stroke="currentColor" stroke-width="1.3" fill="currentColor"/></svg></button>
+        <button class="ib" id="bFull" title="Во весь экран" aria-label="Во весь экран" data-tt="tFull"><svg viewBox="0 0 16 16"><path d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"/></svg></button>
       </span>
     </div>
-    <div class="keys"><span><kbd>Пробел</kbd> плей/пауза</span><span><kbd>J</kbd> <kbd>L</kbd> пред./след. клип</span><span><kbd>←</kbd> <kbd>→</kbd> по кадрам</span></div>
+    <div class="keys"><span><kbd data-t="kSpace">Пробел</kbd> <span data-t="kPlay">плей/пауза</span></span><span><kbd>J</kbd> <kbd>L</kbd> <span data-t="kClip">пред./след. клип</span></span><span><kbd>←</kbd> <kbd>→</kbd> <span data-t="kFrame">по кадрам</span></span></div>
   </section>
 
-  <section class="panel p-timeline" aria-label="Таймлайн">
-    <div class="tabs"><span class="tab on">Последовательность 01</span><span class="spacer"></span><span class="aux mono" id="seqLen"></span></div>
+  <section class="panel p-timeline" aria-label="Таймлайн" data-ta="timeline">
+    <div class="tabs"><span class="tab on" data-t="seq">Последовательность 01</span><span class="spacer"></span><span class="aux mono" id="seqLen"></span></div>
     <div class="tl-wrap">
       <div class="tl">
         <div class="heads">
           <div></div>
-          <div><span class="tn">V2</span><button class="tb" aria-pressed="true" title="Видимость"><svg viewBox="0 0 16 16"><path d="M8 3C4 3 1.5 8 1.5 8S4 13 8 13s6.5-5 6.5-5S12 3 8 3zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg></button></div>
-          <div><span class="tn tgt">V1</span><button class="tb" aria-pressed="true" title="Видимость"><svg viewBox="0 0 16 16"><path d="M8 3C4 3 1.5 8 1.5 8S4 13 8 13s6.5-5 6.5-5S12 3 8 3zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg></button></div>
-          <div><span class="tn">A1</span><button class="tb" aria-pressed="true" title="Звук"><svg viewBox="0 0 16 16"><path d="M2 6h3l4-3v10L5 10H2z"/></svg></button></div>
+          <div><span class="tn">V2</span><button class="tb" aria-pressed="true" title="Видимость" data-tt="vis"><svg viewBox="0 0 16 16"><path d="M8 3C4 3 1.5 8 1.5 8S4 13 8 13s6.5-5 6.5-5S12 3 8 3zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg></button></div>
+          <div><span class="tn tgt">V1</span><button class="tb" aria-pressed="true" title="Видимость" data-tt="vis"><svg viewBox="0 0 16 16"><path d="M8 3C4 3 1.5 8 1.5 8S4 13 8 13s6.5-5 6.5-5S12 3 8 3zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg></button></div>
+          <div><span class="tn">A1</span><button class="tb" aria-pressed="true" title="Звук" data-tt="tMute"><svg viewBox="0 0 16 16"><path d="M2 6h3l4-3v10L5 10H2z"/></svg></button></div>
         </div>
         <div class="lanes" id="lanes">
           <div class="ruler" id="ruler"></div>
@@ -324,15 +333,15 @@ a{color:var(--tc)}
         </div>
       </div>
     </div>
-    <div class="tl-foot"><span>Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.</span><span class="mono">30 fps</span></div>
+    <div class="tl-foot"><span data-t="tlHint">Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.</span><span class="mono">30 fps</span></div>
   </section>
 
-  <section class="panel p-bin" id="works" aria-label="AI-работы">
-    <div class="tabs"><span class="tab on">Проект: AI_works</span><span class="spacer"></span><span class="aux mono" id="binCount"></span></div>
-    <div class="bin-tools" role="group" aria-label="Фильтр">
-      <button class="filt" data-f="all" aria-pressed="true">Все</button>
-      <button class="filt" data-f="video" aria-pressed="false">Видео</button>
-      <button class="filt" data-f="image" aria-pressed="false">Изображения</button>
+  <section class="panel p-bin" id="works" aria-label="AI-работы" data-ta="navWorks">
+    <div class="tabs"><span class="tab on"><span data-t="project">Проект:</span> AI_works</span><span class="spacer"></span><span class="aux mono" id="binCount"></span></div>
+    <div class="bin-tools" role="group" aria-label="Фильтр" data-ta="filter">
+      <button class="filt" data-f="all" aria-pressed="true" data-t="fAll">Все</button>
+      <button class="filt" data-f="video" aria-pressed="false" data-t="fVideo">Видео</button>
+      <button class="filt" data-f="image" aria-pressed="false" data-t="fImage">Изображения</button>
     </div>
     <div class="bin" id="bin"></div>
   </section>
@@ -340,48 +349,90 @@ a{color:var(--tc)}
 </main>
 
 <footer class="status" id="contact">
-  <span class="ok">Готово</span>
+  <span class="ok" data-t="ready">Готово</span>
   <span id="statusLine"></span>
   <span class="r mono" id="statusTc"></span>
 </footer>
 <div class="toast" id="toast" hidden></div>
 
 <script>
-/* ========= ВСЁ, ЧТО НУЖНО ПОМЕНЯТЬ, — ЗДЕСЬ ========= */
+/* ========= ВСЁ, ЧТО НУЖНО ПОМЕНЯТЬ, — ЗДЕСЬ =========
+   Тексты на двух языках: { ru: "…", en: "…" } */
 const CFG = {
-  name: "Геннадий Андреев",
-  initials: "ГА",
+  name: { ru: "Геннадий Андреев", en: "Gennady Andreev" },
+  initials: { ru: "ГА", en: "GA" },
   project: "Andreev_Portfolio_2026",
-  role: "AI Creator · режиссёр монтажа",
-  summary: "Создаю AI-видео и визуал в Kling, Seedance, Higgsfield и Krea и довожу их до готового ролика. За плечами 18 лет режиссёром монтажа в кино, на ТВ и в digital: передачи для «Пятницы», шесть лет в Viacom.",
+  role: { ru: "AI Creator · режиссёр монтажа", en: "AI Creator · Film & Video Editor" },
+  summary: {
+    ru: "Создаю AI-видео и визуал в Kling, Seedance, Higgsfield и Krea и довожу их до готового ролика. За плечами 18 лет режиссёром монтажа в кино, на ТВ и в digital: передачи для «Пятницы», шесть лет в Viacom.",
+    en: "I create AI video and visuals in Kling, Seedance, Higgsfield and Krea and take them all the way to a finished piece. Behind that are 18 years as an editor in film, TV and digital, including shows for Pyatnitsa TV and six years at Viacom."
+  },
   props: [
-    ["Роль", "AI Creator, режиссёр монтажа"],
-    ["Опыт", "18 лет в постпродакшне"],
-    ["Город", "Москва, готов к командировкам"],
-    ["Языки", "Русский, English B2"]
+    [{ ru: "Роль", en: "Role" }, { ru: "AI Creator, режиссёр монтажа", en: "AI Creator, film & video editor" }],
+    [{ ru: "Опыт", en: "Experience" }, { ru: "18 лет в постпродакшне", en: "18 years in post-production" }],
+    [{ ru: "Город", en: "Location" }, { ru: "Москва, готов к командировкам", en: "Moscow, open to travel" }],
+    [{ ru: "Языки", en: "Languages" }, { ru: "Русский, English B2", en: "Russian (native), English B2" }]
   ],
   skills: [
-    ["Монтаж и звук", ["Premiere Pro", "Avid Media Composer", "DaVinci Resolve", "After Effects", "Audition", "Final Cut Pro"]],
-    ["AI-генерация", ["Kling", "Seedance", "Higgsfield", "Krea", "Runway", "Midjourney", "ElevenLabs", "Topaz Video AI"]],
-    ["Текст и процессы", ["ChatGPT", "Claude", "Whisper", "Descript"]]
+    [{ ru: "Монтаж и звук", en: "Editing & sound" }, ["Premiere Pro", "Avid Media Composer", "DaVinci Resolve", "After Effects", "Audition", "Final Cut Pro"]],
+    [{ ru: "AI-генерация", en: "AI generation" }, ["Kling", "Seedance", "Higgsfield", "Krea", "Runway", "Midjourney", "ElevenLabs", "Topaz Video AI"]],
+    [{ ru: "Текст и процессы", en: "Text & workflow" }, ["ChatGPT", "Claude", "Whisper", "Descript"]]
   ],
   career: [
-    { from: 2005, to: 2009, place: "Амедиа", role: "Видеоинженер" },
-    { from: 2010, to: 2016, place: "Студия Анкор", role: "Режиссёр монтажа" },
+    { from: 2005, to: 2009, place: { ru: "Амедиа", en: "Amedia" }, role: { ru: "Видеоинженер", en: "Video engineer" } },
+    { from: 2010, to: 2016, place: { ru: "Студия Анкор", en: "Studio Ankor" }, role: { ru: "Режиссёр монтажа", en: "Editor" } },
     { from: 2016, to: 2022, place: "Viacom", role: "Video Editor" },
-    { from: 2023, to: 2025, place: "Продюсерский центр НОЖИ", role: "Режиссёр монтажа, «Пятница»" },
-    { from: 2025, to: 2026, place: "AI-проект", role: "Режиссёр монтажа, AI-продакшн (NDA)" }
+    { from: 2023, to: 2025, place: { ru: "Продюсерский центр НОЖИ", en: "NOZHI Production" }, role: { ru: "Режиссёр монтажа, «Пятница»", en: "Editor, Pyatnitsa TV" } },
+    { from: 2025, to: 2026, place: { ru: "AI-проект", en: "AI project" }, role: { ru: "Режиссёр монтажа, AI-продакшн (NDA)", en: "Editor, AI production (NDA)" } }
   ],
-  primary: { label: "Написать в Telegram · @b1ohazard", href: "https://t.me/b1ohazard" },
+  primary: { label: { ru: "Написать в Telegram · @b1ohazard", en: "Message on Telegram · @b1ohazard" }, href: "https://t.me/b1ohazard" },
   copy: ["radioactive.wind@gmail.com", "+7 (926) 169-03-23"],
   links: [],
 
   reel: { name: "GennadyAndreev_Showreel_2026.mp4", src: "media/showreel.mp4", poster: "media/showreel.jpg", link: "https://www.youtube.com/watch?v=a4QNpQr4nCU", dur: 58 },
   works: [
-    { name: "Pink_Wolf.mp4", type: "video", src: "media/pink_wolf.mp4", poster: "media/pink_wolf.jpg", dur: 20, note: "Тизер AI-проекта под NDA" },
-    { name: "Pink_Noise.mp4", type: "video", src: "media/pink_noise.mp4", poster: "media/pink_noise.jpg", dur: 15, note: "Тизер AI-проекта под NDA" }
+    { name: "Pink_Wolf.mp4", type: "video", src: "media/pink_wolf.mp4", poster: "media/pink_wolf.jpg", dur: 20, note: { ru: "Тизер AI-проекта под NDA", en: "Teaser for an AI project under NDA" } },
+    { name: "Pink_Noise.mp4", type: "video", src: "media/pink_noise.mp4", poster: "media/pink_noise.jpg", dur: 15, note: { ru: "Тизер AI-проекта под NDA", en: "Teaser for an AI project under NDA" } }
   ]
 };
+
+/* интерфейс */
+const UI = {
+  ru: {
+    title: "Геннадий Андреев · AI Creator", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
+    tabInspector: "Инспектор", tabMeta: "Метаданные", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
+    tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующий клип", tMute: "Звук", tFull: "Во весь экран",
+    kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. клип", kFrame: "по кадрам",
+    timeline: "Таймлайн", seq: "Последовательность 01", vis: "Видимость", tlHint: "Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.",
+    project: "Проект:", filter: "Фильтр", fAll: "Все", fVideo: "Видео", fImage: "Изображения", ready: "Готово",
+    secProfile: "Профиль", secTools: "Инструменты", secExp: "Опыт", secContact: "Экспорт · связаться",
+    copy: "Копировать", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
+    titleClip: "Титр: ", adj: "Корректирующий слой · Grade", clips: n => `${n} клипов`,
+    works: n => { const a = n % 10, b = n % 100; return n + " " + (a === 1 && b !== 11 ? "работа" : a >= 2 && a <= 4 && (b < 12 || b > 14) ? "работы" : "работ"); },
+    soundOn: "Звук включён", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
+  },
+  en: {
+    title: "Gennady Andreev · AI Creator", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
+    tabInspector: "Inspector", tabMeta: "Metadata", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
+    tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next clip", tMute: "Sound", tFull: "Full screen",
+    kSpace: "Space", kPlay: "play/pause", kClip: "prev/next clip", kFrame: "frame by frame",
+    timeline: "Timeline", seq: "Sequence 01", vis: "Visibility", tlHint: "Tap a clip to open it in the monitor. You can drag the playhead.",
+    project: "Project:", filter: "Filter", fAll: "All", fVideo: "Video", fImage: "Images", ready: "Ready",
+    secProfile: "Profile", secTools: "Tools", secExp: "Experience", secContact: "Export · contact",
+    copy: "Copy", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
+    titleClip: "Title: ", adj: "Adjustment layer · Grade", clips: n => `${n} clips`,
+    works: n => `${n} ${n === 1 ? "work" : "works"}`,
+    soundOn: "Sound on", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
+  }
+};
+let lang = (() => {
+  if (/^#?en$/i.test(location.hash)) return "en";
+  if (/^#?ru$/i.test(location.hash)) return "ru";
+  try { const v = localStorage.getItem("lang"); if (v === "ru" || v === "en") return v; } catch {}
+  return /^ru|^uk|^be|^kk/i.test(navigator.language || "") ? "ru" : "en";
+})();
+const tr = x => (x && typeof x === "object" && !Array.isArray(x)) ? (x[lang] ?? x.ru) : x;
+const L = k => UI[lang][k];
 /* ===================================================== */
 
 const FPS = 30, COLORS = ["--c1","--c2","--c3","--c4","--c5","--c6"];
@@ -407,46 +458,46 @@ function section(title, badge, open, body) {
   wrap.append(h, b); return wrap;
 }
 function renderInspector() {
-  const root = $("#inspector");
-  const hero = el("div", "hero-name"); hero.append(el("div", "hero-role", CFG.role), el("h1", "", CFG.name), el("p", "", CFG.summary));
-  const props = CFG.props.map(([k, v]) => { const r = el("div", "prop"); r.append(el("span", "sw", "◷"), el("span", "k", k), el("span", "v", v)); return r; });
+  const root = $("#inspector"); root.textContent = "";
+  const hero = el("div", "hero-name"); hero.append(el("div", "hero-role", tr(CFG.role)), el("h1", "", tr(CFG.name)), el("p", "", tr(CFG.summary)));
+  const props = CFG.props.map(([k, v]) => { const r = el("div", "prop"); r.append(el("span", "sw", "◷"), el("span", "k", tr(k)), el("span", "v", tr(v))); return r; });
   const skillGroups = CFG.skills.map(([g, items]) => { const w = el("div", "sk"), c = el("div", "chips");
-    items.forEach(s => c.append(el("span", "chip", s))); w.append(el("div", "sk-h", g), c); return w; });
+    items.forEach(s => c.append(el("span", "chip", s))); w.append(el("div", "sk-h", tr(g)), c); return w; });
 
   const y0 = Math.min(...CFG.career.map(c => c.from)), y1 = Math.max(...CFG.career.map(c => c.to)), span = Math.max(1, y1 - y0);
   const car = el("div", "career"), yr = el("div", "yr"), lane = el("div", "lane");
   [y0, Math.round((y0 + y1) / 2), y1].forEach((y, i) => { const s = el("span", "", y); s.style.left = ((y - y0) / span * 100) + "%"; yr.append(s); });
   CFG.career.forEach((c, i) => {
     const j = el("div", "job"); j.style.left = ((c.from - y0) / span * 100) + "%"; j.style.width = `calc(${(c.to - c.from) / span * 100}% - 2px)`;
-    j.style.background = `var(${COLORS[i % COLORS.length]})`; j.title = `${c.place} · ${c.from}–${c.to}`; if ((c.to - c.from) / span >= 0.18) j.textContent = c.place; lane.append(j);
+    j.style.background = `var(${COLORS[i % COLORS.length]})`; j.title = `${tr(c.place)} · ${c.from}–${c.to}`; if ((c.to - c.from) / span >= 0.18) j.textContent = tr(c.place); lane.append(j);
   });
   const list = el("ul", "career-list");
-  [...CFG.career].reverse().forEach(c => { const li = el("li"); li.append(el("b", "", c.place), ` · ${c.role} · ${c.from}–${c.to}`); list.append(li); });
+  [...CFG.career].reverse().forEach(c => { const li = el("li"); li.append(el("b", "", tr(c.place)), ` · ${tr(c.role)} · ${c.from}–${c.to}`); list.append(li); });
   car.append(yr, lane);
 
   const exp = el("div", "export");
-  const tg = el("a", "btn btn-primary", CFG.primary.label); tg.href = CFG.primary.href; tg.target = "_blank"; tg.rel = "noopener";
+  const tg = el("a", "btn btn-primary", tr(CFG.primary.label)); tg.href = CFG.primary.href; tg.target = "_blank"; tg.rel = "noopener";
   exp.append(tg);
   CFG.copy.forEach(v => {
-    const row = el("div", "copy-row"), val = el("span", "val", v), cp = el("button", "ib cp"); cp.title = "Копировать"; cp.setAttribute("aria-label", "Копировать " + v);
+    const row = el("div", "copy-row"), val = el("span", "val", v), cp = el("button", "ib cp"); cp.title = L("copy"); cp.setAttribute("aria-label", L("copy") + " " + v);
     cp.innerHTML = '<svg viewBox="0 0 16 16"><path d="M5 1.5h7.5A1.5 1.5 0 0 1 14 3v8h-1.5V3H5zM2 5.5A1.5 1.5 0 0 1 3.5 4h6A1.5 1.5 0 0 1 11 5.5v8A1.5 1.5 0 0 1 9.5 15h-6A1.5 1.5 0 0 1 2 13.5z"/></svg>';
     cp.onclick = () => {
-      const ok = () => toast("Скопировано");
+      const ok = () => toast(L("copied"));
       try { navigator.clipboard.writeText(v).then(ok, () => selectText(val)); } catch { selectText(val); }
     };
     row.append(val, cp); exp.append(row);
   });
   const lr = el("div", "chips");
-  CFG.links.forEach(l => { const a = el("a", "btn btn-ghost", l.label); a.href = l.href; a.target = "_blank"; a.rel = "noopener"; lr.append(a); });
+  CFG.links.forEach(l => { const a = el("a", "btn btn-ghost", tr(l.label)); a.href = l.href; a.target = "_blank"; a.rel = "noopener"; lr.append(a); });
   exp.append(lr);
 
   root.append(hero,
-    section("Профиль", "fx", true, props),
-    section("Инструменты", "fx", true, skillGroups),
-    section("Опыт", "fx", true, [car, list]),
-    section("Экспорт · связаться", "▶", true, [exp]));
+    section(L("secProfile"), "fx", true, props),
+    section(L("secTools"), "fx", true, skillGroups),
+    section(L("secExp"), "fx", true, [car, list]),
+    section(L("secContact"), "▶", true, [exp]));
 }
-function selectText(n) { const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("Выделено — нажми Ctrl+C"); }
+function selectText(n) { const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast(L("selected")); }
 let toastTimer; function toast(m) { const x = $("#toast"); x.textContent = m; x.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => x.hidden = true, 1800); }
 
 /* ---------- bin ---------- */
@@ -463,12 +514,11 @@ function renderBin() {
   const list = seq.filter(c => filter === "all" || (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
   list.forEach(c => {
     const b = el("button", "item"); b.dataset.i = seq.indexOf(c);
-    b.append(thumbFor(c), el("span", "n", c.name), el("span", "s", c.kind === "reel" ? "Шоурил" : c.note));
+    b.append(thumbFor(c), el("span", "n", c.name), el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
     b.onclick = () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
     bin.append(b);
   });
-  const n = CFG.works.length, m10 = n % 10, m100 = n % 100;
-  $("#binCount").textContent = n + " " + (m10 === 1 && m100 !== 11 ? "работа" : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? "работы" : "работ");
+  $("#binCount").textContent = L("works")(CFG.works.length);
   highlight();
 }
 document.querySelectorAll(".filt").forEach(f => f.onclick = () => {
@@ -490,9 +540,9 @@ function layout() {
     b.title = c.name; v1.append(b);
   });
   const title = el("div", "clip v2"); title.style.left = "0"; title.style.width = `calc(${pct(Math.min(12, T))} - 2px)`;
-  title.style.setProperty("--cc", "var(--c4)"); title.append(el("span", "cn", "Титр: " + CFG.name)); v2.append(title);
+  title.style.setProperty("--cc", "var(--c4)"); title.append(el("span", "cn", L("titleClip") + tr(CFG.name))); v2.append(title);
   const adj = el("div", "clip v2"); adj.style.left = pct(seq[1] ? seq[1].start : 0); adj.style.right = "0";
-  adj.style.setProperty("--cc", "#4a4d55"); adj.append(el("span", "cn", "Корректирующий слой · Grade")); v2.append(adj);
+  adj.style.setProperty("--cc", "#4a4d55"); adj.append(el("span", "cn", L("adj"))); v2.append(adj);
 
   const au = el("div", "clip audio"); au.style.left = "0"; au.style.right = "0";
   const cv = el("canvas"); au.append(cv, el("span", "cn", "Music_mix.wav")); a1.append(au);
@@ -506,7 +556,7 @@ function layout() {
   seq.forEach(c => { if (c.start > 0) { const k = el("span", "tick"); k.style.left = pct(c.start); sc.append(k); } });
 
   $("#durTc").textContent = tcf(T); $("#seqLen").textContent = tcf(T);
-  $("#statusLine").textContent = `Последовательность 01 · ${seq.length} клипов`;
+  $("#statusLine").textContent = `${L("seq")} · ${L("clips")(seq.length)}`;
   render();
 }
 function drawWave(cv) {
@@ -548,7 +598,7 @@ function showClip(c) {
     syncVid(); if (playing) vid.play().catch(() => {});
   } else {
     vid.pause();
-    if (c.kind === "reel") { $("#slateT").textContent = "SHOWREEL"; $("#slateS").textContent = c.link ? "Шоурил пока на YouTube" : c.name + " · видео ещё не загружено";
+    if (c.kind === "reel") { $("#slateT").textContent = "SHOWREEL"; $("#slateS").textContent = c.name + " · " + L("noVideo");
       const sl = $("#slateLink"); sl.hidden = !c.link; if (c.link) sl.href = c.link; $("#lBars").hidden = false; }
     else { $("#offName").textContent = c.name; $("#lOff").hidden = false; }
   }
@@ -577,7 +627,7 @@ function render() {
 function setPlaying(p) {
   playing = p;
   $("#playIco").innerHTML = p ? '<path d="M4 3h3v10H4zm5 0h3v10H9z"/>' : '<path d="M4 2.5v11L13.5 8z"/>';
-  $("#bPlay").setAttribute("aria-label", p ? "Пауза" : "Воспроизвести");
+  $("#bPlay").setAttribute("aria-label", L(p ? "tPause" : "tPlay"));
   if (cur && cur.src && cur.type !== "image") p ? vid.play().catch(() => {}) : vid.pause();
 }
 function togglePlay() { if (!playing && t >= T - 1 / FPS) setTime(0, true); setPlaying(!playing); }
@@ -606,10 +656,10 @@ $("#bStart").onclick = () => setTime(0, true);
 $("#bBack").onclick = () => { setPlaying(false); setTime(t - 1 / FPS, true); };
 $("#bFwd").onclick = () => { setPlaying(false); setTime(t + 1 / FPS, true); };
 $("#bNext").onclick = () => jump(1);
-$("#bMute").onclick = () => { vid.muted = !vid.muted; $("#bMute").classList.toggle("on", !vid.muted); toast(vid.muted ? "Звук выключен" : "Звук включён"); };
+$("#bMute").onclick = () => { vid.muted = !vid.muted; $("#bMute").classList.toggle("on", !vid.muted); toast(L(vid.muted ? "soundOff" : "soundOn")); };
 $("#bMute").classList.add("on");
 $("#bFull").onclick = () => {
-  const s = $("#screen"), fail = () => toast("Полный экран недоступен");
+  const s = $("#screen"), fail = () => toast(L("noFull"));
   try {
     if (s.requestFullscreen) s.requestFullscreen().catch(fail);
     else if (s.webkitRequestFullscreen) s.webkitRequestFullscreen();
@@ -644,8 +694,25 @@ seq.forEach(c => {
   v.src = c.src;
 });
 
-$("#initials").textContent = CFG.initials; $("#projName").textContent = CFG.project;
-renderInspector(); layout(); setTime(0); renderBin(); requestAnimationFrame(frame);
+/* ---------- язык ---------- */
+function applyLang(next, save) {
+  lang = next;
+  if (save) { try { localStorage.setItem("lang", lang); } catch {} }
+  document.documentElement.lang = lang;
+  document.title = L("title");
+  document.querySelectorAll("[data-t]").forEach(n => n.textContent = L(n.dataset.t));
+  document.querySelectorAll("[data-tt]").forEach(n => { n.title = L(n.dataset.tt); n.setAttribute("aria-label", L(n.dataset.tt)); });
+  document.querySelectorAll("[data-ta]").forEach(n => n.setAttribute("aria-label", L(n.dataset.ta)));
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+  $("#initials").textContent = tr(CFG.initials);
+  $("#bPlay").setAttribute("aria-label", L(playing ? "tPause" : "tPlay"));
+  renderInspector(); layout(); renderBin();
+  if (cur) showClip(cur);
+}
+document.querySelectorAll(".lang button").forEach(b => b.onclick = () => { if (b.dataset.lang !== lang) applyLang(b.dataset.lang, true); });
+
+$("#projName").textContent = CFG.project;
+applyLang(lang, false); setTime(0); requestAnimationFrame(frame);
 </script>
 
 </body>
