@@ -357,7 +357,6 @@ button.tab:not(.on):hover{color:var(--fg)}
 .meta-clip i{width:10px;height:10px;border-radius:50%;background:var(--cc)}
 .meta-clip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .meta-clip em{font:normal 11px var(--f-mono);color:var(--mute)}
-.tabs .meta-live{color:var(--playhead);flex:none}
 /* скоупы */
 /* панель скоупов растягивается до низа колонки — центр ровняется с боковыми колонками */
 .col-r{align-self:stretch}
@@ -419,7 +418,7 @@ button.tab:not(.on):hover{color:var(--fg)}
 
 <main class="ws">
   <section class="panel p-inspector" id="about" aria-label="Обо мне" data-ta="navAbout">
-    <div class="tabs insp-tabs"><div class="insp-tabgroup" role="tablist"><button class="tab on" id="tabInsp" role="tab" aria-selected="true" aria-controls="inspector" data-t="tabInspector">Информация</button><button class="tab" id="tabMetaBtn" role="tab" aria-selected="false" aria-controls="metaPanel" data-t="tabMeta">Метаданные</button></div><span class="spacer"></span><span class="aux mono meta-live" id="metaLive" hidden>● LIVE</span></div>
+    <div class="tabs insp-tabs"><div class="insp-tabgroup" role="tablist"><button class="tab on" id="tabInsp" role="tab" aria-selected="true" aria-controls="inspector" data-t="tabInspector">Информация</button><button class="tab" id="tabMetaBtn" role="tab" aria-selected="false" aria-controls="metaPanel" data-t="tabMeta">Метаданные</button></div></div>
     <div class="insp" id="inspector" role="tabpanel" aria-labelledby="tabInsp"></div>
     <div class="insp meta" id="metaPanel" role="tabpanel" aria-labelledby="tabMetaBtn" hidden></div>
   </section>
@@ -687,7 +686,7 @@ function setTab(meta) {
   metaTab = meta;
   $("#tabInsp").classList.toggle("on", !meta); $("#tabMetaBtn").classList.toggle("on", meta);
   $("#tabInsp").setAttribute("aria-selected", !meta); $("#tabMetaBtn").setAttribute("aria-selected", meta);
-  $("#inspector").hidden = meta; $("#metaPanel").hidden = !meta; $("#metaLive").hidden = !meta;
+  $("#inspector").hidden = meta; $("#metaPanel").hidden = !meta;
   renderMeta();
 }
 $("#tabInsp").onclick = () => setTab(false);
