@@ -106,7 +106,7 @@ a{color:var(--tc)}
   .ws{grid-template-areas:none}
   .p-inspector,.col-r,.p-bin{grid-area:auto}
   .col-r{display:contents}
-  .p-program{order:1}.p-bin{order:2}.p-inspector{order:3}.p-timeline{order:4}
+  .p-program{order:1}.p-bin{order:2}.p-inspector{order:3}.p-timeline{order:4}.p-scopes{order:5}
   .fmt{display:none}
   .menubar{gap:8px 16px}
   .workspaces{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap;order:3}
@@ -279,6 +279,16 @@ a{color:var(--tc)}
 .status{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;color:var(--dim);font-size:11px;padding:6px 2px}
 .status .ok::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--marker);margin-right:6px}
 .status .r{margin-left:auto}
+/* скоупы */
+/* панель скоупов растягивается до низа колонки — центр ровняется с боковыми колонками */
+.col-r{align-self:stretch}
+.p-scopes{flex:1 1 auto;min-height:240px}
+.scopes{flex:1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.8fr) minmax(0,1.25fr);gap:8px;padding:10px}
+.scope{margin:0;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:6px;min-width:0;min-height:0}
+.scope canvas{width:100%;height:100%;min-height:150px;max-width:100%;display:block;background:#07080a;border-radius:10px;border:1px solid var(--line)}
+.scope figcaption{font:10.5px var(--f-mono);color:var(--dim);letter-spacing:.04em}
+@media (max-width:900px){.p-scopes{min-height:0}.scope canvas{height:auto;aspect-ratio:16/9;min-height:0}}
+@media (max-width:560px){.scopes{grid-template-columns:repeat(2,minmax(0,1fr))}.scope.sq{grid-row:span 2}.scope.sq canvas{aspect-ratio:auto;height:100%}}
 /* карусель изображений: поверх всей страницы */
 .viewer{position:fixed;inset:0;z-index:50;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:rgba(7,8,10,.96);
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
@@ -384,6 +394,15 @@ a{color:var(--tc)}
     <div class="tl-foot"><span data-t="tlHint">Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.</span><span class="mono">30 fps</span></div>
   </section>
 
+  <section class="panel p-scopes" aria-label="Скоупы" data-ta="scopes">
+    <div class="tabs"><span class="tab on">Lumetri Scopes</span><span class="spacer"></span><span class="aux mono" id="scSig">Rec.709</span></div>
+    <div class="scopes">
+      <figure class="scope"><canvas id="scWave"></canvas><figcaption data-t="scWave">Вейвформ · яркость</figcaption></figure>
+      <figure class="scope sq"><canvas id="scVec"></canvas><figcaption data-t="scVec">Вектороскоп</figcaption></figure>
+      <figure class="scope"><canvas id="scHist"></canvas><figcaption data-t="scHist">Гистограмма RGB</figcaption></figure>
+    </div>
+  </section>
+
   </div>
 
   <section class="panel p-bin" id="works" aria-label="AI-работы" data-ta="navWorks">
@@ -469,7 +488,7 @@ const IMAGES = CFG.images.files.map((f, i) => ({ name: f + ".jpg", type: "image"
 /* интерфейс */
 const UI = {
   ru: {
-    title: "Геннадий Андреев · AI Creator", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
+    title: "Геннадий Андреев · AI Creator", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
     tabInspector: "Инспектор", tabMeta: "Метаданные", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующий клип", tMute: "Звук", tFull: "Во весь экран",
     kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. клип", kFrame: "по кадрам",
@@ -482,7 +501,7 @@ const UI = {
     soundOn: "Звук включён", openImages: "Открыть все изображения →", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
   },
   en: {
-    title: "Gennady Andreev · AI Creator", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
+    title: "Gennady Andreev · AI Creator", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
     tabInspector: "Inspector", tabMeta: "Metadata", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next clip", tMute: "Sound", tFull: "Full screen",
     kSpace: "Space", kPlay: "play/pause", kClip: "prev/next clip", kFrame: "frame by frame",
@@ -678,6 +697,7 @@ function scrubFrom(target, e) {
 /* ---------- monitor ---------- */
 const clipAt = x => seq.find(c => x >= c.start && x < c.start + c.dur) || seq[seq.length - 1];
 function showClip(c) {
+  queueScopes();
   ["#lBars", "#lOff", "#lImg", "#lVid"].forEach(s => $(s).hidden = true);
   $("#progName").textContent = " " + c.name;
   if (c.src && c.type === "image") { $("#lImg").src = c.src; $("#lImg").hidden = false; vid.pause(); }
@@ -733,6 +753,7 @@ function jump(d) {
 
 let last = performance.now();
 function frame(now) {
+  if (playing && now - scLast > 90) { scLast = now; drawScopes(); }
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   if (playing && cur) {
     const isVid = cur.src && cur.type !== "image";
@@ -803,6 +824,82 @@ seq.forEach(c => {
   v.src = c.src;
 });
 
+/* ---------- скоупы: считаются по текущему кадру монитора ---------- */
+const SW = 192, SH = 108;
+const scSrc = document.createElement("canvas"); scSrc.width = SW; scSrc.height = SH;
+const scCtx = scSrc.getContext("2d", { willReadFrequently: true });
+const posterCache = {};
+function fitCanvas(cv) {
+  const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+  const w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  return cv.getContext("2d");
+}
+function scopeSource() {
+  if (!cur) return null;
+  if (cur.type === "image") { const im = $("#lImg"); return im.complete && im.naturalWidth ? im : null; }
+  if (cur.src && vid.readyState >= 2 && !vid.hidden) return vid;
+  if (cur.poster) { let im = posterCache[cur.poster]; if (!im) { im = posterCache[cur.poster] = new Image(); im.onload = () => drawScopes(); im.src = cur.poster; } return im.complete && im.naturalWidth ? im : null; }
+  return null;
+}
+function grid(g, w, h) {
+  g.strokeStyle = "rgba(255,255,255,.10)"; g.lineWidth = 1; g.fillStyle = "rgba(255,255,255,.35)";
+  const fs = Math.round(10 * (g.canvas.width / Math.max(1, g.canvas.clientWidth)));
+  g.font = `${fs}px ui-monospace, monospace`;
+  [0, 25, 50, 75, 100].forEach(v => { const y = Math.round(h - 6 - v / 100 * (h - 12)) + .5; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); g.fillText(v, 4, v === 100 ? y + fs + 2 : y - 3); });
+}
+function noSignal(g, w, h) { g.fillStyle = "rgba(255,255,255,.28)"; g.font = `${Math.round(12 * (w / Math.max(1, g.canvas.clientWidth)))}px ui-monospace, monospace`; g.textAlign = "center"; g.fillText(L("noSignal"), w / 2, h / 2); g.textAlign = "start"; }
+function drawScopes() {
+  const gw = fitCanvas($("#scWave")), gv = fitCanvas($("#scVec")), gh = fitCanvas($("#scHist"));
+  const [ww, wh] = [gw.canvas.width, gw.canvas.height], [vw, vh] = [gv.canvas.width, gv.canvas.height], [hw, hh] = [gh.canvas.width, gh.canvas.height];
+  [gw, gv, gh].forEach(g => g.clearRect(0, 0, g.canvas.width, g.canvas.height));
+  /* вектороскоп: круг, мишени цветов 75% и линия телесных тонов */
+  const cx = vw / 2, cy = vh / 2, R = Math.min(vw, vh) / 2 - 8;
+  gv.strokeStyle = "rgba(255,255,255,.14)"; gv.lineWidth = 1;
+  gv.beginPath(); gv.arc(cx, cy, R, 0, Math.PI * 2); gv.stroke();
+  gv.beginPath(); gv.moveTo(cx - R, cy); gv.lineTo(cx + R, cy); gv.moveTo(cx, cy - R); gv.lineTo(cx, cy + R); gv.stroke();
+  const uv = (r, g2, b) => [-0.1146 * r - 0.3854 * g2 + 0.5 * b, 0.5 * r - 0.4542 * g2 - 0.0458 * b];
+  gv.font = `${Math.round(10 * (vw / Math.max(1, gv.canvas.clientWidth)))}px ui-monospace, monospace`; gv.fillStyle = "rgba(255,255,255,.4)";
+  [["R", 191, 0, 0], ["Mg", 191, 0, 191], ["B", 0, 0, 191], ["Cy", 0, 191, 191], ["G", 0, 191, 0], ["Yl", 191, 191, 0]].forEach(([n, r, g2, b]) => {
+    const [u, v] = uv(r, g2, b), x = cx + u / 128 * R, y = cy - v / 128 * R, s = R * .07;
+    gv.strokeRect(x - s, y - s, s * 2, s * 2); gv.fillText(n, x + s + 3, y + 4);
+  });
+  gv.strokeStyle = "rgba(255,180,120,.35)"; gv.setLineDash([4, 4]); gv.beginPath(); gv.moveTo(cx, cy);
+  gv.lineTo(cx + Math.cos(-123 * Math.PI / 180) * R, cy + Math.sin(-123 * Math.PI / 180) * R); gv.stroke(); gv.setLineDash([]);
+  grid(gw, ww, wh); grid(gh, hw, hh);
+  const src = scopeSource();
+  let px;
+  try { if (!src) throw 0; scCtx.drawImage(src, 0, 0, SW, SH); px = scCtx.getImageData(0, 0, SW, SH).data; }
+  catch { noSignal(gw, ww, wh); noSignal(gh, hw, hh); return; }
+  /* вейвформ и вектороскоп — накопление точек, гистограмма — по каналам */
+  const wImg = gw.getImageData(0, 0, ww, wh), wd = wImg.data, vImg = gv.getImageData(0, 0, vw, vh), vd = vImg.data;
+  const hR = new Uint32Array(256), hG = new Uint32Array(256), hB = new Uint32Array(256);
+  for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+    const i = (y * SW + x) * 4, r = px[i], g2 = px[i + 1], b = px[i + 2];
+    hR[r]++; hG[g2]++; hB[b]++;
+    const Y = 0.2126 * r + 0.7152 * g2 + 0.0722 * b;
+    const wx = Math.floor(x / SW * ww), wy = Math.floor(wh - 6 - Y / 255 * (wh - 12));
+    const sm = Math.max(1, Math.round(wh / 160));
+    for (let k = 0; k < 2 * sm; k++) { const o = ((wy + (k % sm)) * ww + Math.min(ww - 1, wx + Math.floor(k / sm))) * 4; if (o >= wd.length) continue; wd[o] = Math.min(255, wd[o] + 18); wd[o + 1] = Math.min(255, wd[o + 1] + 46); wd[o + 2] = Math.min(255, wd[o + 2] + 22); wd[o + 3] = 255; }
+    const [u, v] = uv(r, g2, b), vx = Math.round(cx + u / 128 * R), vy = Math.round(cy - v / 128 * R);
+    if (vx >= 0 && vy >= 0 && vx < vw && vy < vh) { const o = (vy * vw + vx) * 4, m = 0.35; vd[o] = Math.min(255, vd[o] + 30 + r * m); vd[o + 1] = Math.min(255, vd[o + 1] + 30 + g2 * m); vd[o + 2] = Math.min(255, vd[o + 2] + 30 + b * m); vd[o + 3] = 255; }
+  }
+  gw.putImageData(wImg, 0, 0); gv.putImageData(vImg, 0, 0);
+  const max = Math.max(1, ...hR, ...hG, ...hB) * 0.9;
+  gh.globalCompositeOperation = "lighter";
+  [[hR, "rgba(235,70,70,.75)"], [hG, "rgba(70,215,110,.75)"], [hB, "rgba(80,130,255,.75)"]].forEach(([h, col]) => {
+    gh.fillStyle = col; gh.beginPath(); gh.moveTo(0, hh);
+    for (let i = 0; i < 256; i++) gh.lineTo(i / 255 * hw, hh - Math.min(1, Math.sqrt(h[i] / max)) * (hh - 8));
+    gh.lineTo(hw, hh); gh.closePath(); gh.fill();
+  });
+  gh.globalCompositeOperation = "source-over";
+}
+let scLast = 0, scQueued = false;
+function queueScopes() { if (scQueued) return; scQueued = true; requestAnimationFrame(() => { scQueued = false; drawScopes(); }); }
+vid.addEventListener("seeked", queueScopes); vid.addEventListener("loadeddata", queueScopes);
+$("#lImg").addEventListener("load", queueScopes);
+addEventListener("resize", queueScopes);
+
 /* ---------- карусель изображений ---------- */
 let vk = 0, lastFocus = null;
 function buildStrip() {
@@ -846,7 +943,7 @@ function applyLang(next, save) {
   document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
   $("#initials").textContent = tr(CFG.initials);
   $("#bPlay").setAttribute("aria-label", L(playing ? "tPause" : "tPlay"));
-  renderInspector(); layout(); renderBin();
+  renderInspector(); layout(); renderBin(); queueScopes();
   if (cur) showClip(cur);
   if (!$("#viewer").hidden) showViewer();
 }
