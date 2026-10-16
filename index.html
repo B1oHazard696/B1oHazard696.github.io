@@ -28,6 +28,16 @@
   --f-display:"Unbounded", "Nunito", system-ui, sans-serif;
   --f-ui:"Nunito", "SF Pro Rounded", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --shadow:0 10px 40px rgba(0,0,0,.35); --blob:.55;
+}
+/* светлая тема — своим атрибутом data-ui, чтобы не конфликтовать с темой просмотрщика */
+:root[data-ui="light"]{
+  color-scheme: light;
+  --bg:#eceef3; --panel:#ffffff; --panel-2:#f2f4f8; --well:#e2e5ec;
+  --line:#d8dce4; --line-2:#c3c9d4;
+  --fg:#1a1c21; --mute:#596070; --dim:#8a919d;
+  --accent:#2f6fe4; --tc:#1d60d4; --marker:#2e9a55;
+  --shadow:0 8px 30px rgba(30,40,70,.10); --blob:.30;
 }
 *{box-sizing:border-box}
 /* живой фон: цветные пятна, как блики на грейдинге, медленно плывут за панелями */
@@ -36,11 +46,11 @@ body::before{background:
   radial-gradient(38% 42% at 18% 22%, color-mix(in srgb, var(--c1) 55%, transparent), transparent 70%),
   radial-gradient(34% 40% at 82% 18%, color-mix(in srgb, var(--accent) 45%, transparent), transparent 70%),
   radial-gradient(40% 45% at 70% 85%, color-mix(in srgb, var(--c2) 45%, transparent), transparent 70%);
-  opacity:.55;animation:drift1 38s ease-in-out infinite alternate}
+  opacity:var(--blob);animation:drift1 38s ease-in-out infinite alternate}
 body::after{background:
   radial-gradient(30% 36% at 30% 80%, color-mix(in srgb, var(--c4) 45%, transparent), transparent 70%),
   radial-gradient(26% 30% at 92% 60%, color-mix(in srgb, var(--c3) 35%, transparent), transparent 70%);
-  opacity:.45;animation:drift2 46s ease-in-out infinite alternate}
+  opacity:calc(var(--blob) * .8);animation:drift2 46s ease-in-out infinite alternate}
 @keyframes drift1{to{transform:translate(4%,6%) rotate(8deg) scale(1.08)}}
 @keyframes drift2{to{transform:translate(-6%,-4%) rotate(-10deg) scale(1.12)}}
 body{background:var(--bg);color:var(--fg);font:500 14px/1.5 var(--f-ui);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
@@ -73,6 +83,15 @@ a{color:var(--tc)}
 .lang{display:flex;align-items:center;gap:2px;padding:4px 4px 4px 10px;border-radius:999px;flex:none;
   background:color-mix(in srgb, var(--accent) 14%, var(--panel));border:1px solid color-mix(in srgb, var(--accent) 55%, transparent);
   box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent), 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent)}
+.theme-tg{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--tc);
+  background:color-mix(in srgb, var(--accent) 14%, var(--panel));border:1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent)}
+.theme-tg:hover{background:color-mix(in srgb, var(--accent) 24%, var(--panel))}
+.theme-tg svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.theme-tg .i-moon{fill:currentColor;stroke:none}
+.theme-tg .i-moon{display:none}
+:root[data-ui="light"] .theme-tg .i-sun{display:none}
+:root[data-ui="light"] .theme-tg .i-moon{display:block}
 .lang svg{width:16px;height:16px;fill:none;stroke:var(--tc);stroke-width:1.4;margin-right:4px;flex:none}
 .lang button{font:700 13px var(--f-ui);letter-spacing:.04em;min-width:44px;height:30px;padding:0 12px;border-radius:999px;color:var(--fg);opacity:.7;transition:background .15s,opacity .15s}
 .lang button[aria-pressed="true"]{background:var(--accent);color:#fff;opacity:1;box-shadow:0 2px 8px color-mix(in srgb, var(--accent) 45%, transparent)}
@@ -91,7 +110,7 @@ a{color:var(--tc)}
 }
 .col-r{display:flex;flex-direction:column;gap:8px;min-width:0}
 
-.panel{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 70px);background:color-mix(in srgb, var(--panel) 88%, transparent);box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);border:1px solid color-mix(in srgb, var(--line) 80%, transparent);border-radius:16px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.panel{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 70px);background:color-mix(in srgb, var(--panel) 88%, transparent);box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);border:1px solid color-mix(in srgb, var(--line) 80%, transparent);border-radius:16px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .tabs{display:flex;align-items:center;gap:2px;padding:0 8px;height:32px;border-bottom:1px solid var(--line);flex:none}
 .tab{padding:0 10px;height:100%;display:flex;align-items:center;color:var(--dim);font-size:12px;white-space:nowrap}
 .tab.on{min-width:0}
@@ -112,6 +131,7 @@ a{color:var(--tc)}
   .workspaces{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap;order:3}
   .brand{flex:1}
   .lang{order:2}
+  .theme-tg{order:2;width:36px;height:36px}
   .workspaces a.on::after{bottom:-6px}
 }
 
@@ -331,6 +351,10 @@ a{color:var(--tc)}
   <div class="lang" role="group" aria-label="Язык / Language">
     <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.3"/><path d="M1.7 8h12.6M8 1.7c1.9 1.8 2.8 3.9 2.8 6.3S9.9 12.5 8 14.3M8 1.7C6.1 3.5 5.2 5.6 5.2 8s.9 4.5 2.8 6.3"/></svg><button data-lang="ru" aria-pressed="true">RU</button><button data-lang="en" aria-pressed="false">EN</button>
   </div>
+  <button class="theme-tg" id="themeBtn" title="Светлая тема" aria-label="Светлая тема">
+    <svg class="i-sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.1"/><path d="M8 1v1.8M8 13.2V15M1 8h1.8M13.2 8H15M3.05 3.05l1.27 1.27M11.68 11.68l1.27 1.27M3.05 12.95l1.27-1.27M11.68 4.32l1.27-1.27"/></svg>
+    <svg class="i-moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.6 10.2A6 6 0 0 1 5.8 2.4a6 6 0 1 0 7.8 7.8z"/></svg>
+  </button>
   <span class="fmt mono">1920×1080 · 30 fps</span>
 </header>
 
@@ -488,7 +512,7 @@ const IMAGES = CFG.images.files.map((f, i) => ({ name: f + ".jpg", type: "image"
 /* интерфейс */
 const UI = {
   ru: {
-    title: "Геннадий Андреев · AI Creator", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
+    title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
     tabInspector: "Инспектор", tabMeta: "Метаданные", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующий клип", tMute: "Звук", tFull: "Во весь экран",
     kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. клип", kFrame: "по кадрам",
@@ -501,7 +525,7 @@ const UI = {
     soundOn: "Звук включён", openImages: "Открыть все изображения →", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
   },
   en: {
-    title: "Gennady Andreev · AI Creator", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
+    title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
     tabInspector: "Inspector", tabMeta: "Metadata", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next clip", tMute: "Sound", tFull: "Full screen",
     kSpace: "Space", kPlay: "play/pause", kClip: "prev/next clip", kFrame: "frame by frame",
@@ -944,13 +968,27 @@ function applyLang(next, save) {
   $("#initials").textContent = tr(CFG.initials);
   $("#bPlay").setAttribute("aria-label", L(playing ? "tPause" : "tPlay"));
   renderInspector(); layout(); renderBin(); queueScopes();
+  if (typeof applyTheme === "function" && $("#themeBtn").title) applyTheme(ui, false);
   if (cur) showClip(cur);
   if (!$("#viewer").hidden) showViewer();
 }
 document.querySelectorAll(".lang button").forEach(b => b.onclick = () => { if (b.dataset.lang !== lang) applyLang(b.dataset.lang, true); });
 
 $("#projName").textContent = CFG.project;
-applyLang(lang, false); setTime(0); requestAnimationFrame(frame);
+/* ---------- тема ---------- */
+let ui = (() => { try { const v = localStorage.getItem("ui-theme"); if (v === "light" || v === "dark") return v; } catch {} return "dark"; })();
+function applyTheme(next, save) {
+  ui = next;
+  if (ui === "light") document.documentElement.setAttribute("data-ui", "light"); else document.documentElement.removeAttribute("data-ui");
+  if (save) { try { localStorage.setItem("ui-theme", ui); } catch {} }
+  const t = L(ui === "light" ? "toDark" : "toLight"), b = $("#themeBtn");
+  b.title = t; b.setAttribute("aria-label", t); b.setAttribute("aria-pressed", ui === "light");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", ui === "light" ? "#eceef3" : "#111215");
+  const c = document.querySelector(".clip.audio canvas"); c && drawWave(c);
+}
+$("#themeBtn").onclick = () => applyTheme(ui === "light" ? "dark" : "light", true);
+
+applyLang(lang, false); applyTheme(ui, false); setTime(0); requestAnimationFrame(frame);
 </script>
 
 </body>
