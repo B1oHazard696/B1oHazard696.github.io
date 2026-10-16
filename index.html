@@ -249,14 +249,14 @@ button.tab:not(.on):hover{color:var(--fg)}
   .tbtns{justify-self:center}
   #bBack,#bFwd,#durTc{display:none}
   .keys{display:none}
-  .menubar{position:static}
+  .menubar{padding-block:8px;background:var(--bg);box-shadow:0 6px 18px rgba(0,0,0,.18)}
   .proj{font-size:12px}
   .workspaces{gap:0}
   .workspaces a{padding:5px 9px;font-size:12px}
   .hero-name h1{font-size:26px}
 }
 @media (hover:none){.keys{display:none}}
-@media (max-height:500px) and (orientation:landscape){.screen{width:100%}.menubar{position:static}}
+@media (max-height:500px) and (orientation:landscape){.screen{width:100%}}
 
 /* bin */
 .bin-tools{display:flex;padding:10px;border-bottom:1px solid var(--line)}
