@@ -214,7 +214,12 @@ a{color:var(--tc)}
 .filt{padding:4px 12px;border-radius:999px;font-size:11.5px;color:var(--mute);border:1px solid transparent}
 .filt[aria-pressed="true"]{color:var(--fg);border-color:var(--line-2);background:var(--panel-2)}
 .bin{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:12px;align-content:start}
-@media (max-width:560px){.p-bin .bin{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px}.item.img{padding:2px}.item.img .n{display:none}}
+@media (max-width:560px){.p-bin .bin{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px}.item.img{padding:2px}.item.img .n{display:none}
+  /* на телефоне видео в бине — компактные строки, чтобы не выглядели вторым плеером */
+  .item.vid{grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:10px;align-items:start}
+  .item.vid .thumb{grid-row:1 / span 2}
+  .item.vid .n{align-self:end;white-space:normal;overflow-wrap:anywhere}
+}
 .item{display:grid;gap:5px;text-align:left;padding:6px;border-radius:14px;border:1px solid transparent}
 .item:hover{background:var(--panel-2)}
 .item.sel{border-color:var(--accent);background:var(--panel-2)}
@@ -226,6 +231,9 @@ a{color:var(--tc)}
 .thumb .t{position:absolute;left:4px;bottom:4px;width:10px;height:10px;border-radius:50%;background:var(--cc);box-shadow:0 0 0 1px rgba(0,0,0,.5)}
 .item.vid{grid-column:1 / -1}
 .item.img{padding:4px;gap:3px}
+.item.series .thumb{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.item.series .thumb img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
+.item.series .s{color:var(--tc)}
 .item.img .thumb{aspect-ratio:3/4}
 .item.img .n{font-size:10.5px;color:var(--mute)}
 .bin-sec{grid-column:1 / -1;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:6px 4px 0}
@@ -437,7 +445,7 @@ const UI = {
     copy: "Копировать", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
     titleClip: "Титр: ", adj: "Корректирующий слой · Grade", clips: n => `${n} клипов`,
     works: n => { const a = n % 10, b = n % 100; return n + " " + (a === 1 && b !== 11 ? "работа" : a >= 2 && a <= 4 && (b < 12 || b > 14) ? "работы" : "работ"); },
-    soundOn: "Звук включён", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
+    soundOn: "Звук включён", openImages: "Открыть все изображения →", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
   },
   en: {
     title: "Gennady Andreev · AI Creator", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
@@ -450,7 +458,7 @@ const UI = {
     copy: "Copy", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
     titleClip: "Title: ", adj: "Adjustment layer · Grade", clips: n => `${n} clips`,
     works: n => `${n} ${n === 1 ? "work" : "works"}`,
-    soundOn: "Sound on", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
+    soundOn: "Sound on", openImages: "Open all images →", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
   }
 };
 let lang = (() => {
@@ -544,7 +552,7 @@ function thumbFor(c) {
 }
 function renderBin() {
   const bin = $("#bin"); bin.textContent = "";
-  const list = seq.filter(c => filter === "all" || (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
+  const list = seq.filter(c => filter === "all" ? c.type !== "image" : (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
   let shownSeries = false;
   list.forEach(c => {
     if (c.type === "image" && !shownSeries) { shownSeries = true; bin.append(el("div", "bin-sec", `${tr(CFG.images.note)} · ${CFG.images.files.length}`)); }
@@ -553,12 +561,22 @@ function renderBin() {
     b.onclick = () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
     bin.append(b);
   });
+  /* во «Все» серия свёрнута в одну плитку — сетка картинок открывается по кнопке «Изображения» */
+  const imgs = seq.filter(c => c.type === "image");
+  if (filter === "all" && imgs.length) {
+    const t = el("button", "item vid series"), th = el("div", "thumb");
+    imgs.slice(0, 3).forEach(c => { const i = el("img"); i.src = c.poster; i.alt = ""; i.loading = "lazy"; th.append(i); });
+    t.append(th, el("span", "n", `${tr(CFG.images.note)} · ${imgs.length}`), el("span", "s", L("openImages")));
+    t.onclick = () => setFilter("image");
+    bin.append(t);
+  }
   $("#binCount").textContent = L("works")(CFG.works.length);
   highlight();
 }
-document.querySelectorAll(".filt").forEach(f => f.onclick = () => {
-  filter = f.dataset.f; document.querySelectorAll(".filt").forEach(x => x.setAttribute("aria-pressed", x === f)); renderBin();
-});
+function setFilter(f) {
+  filter = f; document.querySelectorAll(".filt").forEach(x => x.setAttribute("aria-pressed", x.dataset.f === f)); renderBin();
+}
+document.querySelectorAll(".filt").forEach(f => f.onclick = () => setFilter(f.dataset.f));
 
 /* ---------- timeline ---------- */
 function layout() {
