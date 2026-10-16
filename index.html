@@ -249,6 +249,7 @@ button.tab:not(.on):hover{color:var(--fg)}
   .tbtns{justify-self:center}
   #bBack,#bFwd,#durTc{display:none}
   .keys{display:none}
+  .panel{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 104px)}
   .menubar{padding-block:8px;background:var(--bg);box-shadow:0 6px 18px rgba(0,0,0,.18)}
   .proj{font-size:12px}
   .workspaces{gap:0}
@@ -1004,6 +1005,9 @@ navLinks.forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
     const target = h === "#works" ? seq.find(c => c.kind === "work") : seq[0];
     if (target) setTime(target.start, true);
+    /* на телефоне, если монитор ушёл с экрана, — подкрутить к нему; на компьютере страница стоит на месте */
+    const r = $("#reel").getBoundingClientRect(), top = $(".menubar").getBoundingClientRect().bottom;
+    if (matchMedia("(max-width:900px)").matches && (r.top < top - 4 || r.bottom > innerHeight + 4)) $("#reel").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   }
   /* «Контакты» — к блоку с Telegram, почтой, телефоном и резюме */
   if (h === "#contact") {
