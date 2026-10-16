@@ -83,11 +83,11 @@ a{color:var(--tc)}
 .ws{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr) minmax(240px,300px);grid-template-areas:"insp mid bin";gap:8px;align-items:start}
 .p-inspector{grid-area:insp}.col-r{grid-area:mid}.p-bin{grid-area:bin}
 .p-bin{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);max-height:calc(100vh - 72px)}
-.p-bin .bin{grid-template-columns:minmax(0,1fr);overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+.p-bin .bin{grid-template-columns:repeat(2,minmax(0,1fr));overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
 @media (max-width:1199px){
   .ws{grid-template-columns:minmax(280px,340px) minmax(0,1fr);grid-template-areas:"insp mid" "insp bin"}
   .p-bin{position:static;max-height:none}
-  .p-bin .bin{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));overflow:visible}
+  .p-bin .bin{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));overflow:visible}
 }
 .col-r{display:flex;flex-direction:column;gap:8px;min-width:0}
 
@@ -214,7 +214,7 @@ a{color:var(--tc)}
 .filt{padding:4px 12px;border-radius:999px;font-size:11.5px;color:var(--mute);border:1px solid transparent}
 .filt[aria-pressed="true"]{color:var(--fg);border-color:var(--line-2);background:var(--panel-2)}
 .bin{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:12px;align-content:start}
-@media (max-width:560px){.p-bin .bin{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px}}
+@media (max-width:560px){.p-bin .bin{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px}.item.img{padding:2px}.item.img .n{display:none}}
 .item{display:grid;gap:5px;text-align:left;padding:6px;border-radius:14px;border:1px solid transparent}
 .item:hover{background:var(--panel-2)}
 .item.sel{border-color:var(--accent);background:var(--panel-2)}
@@ -224,6 +224,12 @@ a{color:var(--tc)}
   background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(0,0,0,.18) 8px 16px),var(--cc)}
 .thumb .d{position:absolute;right:4px;bottom:4px;font:10px var(--f-mono);background:rgba(0,0,0,.7);color:#fff;padding:0 6px;border-radius:999px}
 .thumb .t{position:absolute;left:4px;bottom:4px;width:10px;height:10px;border-radius:50%;background:var(--cc);box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+.item.vid{grid-column:1 / -1}
+.item.img{padding:4px;gap:3px}
+.item.img .thumb{aspect-ratio:3/4}
+.item.img .n{font-size:10.5px;color:var(--mute)}
+.bin-sec{grid-column:1 / -1;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:6px 4px 0}
+.clip.still{padding:0;background-size:cover;background-position:center 25%;border-color:rgba(0,0,0,.6)}
 .item .n{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item .s{font-size:11px;color:var(--mute);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
@@ -408,8 +414,15 @@ const CFG = {
   works: [
     { name: "Pink_Wolf.mp4", type: "video", src: "media/pink_wolf.mp4", poster: "media/pink_wolf.jpg", dur: 20, note: { ru: "Тизер AI-проекта под NDA", en: "Teaser for an AI project under NDA" } },
     { name: "Pink_Noise.mp4", type: "video", src: "media/pink_noise.mp4", poster: "media/pink_noise.jpg", dur: 15, note: { ru: "Тизер AI-проекта под NDA", en: "Teaser for an AI project under NDA" } }
-  ]
+  ],
+  /* серия изображений: файлы лежат в media/soul/ (полный кадр + превью _t) */
+  images: {
+    folder: "media/soul/", dur: 3,
+    note: { ru: "AI-фотосерия Soul", en: "AI photo series Soul" },
+    files: ["01_hustlers_fur", "02_leopard_throne", "03_gold_grillz", "04_diamond_ice", "05_feather_hat", "06_terry_lowrider", "07_jetski_barbie", "08_red_viper", "09_chinchilla_coat", "10_gold_puffer", "11_icy_pool", "12_70s_soul_train", "13_gold_lotto", "14_crystal_goat", "15_cash_party", "16_miami_ice", "17_desert_empress", "18_louvre_gold", "19_banker", "20_leopard_boss", "21_angel_cape", "22_leopard_lowrider", "23_pink_velour_diner", "24_chrome_fisheye", "25_fur_boot_pinup", "26_red_room_grill", "27_neon_empress", "28_miami_feathers", "29_bronx_bandeau", "30_chateau_doll", "31_campaign_baby_tee", "32_desert_track", "33_harness_runway", "34_gangster_grillz", "35_crochet_cubans", "36_varsity_ice", "37_red_lounge_chains", "38_supercar_choker", "39_icy_bedroom_fur", "40_polka_dot_don", "41_brown_velour_mall", "42_purple_fur_nyc", "43_mink_gold_grillz", "44_leopard_jet"]
+  }
 };
+CFG.works.push(...CFG.images.files.map(f => ({ name: f + ".jpg", type: "image", src: CFG.images.folder + f + ".jpg", poster: CFG.images.folder + f + "_t.jpg", dur: CFG.images.dur, note: CFG.images.note })));
 
 /* интерфейс */
 const UI = {
@@ -526,15 +539,17 @@ function thumbFor(c) {
   if (c.poster || (c.type === "image" && c.src)) { const i = el("img"); i.src = c.poster || c.src; i.alt = ""; i.loading = "lazy"; th.append(i); }
   else if (c.src) { const v = el("video"); v.src = c.src + "#t=0.5"; v.muted = true; v.preload = "metadata"; v.playsInline = true; th.append(v); }
   else th.append(el("div", "ph", c.type === "image" ? "IMG · OFFLINE" : "MP4 · OFFLINE"));
-  th.append(el("span", "d", tcf(c.dur).slice(3)), el("span", "t"));
+  if (c.type !== "image") th.append(el("span", "d", tcf(c.dur).slice(3))); th.append(el("span", "t"));
   return th;
 }
 function renderBin() {
   const bin = $("#bin"); bin.textContent = "";
   const list = seq.filter(c => filter === "all" || (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
+  let shownSeries = false;
   list.forEach(c => {
-    const b = el("button", "item"); b.dataset.i = seq.indexOf(c);
-    b.append(thumbFor(c), el("span", "n", c.name), el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
+    if (c.type === "image" && !shownSeries) { shownSeries = true; bin.append(el("div", "bin-sec", `${tr(CFG.images.note)} · ${CFG.images.files.length}`)); }
+    const b = el("button", "item " + (c.type === "image" ? "img" : "vid")); b.dataset.i = seq.indexOf(c);
+    b.append(thumbFor(c), el("span", "n", c.name)); if (c.type !== "image") b.append(el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
     b.onclick = () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
     bin.append(b);
   });
@@ -555,7 +570,8 @@ function layout() {
   seq.forEach((c, i) => {
     const b = el("button", "clip"); b.dataset.i = i;
     b.style.left = pct(c.start); b.style.width = `calc(${pct(c.dur)} - 2px)`; b.style.setProperty("--cc", `var(${c.color})`);
-    b.append(el("span", "cn", c.name), el("span", "cs", tcf(c.dur).slice(3)));
+    if (c.type === "image") { b.classList.add("still"); b.style.backgroundImage = `url("${c.poster}")`; }
+    else b.append(el("span", "cn", c.name), el("span", "cs", tcf(c.dur).slice(3)));
     if (c.kind === "reel") b.append(el("span", "fxb", "fx"));
     b.title = c.name; v1.append(b);
   });
@@ -570,10 +586,12 @@ function layout() {
 
   const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300], step = steps.find(s => T / s <= 9) || 600;
   for (let x = 0; x < T - step * 0.6; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
-  seq.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.name; ru.append(m); });
+  const firstImg = seq.find(c => c.type === "image");
+  const marked = seq.filter(c => c.type !== "image" || c === firstImg);
+  marked.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.type === "image" ? tr(CFG.images.note) : c.name; ru.append(m); });
 
   const sc = $("#scrub"); sc.querySelectorAll(".tick").forEach(n => n.remove());
-  seq.forEach(c => { if (c.start > 0) { const k = el("span", "tick"); k.style.left = pct(c.start); sc.append(k); } });
+  marked.forEach(c => { if (c.start > 0) { const k = el("span", "tick"); k.style.left = pct(c.start); sc.append(k); } });
 
   $("#durTc").textContent = tcf(T); $("#seqLen").textContent = tcf(T);
   $("#statusLine").textContent = `${L("seq")} · ${L("clips")(seq.length)}`;
@@ -635,6 +653,11 @@ function setTime(x, user) {
 function highlight() {
   const i = seq.indexOf(cur);
   document.querySelectorAll(".clip[data-i], .item").forEach(n => n.classList.toggle("sel", +n.dataset.i === i));
+  const bin = $("#bin"), it = bin && bin.querySelector(".item.sel");
+  if (it && bin.scrollHeight > bin.clientHeight + 2) {
+    const top = it.offsetTop - bin.offsetTop, bottom = top + it.offsetHeight;
+    if (top < bin.scrollTop || bottom > bin.scrollTop + bin.clientHeight) bin.scrollTo({ top: Math.max(0, top - 8), behavior: "smooth" });
+  }
 }
 let lastSel = -1;
 function render() {
