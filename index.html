@@ -576,7 +576,7 @@ const CFG = {
   ],
   primary: { label: { ru: "Написать в Telegram · @b1ohazard", en: "Message on Telegram · @b1ohazard" }, href: "https://t.me/b1ohazard" },
   copy: ["radioactive.wind@gmail.com", "+7 (926) 169-03-23"],
-  cv: "media/Andreev_Gennady_CV.pdf",
+  cv: { ru: "media/Andreev_Gennady_CV.pdf", en: "media/Andreev_Gennady_CV_EN.pdf" },
   links: [],
 
   reel: { name: "GennadyAndreev_Showreel_2026.mp4", src: "media/showreel.mp4", srcMobile: "media/showreel_m.mp4", poster: "media/showreel.jpg", link: "https://www.youtube.com/watch?v=a4QNpQr4nCU", dur: 58,
@@ -642,7 +642,7 @@ const UI = {
     timeline: "Timeline", seq: "Sequence 01", vis: "Visibility", tlHint: "Tap a clip to open it in the monitor. You can drag the playhead.",
     project: "Project:", filter: "Filter", fAll: "All", fVideo: "Video", fImage: "Images", ready: "Ready",
     secProfile: "Profile", secTools: "Tools", secExp: "Experience", secContact: "Export · contact",
-    copy: "Copy", cv: "Download CV · PDF (RU)", cvOpen: "Open CV in a new tab", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
+    copy: "Copy", cv: "Download CV · PDF", cvOpen: "Open CV in a new tab", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
     titleClip: "Title: ", adj: "Adjustment layer · Grade", clips: n => `${n} clips`,
     works: n => `${n} ${n === 1 ? "work" : "works"}`,
     soundOn: "Sound on", openImages: "Open all images →", close: "Close", prev: "Previous", next: "Next", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
@@ -764,10 +764,10 @@ function renderInspector() {
   });
   /* резюме PDF — такая же строка, вместо копирования — открыть в новой вкладке */
   { const row = el("div", "copy-row"), a = el("a", "btn btn-line btn-contact"), o = el("a", "ib cp");
-    a.href = CFG.cv; a.setAttribute("download", "Andreev_Gennady_CV.pdf");
+    const cvUrl = tr(CFG.cv); a.href = cvUrl; a.setAttribute("download", cvUrl.split("/").pop());
     a.innerHTML = '<svg viewBox="0 0 16 16"><path d="M4 1.5h5.2L13 5.3v8.2A1.5 1.5 0 0 1 11.5 15h-7A1.5 1.5 0 0 1 3 13.5v-10A2 2 0 0 1 4 1.5zm4.6 1.4V6h3.1zM8 7.2a.7.7 0 0 0-.7.7v2.9l-1-1-1 1L8 13.5l2.7-2.7-1-1-1 1V7.9a.7.7 0 0 0-.7-.7z"/></svg>';
     a.append(el("span", "", L("cv")));
-    o.href = CFG.cv; o.target = "_blank"; o.rel = "noopener"; o.title = L("cvOpen"); o.setAttribute("aria-label", L("cvOpen"));
+    o.href = cvUrl; o.target = "_blank"; o.rel = "noopener"; o.title = L("cvOpen"); o.setAttribute("aria-label", L("cvOpen"));
     o.innerHTML = '<svg viewBox="0 0 16 16"><path d="M9 2h5v5h-1.6V4.7L7.6 9.5 6.5 8.4l4.8-4.8H9zM3.5 4H7v1.6H3.6v6.8h6.8V9H12v3.5A1.5 1.5 0 0 1 10.5 14h-7A1.5 1.5 0 0 1 2 12.5v-7A1.5 1.5 0 0 1 3.5 4z"/></svg>';
     row.append(a, o); exp.append(row); }
   const lr = el("div", "chips");
