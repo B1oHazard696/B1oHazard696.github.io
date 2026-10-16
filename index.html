@@ -30,6 +30,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="media/favicon-32.png">
 <link rel="apple-touch-icon" href="media/apple-touch-icon.png">
 <meta name="theme-color" content="#111215">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Геннадий Андреев","alternateName":"Gennady Andreev","jobTitle":"AI Creator, режиссёр монтажа","url":"https://b1ohazard696.github.io/","image":"https://b1ohazard696.github.io/media/og.jpg","email":"mailto:radioactive.wind@gmail.com","telephone":"+7-926-169-03-23","address":{"@type":"PostalAddress","addressLocality":"Москва","addressCountry":"RU"},"knowsLanguage":["ru","en"],"knowsAbout":["видеомонтаж","AI-видео","постпродакшн","Premiere Pro","DaVinci Resolve","After Effects","Kling","Higgsfield"],"sameAs":["https://t.me/b1ohazard"],"worksFor":{"@type":"Organization","name":"AI-проект (NDA)"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
@@ -346,6 +347,8 @@ button.tab:not(.on):hover{color:var(--fg)}
 .insp-tabgroup{display:flex;gap:3px;padding:4px;border-radius:999px;flex:1;min-width:0;
   background:color-mix(in srgb, var(--accent) 12%, var(--panel));border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);
   box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent)}
+@keyframes flashBlk{0%{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb, var(--accent) 10%, transparent)}100%{box-shadow:inset 0 0 0 2px transparent;background:transparent}}
+.fx.flash{animation:flashBlk 1.6s ease-out}
 /* метаданные клипа */
 .meta-head{display:grid;gap:10px;padding:6px 14px 14px;border-bottom:1px solid var(--line)}
 .meta-thumb{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;overflow:hidden;background:#000}
@@ -426,7 +429,20 @@ button.tab:not(.on):hover{color:var(--fg)}
 <main class="ws">
   <section class="panel p-inspector" id="about" aria-label="Обо мне" data-ta="navAbout">
     <div class="tabs insp-tabs"><div class="insp-tabgroup" role="tablist"><button class="tab on" id="tabInsp" role="tab" aria-selected="true" aria-controls="inspector" data-t="tabInspector">Информация</button><button class="tab" id="tabMetaBtn" role="tab" aria-selected="false" aria-controls="metaPanel" data-t="tabMeta">Метаданные</button></div></div>
-    <div class="insp" id="inspector" role="tabpanel" aria-labelledby="tabInsp"></div>
+    <div class="insp" id="inspector" role="tabpanel" aria-labelledby="tabInsp">
+      <!-- статичная версия для поисковиков и для открытия без JavaScript; скрипт заменяет её интерактивной -->
+      <div class="hero-name"><div class="hero-role">AI Creator · режиссёр монтажа</div><h1>Геннадий Андреев</h1>
+        <p>Создаю AI-видео и визуал в Kling, Seedance, Higgsfield и Krea и довожу их до готового ролика. За плечами 18 лет режиссёром монтажа в кино, на ТВ и в digital: передачи для «Пятницы», шесть лет в Viacom.</p></div>
+      <div class="fx-b" style="padding:12px 14px">
+        <p>Москва, готов к командировкам. Русский, English B2.</p>
+        <h2 style="font-size:13px;margin:8px 0 0">Опыт</h2>
+        <ul class="career-list"><li><b>AI-проект (NDA)</b> · режиссёр монтажа, AI-продакшн · 2025–2026</li><li><b>Продюсерский центр НОЖИ</b> · режиссёр монтажа, телеканал «Пятница» · 2023–2025</li><li><b>Viacom International Media Networks</b> · Video Editor · 2016–2022</li><li><b>Студия Анкор</b> · режиссёр монтажа · 2010–2016</li><li><b>Амедиа</b> · видеоинженер · 2005–2009</li></ul>
+        <h2 style="font-size:13px;margin:8px 0 0">Инструменты</h2>
+        <p>Premiere Pro, Avid Media Composer, DaVinci Resolve, After Effects, Audition, Final Cut Pro, Kling, Seedance, Higgsfield, Krea, Runway, Midjourney, ElevenLabs, Topaz Video AI, ChatGPT, Claude, Whisper, Descript.</p>
+        <h2 style="font-size:13px;margin:8px 0 0">Контакты</h2>
+        <p><a href="https://t.me/b1ohazard">Telegram @b1ohazard</a> · <a href="mailto:radioactive.wind@gmail.com">radioactive.wind@gmail.com</a> · <a href="tel:+79261690323">+7 (926) 169-03-23</a> · <a href="media/Andreev_Gennady_CV.pdf">Резюме (PDF)</a></p>
+      </div>
+    </div>
     <div class="insp meta" id="metaPanel" role="tabpanel" aria-labelledby="tabMetaBtn" hidden></div>
   </section>
 
@@ -560,9 +576,10 @@ const CFG = {
   ],
   primary: { label: { ru: "Написать в Telegram · @b1ohazard", en: "Message on Telegram · @b1ohazard" }, href: "https://t.me/b1ohazard" },
   copy: ["radioactive.wind@gmail.com", "+7 (926) 169-03-23"],
+  cv: "media/Andreev_Gennady_CV.pdf",
   links: [],
 
-  reel: { name: "GennadyAndreev_Showreel_2026.mp4", src: "media/showreel.mp4", poster: "media/showreel.jpg", link: "https://www.youtube.com/watch?v=a4QNpQr4nCU", dur: 58,
+  reel: { name: "GennadyAndreev_Showreel_2026.mp4", src: "media/showreel.mp4", srcMobile: "media/showreel_m.mp4", poster: "media/showreel.jpg", link: "https://www.youtube.com/watch?v=a4QNpQr4nCU", dur: 58,
     meta: {
       title: { ru: "Шоурил 2026", en: "Showreel 2026" },
       sub: { ru: "От плёнки до AI-продакшна", en: "From tape to AI production" },
@@ -612,7 +629,7 @@ const UI = {
     timeline: "Таймлайн", seq: "Последовательность 01", vis: "Видимость", tlHint: "Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.",
     project: "Проект:", filter: "Фильтр", fAll: "Все", fVideo: "Видео", fImage: "Изображения", ready: "Готово",
     secProfile: "Профиль", secTools: "Инструменты", secExp: "Опыт", secContact: "Экспорт · связаться",
-    copy: "Копировать", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
+    copy: "Копировать", cv: "Скачать резюме · PDF", cvOpen: "Открыть резюме в новой вкладке", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
     titleClip: "Титр: ", adj: "Корректирующий слой · Grade", clips: n => `${n} клипов`,
     works: n => { const a = n % 10, b = n % 100; return n + " " + (a === 1 && b !== 11 ? "работа" : a >= 2 && a <= 4 && (b < 12 || b > 14) ? "работы" : "работ"); },
     soundOn: "Звук включён", openImages: "Открыть все изображения →", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
@@ -625,7 +642,7 @@ const UI = {
     timeline: "Timeline", seq: "Sequence 01", vis: "Visibility", tlHint: "Tap a clip to open it in the monitor. You can drag the playhead.",
     project: "Project:", filter: "Filter", fAll: "All", fVideo: "Video", fImage: "Images", ready: "Ready",
     secProfile: "Profile", secTools: "Tools", secExp: "Experience", secContact: "Export · contact",
-    copy: "Copy", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
+    copy: "Copy", cv: "Download CV · PDF (RU)", cvOpen: "Open CV in a new tab", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
     titleClip: "Title: ", adj: "Adjustment layer · Grade", clips: n => `${n} clips`,
     works: n => `${n} ${n === 1 ? "work" : "works"}`,
     soundOn: "Sound on", openImages: "Open all images →", close: "Close", prev: "Previous", next: "Next", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
@@ -647,8 +664,10 @@ const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) 
 const tcf = s => { const f = Math.floor(s * FPS + 1e-6); const p = n => String(n).padStart(2, "0");
   return `${p(Math.floor(f / (3600 * FPS)))}:${p(Math.floor(f / (60 * FPS)) % 60)}:${p(Math.floor(f / FPS) % 60)}:${p(f % FPS)}`; };
 
+/* на телефоне и в режиме экономии трафика — лёгкая версия шоурила (3,6 МБ вместо 13,8 МБ) */
+const LIGHT = matchMedia("(max-width:900px)").matches || !!(navigator.connection && navigator.connection.saveData);
 const seq = [
-  { ...CFG.reel, kind: "reel", type: "video", color: "--c6" },
+  { ...CFG.reel, src: (LIGHT && CFG.reel.srcMobile) || CFG.reel.src, kind: "reel", type: "video", color: "--c6" },
   ...CFG.works.map((w, i) => ({ ...w, kind: "work", color: COLORS[i % COLORS.length] }))
 ];
 let T = 0, t = 0, cur = null, playing = false, filter = "all";
@@ -743,15 +762,24 @@ function renderInspector() {
     };
     row.append(val, cp); exp.append(row);
   });
+  /* резюме PDF — такая же строка, вместо копирования — открыть в новой вкладке */
+  { const row = el("div", "copy-row"), a = el("a", "btn btn-line btn-contact"), o = el("a", "ib cp");
+    a.href = CFG.cv; a.setAttribute("download", "Andreev_Gennady_CV.pdf");
+    a.innerHTML = '<svg viewBox="0 0 16 16"><path d="M4 1.5h5.2L13 5.3v8.2A1.5 1.5 0 0 1 11.5 15h-7A1.5 1.5 0 0 1 3 13.5v-10A2 2 0 0 1 4 1.5zm4.6 1.4V6h3.1zM8 7.2a.7.7 0 0 0-.7.7v2.9l-1-1-1 1L8 13.5l2.7-2.7-1-1-1 1V7.9a.7.7 0 0 0-.7-.7z"/></svg>';
+    a.append(el("span", "", L("cv")));
+    o.href = CFG.cv; o.target = "_blank"; o.rel = "noopener"; o.title = L("cvOpen"); o.setAttribute("aria-label", L("cvOpen"));
+    o.innerHTML = '<svg viewBox="0 0 16 16"><path d="M9 2h5v5h-1.6V4.7L7.6 9.5 6.5 8.4l4.8-4.8H9zM3.5 4H7v1.6H3.6v6.8h6.8V9H12v3.5A1.5 1.5 0 0 1 10.5 14h-7A1.5 1.5 0 0 1 2 12.5v-7A1.5 1.5 0 0 1 3.5 4z"/></svg>';
+    row.append(a, o); exp.append(row); }
   const lr = el("div", "chips");
   CFG.links.forEach(l => { const a = el("a", "btn btn-ghost", tr(l.label)); a.href = l.href; a.target = "_blank"; a.rel = "noopener"; lr.append(a); });
-  exp.append(lr);
+  if (CFG.links.length) exp.append(lr);
 
   root.append(hero,
     section(L("secProfile"), "fx", true, props),
     section(L("secTools"), "fx", true, skillGroups),
     section(L("secExp"), "fx", true, [car]),
     section(L("secContact"), "▶", true, [exp]));
+  root.lastChild.id = "contactBlock";
 }
 function selectText(n) { const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast(L("selected")); }
 let toastTimer; function toast(m) { const x = $("#toast"); x.textContent = m; x.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => x.hidden = true, 1800); }
@@ -976,6 +1004,13 @@ navLinks.forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
     const target = h === "#works" ? seq.find(c => c.kind === "work") : seq[0];
     if (target) setTime(target.start, true);
+  }
+  /* «Контакты» — к блоку с Telegram, почтой, телефоном и резюме */
+  if (h === "#contact") {
+    e.preventDefault(); setTab(false);
+    const blk = $("#contactBlock"); if (!blk) return;
+    blk.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+    blk.classList.remove("flash"); void blk.offsetWidth; blk.classList.add("flash");
   }
 }));
 
