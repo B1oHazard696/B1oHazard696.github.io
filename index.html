@@ -329,6 +329,16 @@ button.tab:not(.on):hover{color:var(--fg)}
 .status{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;color:var(--dim);font-size:11px;padding:6px 2px}
 .status .ok::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--marker);margin-right:6px}
 .status .r{margin-left:auto}
+/* переключатель «Информация / Метаданные» — капсула, как фильтр в «Проекте» */
+.insp-tabs{height:auto;padding:10px;border-bottom:1px solid var(--line);gap:8px}
+.insp-tabs .tab{flex:1 1 0;justify-content:center;height:34px;padding:0 10px;border-radius:999px;font:700 13px var(--f-ui);color:var(--fg);opacity:.72;transition:background .15s,opacity .15s}
+.insp-tabs .tab:hover{opacity:1;background:color-mix(in srgb, var(--accent) 20%, transparent)}
+.insp-tabs .tab.on{opacity:1;background:var(--accent);color:#fff;box-shadow:0 2px 8px color-mix(in srgb, var(--accent) 45%, transparent)}
+.insp-tabs .tab.on::after{display:none}
+.insp-tabs .spacer{display:none}
+.insp-tabgroup{display:flex;gap:3px;padding:4px;border-radius:999px;flex:1;min-width:0;
+  background:color-mix(in srgb, var(--accent) 12%, var(--panel));border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent)}
 /* метаданные клипа */
 .meta-head{display:grid;gap:10px;padding:6px 14px 14px;border-bottom:1px solid var(--line)}
 .meta-thumb{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;overflow:hidden;background:#000}
@@ -347,7 +357,7 @@ button.tab:not(.on):hover{color:var(--fg)}
 .meta-clip i{width:10px;height:10px;border-radius:50%;background:var(--cc)}
 .meta-clip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .meta-clip em{font:normal 11px var(--f-mono);color:var(--mute)}
-.meta-live{color:var(--playhead)}
+.tabs .meta-live{color:var(--playhead);flex:none}
 /* скоупы */
 /* панель скоупов растягивается до низа колонки — центр ровняется с боковыми колонками */
 .col-r{align-self:stretch}
@@ -409,7 +419,7 @@ button.tab:not(.on):hover{color:var(--fg)}
 
 <main class="ws">
   <section class="panel p-inspector" id="about" aria-label="Обо мне" data-ta="navAbout">
-    <div class="tabs" role="tablist"><button class="tab on" id="tabInsp" role="tab" aria-selected="true" aria-controls="inspector" data-t="tabInspector">Инспектор</button><button class="tab" id="tabMetaBtn" role="tab" aria-selected="false" aria-controls="metaPanel" data-t="tabMeta">Метаданные</button><span class="spacer"></span><span class="aux mono meta-live" id="metaLive" hidden>● LIVE</span></div>
+    <div class="tabs insp-tabs"><div class="insp-tabgroup" role="tablist"><button class="tab on" id="tabInsp" role="tab" aria-selected="true" aria-controls="inspector" data-t="tabInspector">Информация</button><button class="tab" id="tabMetaBtn" role="tab" aria-selected="false" aria-controls="metaPanel" data-t="tabMeta">Метаданные</button></div><span class="spacer"></span><span class="aux mono meta-live" id="metaLive" hidden>● LIVE</span></div>
     <div class="insp" id="inspector" role="tabpanel" aria-labelledby="tabInsp"></div>
     <div class="insp meta" id="metaPanel" role="tabpanel" aria-labelledby="tabMetaBtn" hidden></div>
   </section>
@@ -590,7 +600,7 @@ const IMAGES = CFG.images.files.map((f, i) => ({ name: f + ".jpg", type: "image"
 const UI = {
   ru: {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
-    tabInspector: "Инспектор", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все клипы последовательности", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
+    tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все клипы последовательности", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующий клип", tMute: "Звук", tFull: "Во весь экран",
     kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. клип", kFrame: "по кадрам",
     timeline: "Таймлайн", seq: "Последовательность 01", vis: "Видимость", tlHint: "Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.",
@@ -603,7 +613,7 @@ const UI = {
   },
   en: {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
-    tabInspector: "Inspector", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All clips in the sequence", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
+    tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All clips in the sequence", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next clip", tMute: "Sound", tFull: "Full screen",
     kSpace: "Space", kPlay: "play/pause", kClip: "prev/next clip", kFrame: "frame by frame",
     timeline: "Timeline", seq: "Sequence 01", vis: "Visibility", tlHint: "Tap a clip to open it in the monitor. You can drag the playhead.",
