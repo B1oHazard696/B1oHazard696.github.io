@@ -229,6 +229,7 @@ a{color:var(--tc)}
 .item.img .thumb{aspect-ratio:3/4}
 .item.img .n{font-size:10.5px;color:var(--mute)}
 .bin-sec{grid-column:1 / -1;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:6px 4px 0}
+.clip.still{padding:0;background-size:cover;background-position:center 25%;border-color:rgba(0,0,0,.6)}
 .item .n{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item .s{font-size:11px;color:var(--mute);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
@@ -270,19 +271,6 @@ a{color:var(--tc)}
 .status{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;color:var(--dim);font-size:11px;padding:6px 2px}
 .status .ok::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--marker);margin-right:6px}
 .status .r{margin-left:auto}
-.viewer{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(6,7,9,.86);
-  padding:calc(env(safe-area-inset-top,0px) + 16px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px,env(safe-area-inset-left,0px))}
-.vw-panel{width:min(100%, 980px);max-height:100%;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line-2);border-radius:16px;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,.6)}
-.vw-panel .tabs .tab.on{min-width:0}
-#vwName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.vw-x{flex:none;margin-left:6px}
-.vw-stage{position:relative;flex:1;min-height:0;display:grid;place-items:center;background:var(--well);padding:12px 56px;touch-action:pan-y}
-.vw-stage img{max-width:100%;max-height:calc(100vh - 170px);max-height:calc(100svh - 170px);border-radius:10px;object-fit:contain;display:block}
-.vw-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;background:var(--panel-2);border:1px solid var(--line-2)}
-.vw-nav:hover{border-color:var(--mute)}
-.vw-prev{left:8px}.vw-next{right:8px}
-.vw-note{padding:10px 14px;font-size:12px;color:var(--mute)}
-@media (max-width:560px){.vw-stage{padding:8px}.vw-nav{top:auto;bottom:12px;transform:none;background:rgba(20,21,24,.8)}.viewer{padding-left:8px;padding-right:8px}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel-2);border:1px solid var(--line-2);
   padding:9px 18px;border-radius:999px;font-size:12px;z-index:30}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}body::before,body::after{animation:none}}
@@ -386,19 +374,6 @@ a{color:var(--tc)}
   <span id="statusLine"></span>
   <span class="r mono" id="statusTc"></span>
 </footer>
-<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vwName">
-  <div class="vw-panel">
-    <div class="tabs"><span class="tab on"><span data-t="source">Источник:</span><span id="vwName" style="margin-left:.35em"></span></span><span class="spacer"></span>
-      <span class="aux mono" id="vwCount"></span>
-      <button class="ib vw-x" id="vwClose" data-tt="close" title="Закрыть" aria-label="Закрыть"><svg viewBox="0 0 16 16"><path d="M3.5 2.1 8 6.6l4.5-4.5 1.4 1.4L9.4 8l4.5 4.5-1.4 1.4L8 9.4l-4.5 4.5-1.4-1.4L6.6 8 2.1 3.5z"/></svg></button></div>
-    <div class="vw-stage" id="vwStage">
-      <button class="ib vw-nav vw-prev" id="vwPrev" data-tt="prev" title="Предыдущее" aria-label="Предыдущее"><svg viewBox="0 0 16 16"><path d="M10.5 2 4.5 8l6 6 1.4-1.4L7.3 8l4.6-4.6z"/></svg></button>
-      <img id="vwImg" alt="">
-      <button class="ib vw-nav vw-next" id="vwNext" data-tt="next" title="Следующее" aria-label="Следующее"><svg viewBox="0 0 16 16"><path d="M5.5 2 4.1 3.4 8.7 8l-4.6 4.6L5.5 14l6-6z"/></svg></button>
-    </div>
-    <div class="vw-note" id="vwNote"></div>
-  </div>
-</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -447,8 +422,7 @@ const CFG = {
     files: ["01_hustlers_fur", "02_leopard_throne", "03_gold_grillz", "04_diamond_ice", "05_feather_hat", "06_terry_lowrider", "07_jetski_barbie", "08_red_viper", "09_chinchilla_coat", "10_gold_puffer", "11_icy_pool", "12_70s_soul_train", "13_gold_lotto", "14_crystal_goat", "15_cash_party", "16_miami_ice", "17_desert_empress", "18_louvre_gold", "19_banker", "20_leopard_boss", "21_angel_cape", "22_leopard_lowrider", "23_pink_velour_diner", "24_chrome_fisheye", "25_fur_boot_pinup", "26_red_room_grill", "27_neon_empress", "28_miami_feathers", "29_bronx_bandeau", "30_chateau_doll", "31_campaign_baby_tee", "32_desert_track", "33_harness_runway", "34_gangster_grillz", "35_crochet_cubans", "36_varsity_ice", "37_red_lounge_chains", "38_supercar_choker", "39_icy_bedroom_fur", "40_polka_dot_don", "41_brown_velour_mall", "42_purple_fur_nyc", "43_mink_gold_grillz", "44_leopard_jet"]
   }
 };
-/* изображения не входят в таймлайн — открываются отдельно в окне просмотра */
-const IMAGES = CFG.images.files.map((f, i) => ({ name: f + ".jpg", type: "image", src: CFG.images.folder + f + ".jpg", poster: CFG.images.folder + f + "_t.jpg", color: `--c${(i % 6) + 1}` }));
+CFG.works.push(...CFG.images.files.map(f => ({ name: f + ".jpg", type: "image", src: CFG.images.folder + f + ".jpg", poster: CFG.images.folder + f + "_t.jpg", dur: CFG.images.dur, note: CFG.images.note })));
 
 /* интерфейс */
 const UI = {
@@ -462,7 +436,7 @@ const UI = {
     secProfile: "Профиль", secTools: "Инструменты", secExp: "Опыт", secContact: "Экспорт · связаться",
     copy: "Копировать", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
     titleClip: "Титр: ", adj: "Корректирующий слой · Grade", clips: n => `${n} клипов`,
-    works: (v, i) => `${v} видео · ${i} фото`, source: "Источник:", close: "Закрыть", prev: "Предыдущее", next: "Следующее",
+    works: n => { const a = n % 10, b = n % 100; return n + " " + (a === 1 && b !== 11 ? "работа" : a >= 2 && a <= 4 && (b < 12 || b > 14) ? "работы" : "работ"); },
     soundOn: "Звук включён", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
   },
   en: {
@@ -475,7 +449,7 @@ const UI = {
     secProfile: "Profile", secTools: "Tools", secExp: "Experience", secContact: "Export · contact",
     copy: "Copy", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
     titleClip: "Title: ", adj: "Adjustment layer · Grade", clips: n => `${n} clips`,
-    works: (v, i) => `${v} videos · ${i} images`, source: "Source:", close: "Close", prev: "Previous", next: "Next",
+    works: n => `${n} ${n === 1 ? "work" : "works"}`,
     soundOn: "Sound on", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
   }
 };
@@ -570,22 +544,16 @@ function thumbFor(c) {
 }
 function renderBin() {
   const bin = $("#bin"); bin.textContent = "";
-  if (filter !== "image") seq.forEach((c, i) => {
-    const b = el("button", "item vid"); b.dataset.i = i;
-    b.append(thumbFor(c), el("span", "n", c.name), el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
+  const list = seq.filter(c => filter === "all" || (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
+  let shownSeries = false;
+  list.forEach(c => {
+    if (c.type === "image" && !shownSeries) { shownSeries = true; bin.append(el("div", "bin-sec", `${tr(CFG.images.note)} · ${CFG.images.files.length}`)); }
+    const b = el("button", "item " + (c.type === "image" ? "img" : "vid")); b.dataset.i = seq.indexOf(c);
+    b.append(thumbFor(c), el("span", "n", c.name)); if (c.type !== "image") b.append(el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
     b.onclick = () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
     bin.append(b);
   });
-  if (filter !== "video" && IMAGES.length) {
-    bin.append(el("div", "bin-sec", `${tr(CFG.images.note)} · ${IMAGES.length}`));
-    IMAGES.forEach((c, k) => {
-      const b = el("button", "item img"); b.dataset.k = k;
-      b.append(thumbFor(c), el("span", "n", c.name));
-      b.onclick = () => openViewer(k);
-      bin.append(b);
-    });
-  }
-  $("#binCount").textContent = L("works")(seq.length, IMAGES.length);
+  $("#binCount").textContent = L("works")(CFG.works.length);
   highlight();
 }
 document.querySelectorAll(".filt").forEach(f => f.onclick = () => {
@@ -602,7 +570,8 @@ function layout() {
   seq.forEach((c, i) => {
     const b = el("button", "clip"); b.dataset.i = i;
     b.style.left = pct(c.start); b.style.width = `calc(${pct(c.dur)} - 2px)`; b.style.setProperty("--cc", `var(${c.color})`);
-    b.append(el("span", "cn", c.name), el("span", "cs", tcf(c.dur).slice(3)));
+    if (c.type === "image") { b.classList.add("still"); b.style.backgroundImage = `url("${c.poster}")`; }
+    else b.append(el("span", "cn", c.name), el("span", "cs", tcf(c.dur).slice(3)));
     if (c.kind === "reel") b.append(el("span", "fxb", "fx"));
     b.title = c.name; v1.append(b);
   });
@@ -617,8 +586,9 @@ function layout() {
 
   const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300], step = steps.find(s => T / s <= 9) || 600;
   for (let x = 0; x < T - step * 0.6; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
-  const marked = seq;
-  marked.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.name; ru.append(m); });
+  const firstImg = seq.find(c => c.type === "image");
+  const marked = seq.filter(c => c.type !== "image" || c === firstImg);
+  marked.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.type === "image" ? tr(CFG.images.note) : c.name; ru.append(m); });
 
   const sc = $("#scrub"); sc.querySelectorAll(".tick").forEach(n => n.remove());
   marked.forEach(c => { if (c.start > 0) { const k = el("span", "tick"); k.style.left = pct(c.start); sc.append(k); } });
@@ -744,12 +714,6 @@ $("#safeBtn").onclick = e => { const s = $("#safe"); s.hidden = !s.hidden; e.cur
 vid.addEventListener("ended", () => { if (playing) { const nx = seq[seq.indexOf(cur) + 1]; nx ? setTime(nx.start, true) : setPlaying(false); } });
 
 addEventListener("keydown", e => {
-  if (!$("#viewer").hidden) {
-    if (e.key === "Escape") closeViewer();
-    else if (e.key === "ArrowLeft") { e.preventDefault(); stepViewer(-1); }
-    else if (e.key === "ArrowRight") { e.preventDefault(); stepViewer(1); }
-    return;
-  }
   if (e.target.closest("input,textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key.toLowerCase();
   if (k === " " && !e.target.closest("button,a")) { e.preventDefault(); togglePlay(); }
@@ -782,36 +746,6 @@ seq.forEach(c => {
   v.src = c.src;
 });
 
-/* ---------- окно просмотра изображений ---------- */
-let vk = 0, lastFocus = null;
-function showViewer() {
-  const c = IMAGES[vk];
-  $("#vwImg").src = c.src; $("#vwImg").alt = c.name;
-  $("#vwName").textContent = c.name;
-  $("#vwCount").textContent = `${String(vk + 1).padStart(2, "0")} / ${IMAGES.length}`;
-  $("#vwNote").textContent = tr(CFG.images.note);
-  [IMAGES[vk + 1], IMAGES[vk - 1]].forEach(n => { if (n) new Image().src = n.src; });
-  document.querySelectorAll(".item.img").forEach(n => n.classList.toggle("sel", +n.dataset.k === vk));
-}
-function openViewer(k) {
-  vk = k; lastFocus = document.activeElement; setPlaying(false);
-  $("#viewer").hidden = false; document.body.style.overflow = "hidden";
-  showViewer(); $("#vwClose").focus();
-}
-function closeViewer() {
-  $("#viewer").hidden = true; document.body.style.overflow = "";
-  document.querySelectorAll(".item.img.sel").forEach(n => n.classList.remove("sel"));
-  lastFocus?.focus?.();
-}
-function stepViewer(d) { vk = (vk + d + IMAGES.length) % IMAGES.length; showViewer(); }
-$("#vwClose").onclick = closeViewer;
-$("#vwPrev").onclick = () => stepViewer(-1);
-$("#vwNext").onclick = () => stepViewer(1);
-$("#viewer").addEventListener("click", e => { if (e.target.id === "viewer") closeViewer(); });
-{ let x0 = null; const st = $("#vwStage");
-  st.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
-  st.addEventListener("touchend", e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) stepViewer(dx < 0 ? 1 : -1); }); }
-
 /* ---------- язык ---------- */
 function applyLang(next, save) {
   lang = next;
@@ -826,7 +760,6 @@ function applyLang(next, save) {
   $("#bPlay").setAttribute("aria-label", L(playing ? "tPause" : "tPlay"));
   renderInspector(); layout(); renderBin();
   if (cur) showClip(cur);
-  if (!$("#viewer").hidden) showViewer();
 }
 document.querySelectorAll(".lang button").forEach(b => b.onclick = () => { if (b.dataset.lang !== lang) applyLang(b.dataset.lang, true); });
 
