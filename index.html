@@ -279,6 +279,26 @@ a{color:var(--tc)}
 .status{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;color:var(--dim);font-size:11px;padding:6px 2px}
 .status .ok::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--marker);margin-right:6px}
 .status .r{margin-left:auto}
+/* карусель изображений: поверх всей страницы */
+.viewer{position:fixed;inset:0;z-index:50;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:rgba(7,8,10,.96);
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.vw-top{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.vw-title{flex:1;min-width:0;display:flex;align-items:baseline;gap:10px;overflow:hidden;white-space:nowrap}
+.vw-title b{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.vw-title span{color:var(--mute);font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.vw-count{color:var(--tc);font-size:13px;flex:none}
+.vw-btn{width:42px;height:42px;background:var(--panel-2);border:1px solid var(--line-2);flex:none}
+.vw-btn:hover{border-color:var(--mute)}
+.vw-stage{position:relative;min-height:0;overflow:hidden;touch-action:pan-y}
+.vw-stage img{position:absolute;inset:0;margin:auto;width:auto;height:auto;max-width:calc(100% - 144px);max-height:100%;border-radius:12px;display:block;user-select:none;-webkit-user-drag:none}
+.vw-nav{position:absolute;z-index:2;top:50%;transform:translateY(-50%)}
+.vw-prev{left:16px}.vw-next{right:16px}
+.vw-strip{display:flex;gap:6px;overflow-x:auto;padding:12px 16px 14px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;scroll-behavior:smooth}
+.vw-strip button{flex:none;width:54px;height:72px;border-radius:8px;overflow:hidden;opacity:.45;border:2px solid transparent;padding:0;transition:opacity .15s}
+.vw-strip button img{width:100%;height:100%;object-fit:cover;display:block}
+.vw-strip button:hover{opacity:.8}
+.vw-strip button.on{opacity:1;border-color:var(--accent)}
+@media (max-width:560px){.vw-stage img{max-width:calc(100% - 16px)}.vw-nav{top:auto;bottom:10px;transform:none;background:rgba(20,21,24,.75)}.vw-title span{display:none}.vw-strip button{width:42px;height:56px}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel-2);border:1px solid var(--line-2);
   padding:9px 18px;border-radius:999px;font-size:12px;z-index:30}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}body::before,body::after{animation:none}}
@@ -382,6 +402,19 @@ a{color:var(--tc)}
   <span id="statusLine"></span>
   <span class="r mono" id="statusTc"></span>
 </footer>
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vwName">
+  <div class="vw-top">
+    <span class="vw-title"><b id="vwName"></b><span id="vwNote"></span></span>
+    <span class="mono vw-count" id="vwCount"></span>
+    <button class="ib vw-btn" id="vwClose" data-tt="close" title="Закрыть" aria-label="Закрыть"><svg viewBox="0 0 16 16"><path d="M3.5 2.1 8 6.6l4.5-4.5 1.4 1.4L9.4 8l4.5 4.5-1.4 1.4L8 9.4l-4.5 4.5-1.4-1.4L6.6 8 2.1 3.5z"/></svg></button>
+  </div>
+  <div class="vw-stage" id="vwStage">
+    <button class="ib vw-btn vw-nav vw-prev" id="vwPrev" data-tt="prev" title="Предыдущее" aria-label="Предыдущее"><svg viewBox="0 0 16 16"><path d="M10.5 2 4.5 8l6 6 1.4-1.4L7.3 8l4.6-4.6z"/></svg></button>
+    <img id="vwImg" alt="">
+    <button class="ib vw-btn vw-nav vw-next" id="vwNext" data-tt="next" title="Следующее" aria-label="Следующее"><svg viewBox="0 0 16 16"><path d="M5.5 2 4.1 3.4 8.7 8l-4.6 4.6L5.5 14l6-6z"/></svg></button>
+  </div>
+  <div class="vw-strip" id="vwStrip"></div>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -430,7 +463,8 @@ const CFG = {
     files: ["01_hustlers_fur", "02_leopard_throne", "03_gold_grillz", "04_diamond_ice", "05_feather_hat", "06_terry_lowrider", "07_jetski_barbie", "08_red_viper", "09_chinchilla_coat", "10_gold_puffer", "11_icy_pool", "12_70s_soul_train", "13_gold_lotto", "14_crystal_goat", "15_cash_party", "16_miami_ice", "17_desert_empress", "18_louvre_gold", "19_banker", "20_leopard_boss", "21_angel_cape", "22_leopard_lowrider", "23_pink_velour_diner", "24_chrome_fisheye", "25_fur_boot_pinup", "26_red_room_grill", "27_neon_empress", "28_miami_feathers", "29_bronx_bandeau", "30_chateau_doll", "31_campaign_baby_tee", "32_desert_track", "33_harness_runway", "34_gangster_grillz", "35_crochet_cubans", "36_varsity_ice", "37_red_lounge_chains", "38_supercar_choker", "39_icy_bedroom_fur", "40_polka_dot_don", "41_brown_velour_mall", "42_purple_fur_nyc", "43_mink_gold_grillz", "44_leopard_jet"]
   }
 };
-CFG.works.push(...CFG.images.files.map(f => ({ name: f + ".jpg", type: "image", src: CFG.images.folder + f + ".jpg", poster: CFG.images.folder + f + "_t.jpg", dur: CFG.images.dur, note: CFG.images.note })));
+/* изображения не на таймлайне — открываются поверх всего в карусели */
+const IMAGES = CFG.images.files.map((f, i) => ({ name: f + ".jpg", type: "image", src: CFG.images.folder + f + ".jpg", poster: CFG.images.folder + f + "_t.jpg", color: `--c${(i % 6) + 1}` }));
 
 /* интерфейс */
 const UI = {
@@ -445,7 +479,7 @@ const UI = {
     copy: "Копировать", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
     titleClip: "Титр: ", adj: "Корректирующий слой · Grade", clips: n => `${n} клипов`,
     works: n => { const a = n % 10, b = n % 100; return n + " " + (a === 1 && b !== 11 ? "работа" : a >= 2 && a <= 4 && (b < 12 || b > 14) ? "работы" : "работ"); },
-    soundOn: "Звук включён", openImages: "Открыть все изображения →", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
+    soundOn: "Звук включён", openImages: "Открыть все изображения →", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
   },
   en: {
     title: "Gennady Andreev · AI Creator", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
@@ -458,7 +492,7 @@ const UI = {
     copy: "Copy", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
     titleClip: "Title: ", adj: "Adjustment layer · Grade", clips: n => `${n} clips`,
     works: n => `${n} ${n === 1 ? "work" : "works"}`,
-    soundOn: "Sound on", openImages: "Open all images →", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
+    soundOn: "Sound on", openImages: "Open all images →", close: "Close", prev: "Previous", next: "Next", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
   }
 };
 let lang = (() => {
@@ -552,17 +586,17 @@ function thumbFor(c) {
 }
 function renderBin() {
   const bin = $("#bin"); bin.textContent = "";
-  const list = seq.filter(c => filter === "all" ? c.type !== "image" : (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
+  const list = filter === "image" ? IMAGES : seq.filter(c => filter === "all" || (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
   let shownSeries = false;
-  list.forEach(c => {
+  list.forEach((c, k) => {
     if (c.type === "image" && !shownSeries) { shownSeries = true; bin.append(el("div", "bin-sec", `${tr(CFG.images.note)} · ${CFG.images.files.length}`)); }
-    const b = el("button", "item " + (c.type === "image" ? "img" : "vid")); b.dataset.i = seq.indexOf(c);
+    const b = el("button", "item " + (c.type === "image" ? "img" : "vid")); if (c.type === "image") b.dataset.k = k; else b.dataset.i = seq.indexOf(c);
     b.append(thumbFor(c), el("span", "n", c.name)); if (c.type !== "image") b.append(el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
-    b.onclick = () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
+    b.onclick = c.type === "image" ? () => openViewer(k) : () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
     bin.append(b);
   });
   /* во «Все» серия свёрнута в одну плитку — сетка картинок открывается по кнопке «Изображения» */
-  const imgs = seq.filter(c => c.type === "image");
+  const imgs = IMAGES;
   if (filter === "all" && imgs.length) {
     const t = el("button", "item vid series"), th = el("div", "thumb");
     imgs.slice(0, 3).forEach(c => { const i = el("img"); i.src = c.poster; i.alt = ""; i.loading = "lazy"; th.append(i); });
@@ -570,7 +604,7 @@ function renderBin() {
     t.onclick = () => setFilter("image");
     bin.append(t);
   }
-  $("#binCount").textContent = L("works")(CFG.works.length);
+  $("#binCount").textContent = L("works")(CFG.works.length + IMAGES.length);
   highlight();
 }
 function setFilter(f) {
@@ -604,9 +638,8 @@ function layout() {
 
   const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300], step = steps.find(s => T / s <= 9) || 600;
   for (let x = 0; x < T - step * 0.6; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
-  const firstImg = seq.find(c => c.type === "image");
-  const marked = seq.filter(c => c.type !== "image" || c === firstImg);
-  marked.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.type === "image" ? tr(CFG.images.note) : c.name; ru.append(m); });
+  const marked = seq;
+  marked.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.name; ru.append(m); });
 
   const sc = $("#scrub"); sc.querySelectorAll(".tick").forEach(n => n.remove());
   marked.forEach(c => { if (c.start > 0) { const k = el("span", "tick"); k.style.left = pct(c.start); sc.append(k); } });
@@ -732,6 +765,12 @@ $("#safeBtn").onclick = e => { const s = $("#safe"); s.hidden = !s.hidden; e.cur
 vid.addEventListener("ended", () => { if (playing) { const nx = seq[seq.indexOf(cur) + 1]; nx ? setTime(nx.start, true) : setPlaying(false); } });
 
 addEventListener("keydown", e => {
+  if (!$("#viewer").hidden) {
+    if (e.key === "Escape") closeViewer();
+    else if (e.key === "ArrowLeft") { e.preventDefault(); stepViewer(-1); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); stepViewer(1); }
+    return;
+  }
   if (e.target.closest("input,textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key.toLowerCase();
   if (k === " " && !e.target.closest("button,a")) { e.preventDefault(); togglePlay(); }
@@ -764,6 +803,37 @@ seq.forEach(c => {
   v.src = c.src;
 });
 
+/* ---------- карусель изображений ---------- */
+let vk = 0, lastFocus = null;
+function buildStrip() {
+  const st = $("#vwStrip"); if (st.childElementCount) return;
+  IMAGES.forEach((c, k) => { const b = el("button"), i = el("img"); i.src = c.poster; i.alt = ""; i.loading = "lazy"; b.append(i); b.setAttribute("aria-label", c.name); b.onclick = () => { vk = k; showViewer(); }; st.append(b); });
+}
+function showViewer() {
+  const c = IMAGES[vk];
+  $("#vwImg").src = c.src; $("#vwImg").alt = c.name;
+  $("#vwName").textContent = c.name; $("#vwNote").textContent = tr(CFG.images.note);
+  $("#vwCount").textContent = `${String(vk + 1).padStart(2, "0")} / ${IMAGES.length}`;
+  [IMAGES[vk + 1], IMAGES[vk - 1]].forEach(n => { if (n) new Image().src = n.src; });
+  const st = $("#vwStrip");
+  [...st.children].forEach((b, k) => b.classList.toggle("on", k === vk));
+  const on = st.children[vk]; if (on) st.scrollTo({ left: on.offsetLeft - st.clientWidth / 2 + on.offsetWidth / 2 });
+}
+function openViewer(k) {
+  vk = k; lastFocus = document.activeElement; setPlaying(false);
+  buildStrip(); $("#viewer").hidden = false; document.body.style.overflow = "hidden";
+  showViewer(); $("#vwClose").focus();
+}
+function closeViewer() { $("#viewer").hidden = true; document.body.style.overflow = ""; lastFocus?.focus?.(); }
+function stepViewer(d) { vk = (vk + d + IMAGES.length) % IMAGES.length; showViewer(); }
+$("#vwClose").onclick = closeViewer;
+$("#vwPrev").onclick = () => stepViewer(-1);
+$("#vwNext").onclick = () => stepViewer(1);
+$("#vwStage").addEventListener("click", e => { if (e.target.id === "vwStage") closeViewer(); });
+{ let x0 = null; const st = $("#vwStage");
+  st.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
+  st.addEventListener("touchend", e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) stepViewer(dx < 0 ? 1 : -1); }); }
+
 /* ---------- язык ---------- */
 function applyLang(next, save) {
   lang = next;
@@ -778,6 +848,7 @@ function applyLang(next, save) {
   $("#bPlay").setAttribute("aria-label", L(playing ? "tPause" : "tPlay"));
   renderInspector(); layout(); renderBin();
   if (cur) showClip(cur);
+  if (!$("#viewer").hidden) showViewer();
 }
 document.querySelectorAll(".lang button").forEach(b => b.onclick = () => { if (b.dataset.lang !== lang) applyLang(b.dataset.lang, true); });
 
