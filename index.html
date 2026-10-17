@@ -717,9 +717,8 @@ function prop(k, v) { const r = el("div", "prop"); r.append(el("span", "sw", "�
 function renderMeta() {
   const root = $("#metaPanel"); if (!metaTab) return; root.textContent = "";
   const c = cur || seq[0], m = c.meta || {};
-  const head = el("div", "meta-head"), th = el("div", "meta-thumb"), im = el("img");
-  im.src = c.poster || c.src || ""; im.alt = ""; th.append(im, el("span", "badge", c.kind === "reel" ? "SHOWREEL" : (c.type === "image" ? "STILL" : "AI · VIDEO")));
-  head.append(th, el("h2", "meta-title", tr(m.title) || c.name)); if (m.sub) head.append(el("p", "meta-sub", tr(m.sub)));
+  const head = el("div", "meta-head");
+  head.append(el("h2", "meta-title", tr(m.title) || c.name)); if (m.sub) head.append(el("p", "meta-sub", tr(m.sub)));
   const clip = [prop(L("mFile"), c.name), prop(L("mDur"), tcf(c.dur))];
   if (m.res || (c.type !== "image" && vid.videoWidth && vid.dataset.src === c.src)) clip.push(prop(L("mRes"), (vid.dataset.src === c.src && vid.videoWidth) ? `${vid.videoWidth}×${vid.videoHeight}` : m.res));
   if (m.fps) clip.push(prop(L("mFps"), m.fps + " fps"));
