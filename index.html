@@ -337,6 +337,7 @@ button.tab:not(.on):hover{color:var(--fg)}
 /* status bar */
 .status{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;color:var(--dim);font-size:11px;padding:6px 2px}
 .status .ok::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--marker);margin-right:6px}
+.status .views{opacity:.7;font-size:10.5px;letter-spacing:.02em}
 .status .r{margin-left:auto}
 /* переключатель «Информация / Метаданные» — капсула, как фильтр в «Проекте» */
 .insp-tabs{height:auto;padding:10px;border-bottom:1px solid var(--line);gap:8px}
@@ -528,6 +529,7 @@ button.tab:not(.on):hover{color:var(--fg)}
 <footer class="status" id="contact">
   <span class="ok" data-t="ready">Готово</span>
   <span id="statusLine"></span>
+  <span class="views mono" id="views" hidden></span>
   <span class="r mono" id="statusTc"></span>
 </footer>
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vwName">
@@ -633,7 +635,7 @@ const UI = {
     copy: "Копировать", cv: "Скачать резюме · PDF", cvOpen: "Открыть резюме в новой вкладке", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
     titleClip: "Титр: ", adj: "Корректирующий слой · Grade", clips: n => `${n} клипов`,
     works: n => { const a = n % 10, b = n % 100; return n + " " + (a === 1 && b !== 11 ? "работа" : a >= 2 && a <= 4 && (b < 12 || b > 14) ? "работы" : "работ"); },
-    soundOn: "Звук включён", openImages: "Открыть все изображения →", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
+    soundOn: "Звук включён", viewsTitle: "Просмотры сайта", openImages: "Открыть все изображения →", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
   },
   en: {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
@@ -646,7 +648,7 @@ const UI = {
     copy: "Copy", cv: "Download CV · PDF", cvOpen: "Open CV in a new tab", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
     titleClip: "Title: ", adj: "Adjustment layer · Grade", clips: n => `${n} clips`,
     works: n => `${n} ${n === 1 ? "work" : "works"}`,
-    soundOn: "Sound on", openImages: "Open all images →", close: "Close", prev: "Previous", next: "Next", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
+    soundOn: "Sound on", viewsTitle: "Site views", openImages: "Open all images →", close: "Close", prev: "Previous", next: "Next", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
   }
 };
 let lang = (() => {
@@ -1133,6 +1135,19 @@ $("#vwStage").addEventListener("click", e => { if (e.target.id === "vwStage") cl
   st.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
   st.addEventListener("touchend", e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) stepViewer(dx < 0 ? 1 : -1); }); }
 
+/* ---------- счётчик просмотров в подвале (только на опубликованном сайте) ---------- */
+(function views() {
+  const host = location.hostname;
+  if (!/(^|\.)b1ohazard696\.github\.io$|(^|\.)andreev\.pro$/.test(host)) return;
+  const NS = "b1ohazard696-portfolio", KEY = "views";
+  let fresh = true; try { fresh = !sessionStorage.getItem("v-counted"); sessionStorage.setItem("v-counted", "1"); } catch {}
+  const show = n => { if (!(n >= 0)) return; const v = $("#views"); v.hidden = false; v.textContent = "◉ " + Number(n).toLocaleString("ru-RU"); v.title = L("viewsTitle"); };
+  const get = u => fetch(u, { cache: "no-store" }).then(r => { if (!r.ok) throw r.status; return r.json(); });
+  /* основной сервис — Abacus, запасной — CounterAPI; если оба недоступны, счётчик просто не показывается */
+  get(`https://abacus.jasoncameron.dev/${fresh ? "hit" : "get"}/${NS}/${KEY}`).then(j => show(j.value))
+    .catch(() => get(`https://api.counterapi.dev/v1/${NS}/${KEY}${fresh ? "/up" : ""}`).then(j => show(j.count)).catch(() => {}));
+})();
+
 /* ---------- язык ---------- */
 function applyLang(next, save) {
   lang = next;
@@ -1146,6 +1161,7 @@ function applyLang(next, save) {
   $("#initials").textContent = tr(CFG.initials);
   $("#bPlay").setAttribute("aria-label", L(playing ? "tPause" : "tPlay"));
   renderInspector(); layout(); renderBin(); queueScopes(); renderMeta();
+  if (!$("#views").hidden) $("#views").title = L("viewsTitle");
   if (typeof applyTheme === "function" && $("#themeBtn").title) applyTheme(ui, false);
   if (cur) showClip(cur);
   if (!$("#viewer").hidden) showViewer();
