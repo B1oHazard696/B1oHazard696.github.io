@@ -295,6 +295,14 @@ button.tab:not(.on):hover{color:var(--fg)}
 .item.series .thumb{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
 .item.series .thumb img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
 .item.series .s{color:var(--tc)}
+.item.series .thumb{position:relative}
+.folder-ico{position:absolute;left:6px;top:6px;width:26px;height:22px;border-radius:6px;display:grid;place-items:center;background:rgba(0,0,0,.6);color:#ffc857;z-index:2}
+.folder-ico svg{width:15px;height:15px;fill:currentColor}
+.bin-back{grid-column:1 / -1;display:flex;align-items:center;gap:8px;height:38px;padding:0 12px;border-radius:999px;text-align:left;font-size:12.5px;color:var(--mute);
+  background:color-mix(in srgb, var(--accent) 10%, var(--panel));border:1px solid color-mix(in srgb, var(--accent) 45%, transparent)}
+.bin-back:hover{color:var(--fg)}
+.bin-back svg{width:14px;height:14px;fill:currentColor;flex:none}
+.bin-back b{margin-left:auto;color:var(--fg);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item.img .thumb{aspect-ratio:3/4}
 .item.img .n{font-size:10.5px;color:var(--mute)}
 .bin-sec{grid-column:1 / -1;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:6px 4px 0}
@@ -627,15 +635,18 @@ const CFG = {
         year: "2026", codec: "H.264 · AAC", res: "1504×1120", fps: 24
       } }
   ],
-  /* серия изображений: файлы лежат в media/soul/ (полный кадр + превью _t) */
-  images: {
-    folder: "media/soul/", dur: 3,
-    note: { ru: "AI-фотосерия Soul", en: "AI photo series Soul" },
-    files: ["01_hustlers_fur", "02_leopard_throne", "03_gold_grillz", "04_diamond_ice", "05_feather_hat", "06_terry_lowrider", "07_jetski_barbie", "08_red_viper", "09_chinchilla_coat", "10_gold_puffer", "11_icy_pool", "12_70s_soul_train", "13_gold_lotto", "14_crystal_goat", "15_cash_party", "16_miami_ice", "17_desert_empress", "18_louvre_gold", "19_banker", "20_leopard_boss", "21_angel_cape", "22_leopard_lowrider", "23_pink_velour_diner", "24_chrome_fisheye", "25_fur_boot_pinup", "26_red_room_grill", "27_neon_empress", "28_miami_feathers", "29_bronx_bandeau", "30_chateau_doll", "31_campaign_baby_tee", "32_desert_track", "33_harness_runway", "34_gangster_grillz", "35_crochet_cubans", "36_varsity_ice", "37_red_lounge_chains", "38_supercar_choker", "39_icy_bedroom_fur", "40_polka_dot_don", "41_brown_velour_mall", "42_purple_fur_nyc", "43_mink_gold_grillz", "44_leopard_jet"]
-  }
+  /* папки с изображениями: каждая серия — своя папка в media/<id>/ (полный кадр + превью _t).
+     Чтобы добавить новую серию, допиши сюда ещё один объект. */
+  series: [
+    { id: "soul", folder: "media/soul/",
+      title: { ru: "AI-фотосерия Soul", en: "AI photo series Soul" },
+      files: ["01_hustlers_fur", "02_leopard_throne", "03_gold_grillz", "04_diamond_ice", "05_feather_hat", "06_terry_lowrider", "07_jetski_barbie", "08_red_viper", "09_chinchilla_coat", "10_gold_puffer", "11_icy_pool", "12_70s_soul_train", "13_gold_lotto", "14_crystal_goat", "15_cash_party", "16_miami_ice", "17_desert_empress", "18_louvre_gold", "19_banker", "20_leopard_boss", "21_angel_cape", "22_leopard_lowrider", "23_pink_velour_diner", "24_chrome_fisheye", "25_fur_boot_pinup", "26_red_room_grill", "27_neon_empress", "28_miami_feathers", "29_bronx_bandeau", "30_chateau_doll", "31_campaign_baby_tee", "32_desert_track", "33_harness_runway", "34_gangster_grillz", "35_crochet_cubans", "36_varsity_ice", "37_red_lounge_chains", "38_supercar_choker", "39_icy_bedroom_fur", "40_polka_dot_don", "41_brown_velour_mall", "42_purple_fur_nyc", "43_mink_gold_grillz", "44_leopard_jet"] }
+  ]
 };
-/* изображения не на таймлайне — открываются поверх всего в карусели */
-const IMAGES = CFG.images.files.map((f, i) => ({ name: f + ".jpg", type: "image", src: CFG.images.folder + f + ".jpg", poster: CFG.images.folder + f + "_t.jpg", color: `--c${(i % 6) + 1}` }));
+/* изображения не на таймлайне — лежат по папкам и открываются поверх всего в карусели */
+const SERIES = CFG.series.map(sr => ({ ...sr, items: sr.files.map((f, i) => ({ name: f + ".jpg", type: "image", src: sr.folder + f + ".jpg", poster: sr.folder + f + "_t.jpg", color: `--c${(i % 6) + 1}` })) }));
+const IMG_TOTAL = SERIES.reduce((n, sr) => n + sr.items.length, 0);
+let openSeries = null;
 
 /* интерфейс */
 const UI = {
@@ -650,7 +661,7 @@ const UI = {
     copy: "Копировать", cv: "Скачать резюме · PDF", cvOpen: "Открыть резюме в новой вкладке", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
     titleClip: "Титр: ", adj: "Корректирующий слой · Grade", clips: n => `${n} клипов`,
     works: n => { const a = n % 10, b = n % 100; return n + " " + (a === 1 && b !== 11 ? "работа" : a >= 2 && a <= 4 && (b < 12 || b > 14) ? "работы" : "работ"); },
-    soundOn: "Звук включён", viewsTitle: "Просмотры сайта", openImages: "Открыть все изображения →", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
+    soundOn: "Звук включён", viewsTitle: "Просмотры сайта", openImages: "Открыть все изображения →", openFolder: "Папка · открыть →", allFolders: "Все папки", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
   },
   en: {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
@@ -663,7 +674,7 @@ const UI = {
     copy: "Copy", cv: "Download CV · PDF", cvOpen: "Open CV in a new tab", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
     titleClip: "Title: ", adj: "Adjustment layer · Grade", clips: n => `${n} clips`,
     works: n => `${n} ${n === 1 ? "work" : "works"}`,
-    soundOn: "Sound on", viewsTitle: "Site views", openImages: "Open all images →", close: "Close", prev: "Previous", next: "Next", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
+    soundOn: "Sound on", viewsTitle: "Site views", openImages: "Open all images →", openFolder: "Folder · open →", allFolders: "All folders", close: "Close", prev: "Previous", next: "Next", soundOff: "Sound off", noFull: "Full screen isn't available", noVideo: "video not uploaded yet"
   }
 };
 let lang = (() => {
@@ -821,13 +832,16 @@ function thumbFor(c) {
 }
 function renderBin() {
   const bin = $("#bin"); bin.textContent = "";
-  const list = filter === "image" ? IMAGES : seq.filter(c => filter === "all" || (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
-  let shownSeries = false;
+  const sr = filter === "image" && SERIES.find(x => x.id === openSeries);
+  const list = filter === "image" ? (sr ? sr.items : []) : seq.filter(c => filter === "all" || (c.kind === "work" && c.type === filter) || (filter === "video" && c.kind === "reel"));
+  /* «Изображения» без открытой папки — список папок; внутри папки — кнопка «назад» и кадры серии */
+  if (filter === "image" && !sr) SERIES.forEach(x => bin.append(folderTile(x)));
+  if (sr) { const bk = el("button", "bin-back"); bk.innerHTML = '<svg viewBox="0 0 16 16"><path d="M10.5 2 4.5 8l6 6 1.4-1.4L7.3 8l4.6-4.6z"/></svg>';
+    bk.append(el("span", "", L("allFolders")), el("b", "", `${tr(sr.title)} · ${sr.items.length}`)); bk.onclick = () => { openSeries = null; renderBin(); }; bin.append(bk); }
   list.forEach((c, k) => {
-    if (c.type === "image" && !shownSeries) { shownSeries = true; bin.append(el("div", "bin-sec", `${tr(CFG.images.note)} · ${CFG.images.files.length}`)); }
     const b = el("button", "item " + (c.type === "image" ? "img" : "vid")); if (c.type === "image") b.dataset.k = k; else b.dataset.i = seq.indexOf(c);
     b.append(thumbFor(c), el("span", "n", c.name)); if (c.type !== "image") b.append(el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
-    b.onclick = c.type === "image" ? () => openViewer(k) : () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
+    b.onclick = c.type === "image" ? () => openViewer(sr, k) : () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
     /* превью при наведении: ролик беззвучно играет прямо в карточке, как скраб в бине */
     if (c.type !== "image" && c.src && matchMedia("(hover:hover)").matches) {
       let pv = null;
@@ -838,19 +852,21 @@ function renderBin() {
     }
     bin.append(b);
   });
-  /* во «Все» серия свёрнута в одну плитку — сетка картинок открывается по кнопке «Изображения» */
-  const imgs = IMAGES;
-  if (filter === "all" && imgs.length) {
-    const t = el("button", "item vid series"), th = el("div", "thumb");
-    imgs.slice(0, 3).forEach(c => { const i = el("img"); i.src = c.poster; i.alt = ""; i.loading = "lazy"; th.append(i); });
-    t.append(th, el("span", "n", `${tr(CFG.images.note)} · ${imgs.length}`), el("span", "s", L("openImages")));
-    t.onclick = () => setFilter("image");
-    bin.append(t);
-  }
-  $("#binCount").textContent = L("works")(CFG.works.length + IMAGES.length);
+  /* во «Все» папки с изображениями идут плитками после видео */
+  if (filter === "all") SERIES.forEach(x => bin.append(folderTile(x)));
+  $("#binCount").textContent = L("works")(CFG.works.length + IMG_TOTAL);
   highlight();
 }
+function folderTile(x) {
+  const t = el("button", "item vid series"), th = el("div", "thumb");
+  x.items.slice(0, 3).forEach(c => { const i = el("img"); i.src = c.poster; i.alt = ""; i.loading = "lazy"; th.append(i); });
+  const tab = el("span", "folder-ico"); tab.innerHTML = '<svg viewBox="0 0 16 16"><path d="M1.5 4A1.5 1.5 0 0 1 3 2.5h3.2l1.6 1.6H13A1.5 1.5 0 0 1 14.5 5.6v6.9A1.5 1.5 0 0 1 13 14H3a1.5 1.5 0 0 1-1.5-1.5z"/></svg>'; th.append(tab);
+  t.append(th, el("span", "n", `${tr(x.title)} · ${x.items.length}`), el("span", "s", L("openFolder")));
+  t.onclick = () => { openSeries = x.id; setFilter("image"); };
+  return t;
+}
 function setFilter(f) {
+  if (f !== "image") openSeries = null;
   filter = f; document.querySelectorAll(".filt").forEach(x => x.setAttribute("aria-pressed", x.dataset.f === f)); renderBin();
 }
 document.querySelectorAll(".filt").forEach(f => f.onclick = () => setFilter(f.dataset.f));
@@ -1147,28 +1163,28 @@ $("#lImg").addEventListener("load", queueScopes);
 addEventListener("resize", queueScopes);
 
 /* ---------- карусель изображений ---------- */
-let vk = 0, lastFocus = null;
+let vk = 0, lastFocus = null, VS = SERIES[0], stripOf = null;
 function buildStrip() {
-  const st = $("#vwStrip"); if (st.childElementCount) return;
-  IMAGES.forEach((c, k) => { const b = el("button"), i = el("img"); i.src = c.poster; i.alt = ""; i.loading = "lazy"; b.append(i); b.setAttribute("aria-label", c.name); b.onclick = () => { vk = k; showViewer(); }; st.append(b); });
+  const st = $("#vwStrip"); if (stripOf === VS.id) return; st.textContent = ""; stripOf = VS.id;
+  VS.items.forEach((c, k) => { const b = el("button"), i = el("img"); i.src = c.poster; i.alt = ""; i.loading = "lazy"; b.append(i); b.setAttribute("aria-label", c.name); b.onclick = () => { vk = k; showViewer(); }; st.append(b); });
 }
 function showViewer() {
-  const c = IMAGES[vk];
+  const c = VS.items[vk];
   $("#vwImg").src = c.src; $("#vwImg").alt = c.name;
-  $("#vwName").textContent = c.name; $("#vwNote").textContent = tr(CFG.images.note);
-  $("#vwCount").textContent = `${String(vk + 1).padStart(2, "0")} / ${IMAGES.length}`;
-  [IMAGES[vk + 1], IMAGES[vk - 1]].forEach(n => { if (n) new Image().src = n.src; });
+  $("#vwName").textContent = c.name; $("#vwNote").textContent = tr(VS.title);
+  $("#vwCount").textContent = `${String(vk + 1).padStart(2, "0")} / ${VS.items.length}`;
+  [VS.items[vk + 1], VS.items[vk - 1]].forEach(n => { if (n) new Image().src = n.src; });
   const st = $("#vwStrip");
   [...st.children].forEach((b, k) => b.classList.toggle("on", k === vk));
   const on = st.children[vk]; if (on) st.scrollTo({ left: on.offsetLeft - st.clientWidth / 2 + on.offsetWidth / 2 });
 }
-function openViewer(k) {
-  vk = k; lastFocus = document.activeElement; setPlaying(false);
+function openViewer(series, k) {
+  VS = series || SERIES[0]; vk = k; lastFocus = document.activeElement; setPlaying(false);
   buildStrip(); $("#viewer").hidden = false; document.body.style.overflow = "hidden";
   showViewer(); $("#vwClose").focus();
 }
 function closeViewer() { $("#viewer").hidden = true; document.body.style.overflow = ""; lastFocus?.focus?.(); }
-function stepViewer(d) { vk = (vk + d + IMAGES.length) % IMAGES.length; showViewer(); }
+function stepViewer(d) { const n = VS.items.length; vk = (vk + d + n) % n; showViewer(); }
 $("#vwClose").onclick = closeViewer;
 $("#vwPrev").onclick = () => stepViewer(-1);
 $("#vwNext").onclick = () => stepViewer(1);
