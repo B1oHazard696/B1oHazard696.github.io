@@ -283,6 +283,8 @@ button.tab:not(.on):hover{color:var(--fg)}
 .item:hover{background:var(--panel-2)}
 .item.sel{border-color:var(--accent);background:var(--panel-2)}
 .thumb{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:10px;overflow:hidden;background:var(--well)}
+.thumb .pv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.thumb .d,.thumb .t{z-index:2}
 .thumb>img,.thumb>video{width:100%;height:100%;object-fit:cover;display:block}
 .thumb .ph{position:absolute;inset:0;display:grid;place-items:center;font:600 10px var(--f-mono);color:rgba(255,255,255,.85);letter-spacing:.06em;
   background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(0,0,0,.18) 8px 16px),var(--cc)}
@@ -323,6 +325,9 @@ button.tab:not(.on):hover{color:var(--fg)}
 .clip.sel{outline:2px solid #fff;outline-offset:-2px}
 .clip .fxb{position:absolute;right:4px;top:3px;font:600 9px var(--f-mono);background:rgba(0,0,0,.35);padding:0 5px;border-radius:999px}
 .clip.v2{opacity:.9}
+.clip.chap{opacity:.55;padding:3px 6px;cursor:pointer;transition:opacity .15s}
+.clip.chap:hover,.clip.chap.on{opacity:1}
+.ruler .mk.ch{width:6px;height:6px;transform:translateX(-3px);background:var(--c3)}
 .clip.audio{background:#1f5a4a;padding:0}
 .clip.audio canvas{position:absolute;inset:0;width:100%;height:100%}
 .clip.audio .cn{position:relative;padding:3px 6px}
@@ -582,6 +587,16 @@ const CFG = {
   cv: { ru: "media/Andreev_Gennady_CV.pdf", en: "media/Andreev_Gennady_CV_EN.pdf" },
   links: [],
 
+  /* главы шоурила — по титрам в самом ролике */
+  chapters: [
+    { t: 0,  n: "00", ru: "Нарезка", en: "Cut" },
+    { t: 4,  n: "01", ru: "Начало", en: "Origin" },
+    { t: 10, n: "02", ru: "Кино и ТВ · 2005–2016", en: "Film & TV · 2005–2016" },
+    { t: 18, n: "03", ru: "Viacom · 2016–2022", en: "Viacom · 2016–2022" },
+    { t: 22, n: "04", ru: "«Пятница» · 2023–2025", en: "Friday! · 2023–2025" },
+    { t: 34, n: "05", ru: "AI-продакшн · 2025→", en: "AI production · 2025→" },
+    { t: 46, n: "06", ru: "Таймлайн", en: "The Timeline" }
+  ],
   reel: { name: "GennadyAndreev_Showreel_2026.mp4", src: "media/showreel.mp4", srcMobile: "media/showreel_m.mp4", poster: "media/showreel.jpg", link: "https://www.youtube.com/watch?v=a4QNpQr4nCU", dur: 58,
     meta: {
       title: { ru: "Шоурил 2026", en: "Showreel 2026" },
@@ -589,7 +604,7 @@ const CFG = {
       text: { ru: "Нарезка из 18 лет работы: телепередачи, кино, промо и шоурилы для ТВ и YouTube, и AI-продакшн последних лет. Ролик собран как путь от видеоинженера на плёнке в 2005 году до AI-креатора.",
               en: "A cut of 18 years of work: TV shows, film, promos and reels for TV and YouTube, plus recent AI production. Built as a path from a tape video engineer in 2005 to an AI creator." },
       role: { ru: "Идея, монтаж, графика", en: "Concept, editing, graphics" },
-      tools: "After Effects, Premiere Pro",
+      tools: "After Effects, Premiere Pro; AI-кадры: Kling 3.0 via Higgsfield",
       year: "2026", codec: "H.264 · AAC", res: "1920×1080", fps: 30
     } },
   works: [
@@ -626,7 +641,7 @@ const IMAGES = CFG.images.files.map((f, i) => ({ name: f + ".jpg", type: "image"
 const UI = {
   ru: {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
-    tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все клипы последовательности", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
+    tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все клипы последовательности", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующий клип", tMute: "Звук", tFull: "Во весь экран",
     kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. клип", kFrame: "по кадрам",
     timeline: "Таймлайн", seq: "Последовательность 01", vis: "Видимость", tlHint: "Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.",
@@ -639,7 +654,7 @@ const UI = {
   },
   en: {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
-    tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All clips in the sequence", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
+    tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All clips in the sequence", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next clip", tMute: "Sound", tFull: "Full screen",
     kSpace: "Space", kPlay: "play/pause", kClip: "prev/next clip", kFrame: "frame by frame",
     timeline: "Timeline", seq: "Sequence 01", vis: "Visibility", tlHint: "Tap a clip to open it in the monitor. You can drag the playhead.",
@@ -709,6 +724,14 @@ function renderMeta() {
   root.append(head, section(L("mClip"), "fx", true, clip));
   if (about.length) root.append(section(L("mAbout"), "fx", true, about));
   if (cred.length) root.append(section(L("mCredits"), "fx", true, cred));
+  if (c.kind === "reel" && CFG.chapters) {
+    const cl = el("div", "meta-clips"), rel = t - c.start;
+    CFG.chapters.forEach((ch, i) => { const nx = CFG.chapters[i + 1], on = rel >= ch.t && (!nx || rel < nx.t);
+      const b = el("button", "meta-clip" + (on ? " on" : "")); b.style.setProperty("--cc", `var(${COLORS[i % COLORS.length]})`);
+      b.append(el("i"), el("span", "", `${ch.n} ${tr(ch)}`), el("em", "", tcf(ch.t).slice(3)));
+      b.onclick = () => setTime(c.start + ch.t, true); cl.append(b); });
+    root.append(section(L("mChapters"), "▶", true, [cl]));
+  }
   root.append(section(L("mAll"), "▶", true, [list]));
 }
 function setTab(meta) {
@@ -805,6 +828,14 @@ function renderBin() {
     const b = el("button", "item " + (c.type === "image" ? "img" : "vid")); if (c.type === "image") b.dataset.k = k; else b.dataset.i = seq.indexOf(c);
     b.append(thumbFor(c), el("span", "n", c.name)); if (c.type !== "image") b.append(el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
     b.onclick = c.type === "image" ? () => openViewer(k) : () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
+    /* превью при наведении: ролик беззвучно играет прямо в карточке, как скраб в бине */
+    if (c.type !== "image" && c.src && matchMedia("(hover:hover)").matches) {
+      let pv = null;
+      b.addEventListener("mouseenter", () => { const th = b.querySelector(".thumb"); if (!th || pv) return;
+        pv = el("video", "pv"); pv.muted = true; pv.loop = true; pv.playsInline = true; pv.preload = "auto";
+        pv.src = (c.srcMobile || c.src) + (c.kind === "reel" ? "#t=6" : ""); th.append(pv); pv.play().catch(() => {}); });
+      b.addEventListener("mouseleave", () => { if (pv) { pv.pause(); pv.removeAttribute("src"); pv.load(); pv.remove(); pv = null; } });
+    }
     bin.append(b);
   });
   /* во «Все» серия свёрнута в одну плитку — сетка картинок открывается по кнопке «Изображения» */
@@ -839,8 +870,14 @@ function layout() {
     if (c.kind === "reel") b.append(el("span", "fxb", "fx"));
     b.title = c.name; v1.append(b);
   });
-  const title = el("div", "clip v2"); title.style.left = "0"; title.style.width = `calc(${pct(Math.min(12, T))} - 2px)`;
-  title.style.setProperty("--cc", "var(--c4)"); title.append(el("span", "cn", L("titleClip") + tr(CFG.name))); v2.append(title);
+  /* V2: главы шоурила — подписанные клипы-маркеры, нажатие перематывает к главе */
+  const reel = seq[0], chs = CFG.chapters || [];
+  chs.forEach((ch, i) => {
+    const end = i + 1 < chs.length ? chs[i + 1].t : reel.dur, b = el("button", "clip v2 chap"); b.dataset.ch = i;
+    b.style.left = pct(reel.start + ch.t); b.style.width = `calc(${pct(end - ch.t)} - 2px)`;
+    b.style.setProperty("--cc", `var(${COLORS[i % COLORS.length]})`);
+    b.append(el("span", "cn", `${ch.n} ${tr(ch)}`)); b.title = `${ch.n} — ${tr(ch)} · ${tcf(ch.t)}`; v2.append(b);
+  });
   const adj = el("div", "clip v2"); adj.style.left = pct(seq[1] ? seq[1].start : 0); adj.style.right = "0";
   adj.style.setProperty("--cc", "#4a4d55"); adj.append(el("span", "cn", L("adj"))); v2.append(adj);
 
@@ -852,6 +889,7 @@ function layout() {
   for (let x = 0; x < T - step * 0.6; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
   const marked = seq;
   marked.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.name; ru.append(m); });
+  chs.slice(1).forEach(ch => { const m = el("span", "mk ch"); m.style.left = pct(reel.start + ch.t); m.title = `${ch.n} — ${tr(ch)}`; ru.append(m); });
 
   const sc = $("#scrub"); sc.querySelectorAll(".tick").forEach(n => n.remove());
   marked.forEach(c => { if (c.start > 0) { const k = el("span", "tick"); k.style.left = pct(c.start); sc.append(k); } });
@@ -881,9 +919,11 @@ function scrubFrom(target, e) {
 [["#lanes"], ["#scrub"]].forEach(([s]) => {
   const n = $(s); let down = false;
   n.addEventListener("pointerdown", e => { down = true; n.setPointerCapture(e.pointerId);
-    const clip = e.target.closest(".clip[data-i]");
-    if (clip) setTime(seq[+clip.dataset.i].start, true); else scrubFrom(n, e); });
-  n.addEventListener("pointermove", e => { if (down && !e.target.closest?.(".clip[data-i]")) scrubFrom(n, e); });
+    const clip = e.target.closest(".clip[data-i]"), chap = e.target.closest(".clip[data-ch]");
+    if (clip) setTime(seq[+clip.dataset.i].start, true);
+    else if (chap) setTime(seq[0].start + CFG.chapters[+chap.dataset.ch].t, true);
+    else scrubFrom(n, e); });
+  n.addEventListener("pointermove", e => { if (down && !e.target.closest?.(".clip[data-i], .clip[data-ch]")) scrubFrom(n, e); });
   n.addEventListener("pointerup", () => down = false); n.addEventListener("pointercancel", () => down = false);
 });
 
@@ -924,13 +964,15 @@ function highlight() {
     if (top < bin.scrollTop || bottom > bin.scrollTop + bin.clientHeight) bin.scrollTo({ top: Math.max(0, top - 8), behavior: "smooth" });
   }
 }
-let lastSel = -1;
+let lastSel = -1, lastCh = -2;
 function render() {
   const p = T ? t / T * 100 : 0;
   $("#playhead").style.left = p + "%";
   $("#scrub .fill").style.width = p + "%"; $("#scrub .head").style.left = p + "%";
   $("#tc").textContent = tcf(t); $("#statusTc").textContent = tcf(t) + " / " + tcf(T);
   const i = seq.indexOf(cur); if (i !== lastSel) { lastSel = i; highlight(); }
+  let ci = -1; if (cur === seq[0]) CFG.chapters.forEach((ch, k) => { if (t - seq[0].start >= ch.t) ci = k; });
+  if (ci !== lastCh) { lastCh = ci; document.querySelectorAll(".clip.chap").forEach(n => n.classList.toggle("on", +n.dataset.ch === ci)); if (metaTab) renderMeta(); }
 }
 function setPlaying(p) {
   playing = p;
