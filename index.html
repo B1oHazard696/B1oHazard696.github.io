@@ -647,6 +647,8 @@ const CFG = {
   copy: ["radioactive.wind@gmail.com", "+7 (926) 169-03-23"],
   cv: { ru: "media/Andreev_Gennady_CV.pdf", en: "media/Andreev_Gennady_CV_EN.pdf" },
   links: [],
+  /* уведомления о заходах в Telegram: адрес Cloudflare Worker (см. notify/README). Пусто — выключено */
+  notify: "",
 
   /* главы шоурила — по титрам в самом ролике */
   chapters: [
@@ -1346,6 +1348,30 @@ $("#vwStage").addEventListener("click", e => { if (e.target.id === "vwStage") cl
   /* основной сервис — Abacus, запасной — CounterAPI; если оба недоступны, счётчик просто не показывается */
   get(`https://abacus.jasoncameron.dev/${fresh ? "hit" : "get"}/${NS}/${KEY}`).then(j => show(j.value))
     .catch(() => get(`https://api.counterapi.dev/v1/${NS}/${KEY}${fresh ? "/up" : ""}`).then(j => show(j.count)).catch(() => {}));
+})();
+
+/* ---------- уведомления о посетителях → Telegram (через свой Cloudflare Worker) ----------
+   заход — не чаще раза в 6 часов с одного браузера; отдельно — скачивание резюме и клик по контактам.
+   Открой сайт один раз с #me, чтобы свои заходы не присылались (#me-off — вернуть) */
+(function notify() {
+  if (/^#me(-off)?$/.test(location.hash)) {
+    try { location.hash === "#me" ? localStorage.setItem("notify-off", "1") : localStorage.removeItem("notify-off"); } catch {}
+    toast(location.hash === "#me" ? "Свои заходы больше не присылаются" : "Свои заходы снова присылаются");
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+  const url = CFG.notify, host = location.hostname;
+  if (!url || navigator.webdriver || !/(^|\.)b1ohazard696\.github\.io$|(^|\.)andreev\.pro$/.test(host)) return;
+  try { if (localStorage.getItem("notify-off")) return; } catch {}
+  const ua = navigator.userAgent, dev = /iPhone/.test(ua) ? "iPhone" : /iPad/.test(ua) ? "iPad" : /Android/.test(ua) ? "Android" : /Mac/.test(ua) ? "Mac" : /Windows/.test(ua) ? "Windows" : /Linux/.test(ua) ? "Linux" : "?";
+  const br = /YaBrowser/.test(ua) ? "Яндекс" : /Edg\//.test(ua) ? "Edge" : /OPR\//.test(ua) ? "Opera" : /Telegram/.test(ua) ? "Telegram" : /Chrome|CriOS/.test(ua) ? "Chrome" : /Firefox|FxiOS/.test(ua) ? "Firefox" : /Safari/.test(ua) ? "Safari" : "?";
+  let ref = ""; try { ref = document.referrer ? new URL(document.referrer).hostname : ""; } catch {}
+  const send = (ev, extra) => { const body = JSON.stringify({ ev, lang, dev, br, ref, scr: `${screen.width}×${screen.height}`, ...extra });
+    try { if (!navigator.sendBeacon(url, new Blob([body], { type: "text/plain" }))) throw 0; } catch { fetch(url, { method: "POST", body, keepalive: true, mode: "no-cors" }).catch(() => {}); } };
+  let due = true; try { const last = +localStorage.getItem("notify-last") || 0; due = Date.now() - last > 6 * 3600e3; if (due) localStorage.setItem("notify-last", Date.now()); } catch {}
+  if (due) send("visit");
+  document.addEventListener("click", e => { const a = e.target.closest("a[href]"); if (!a) return; const h = a.getAttribute("href");
+    if (/\.pdf$/i.test(h)) send("cv", { what: h.split("/").pop() });
+    else if (/^(https:\/\/t\.me\/|mailto:|tel:)/.test(h)) send("contact", { what: h.replace(/^mailto:|^tel:|^https:\/\//, "") }); });
 })();
 
 /* ---------- язык ---------- */
