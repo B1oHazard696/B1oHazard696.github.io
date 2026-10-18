@@ -538,7 +538,7 @@ button.tab:not(.on):hover{color:var(--fg)}
   </section>
 
   <section class="panel p-timeline" aria-label="Таймлайн" data-ta="timeline">
-    <div class="tabs"><span class="tab on" data-t="seq">Последовательность 01</span><span class="spacer"></span><span class="aux mono" id="seqLen"></span></div>
+    <div class="tabs"><span class="tab on" id="seqName">GennadyAndreev_Showreel_2026</span><span class="spacer"></span><span class="aux mono" id="seqLen"></span></div>
     <div class="tl-wrap">
       <div class="tl">
         <div class="heads">
@@ -688,6 +688,15 @@ const CFG = {
         role: { ru: "AI Creator, режиссёр монтажа", en: "AI Creator, editor" },
         tools: "Kling, Seedance, Higgsfield, Krea, After Effects", nda: true,
         year: "2026", codec: "H.264 · AAC", res: "1504×1120", fps: 24
+      } },
+    { name: "Techno_Party.mp4", type: "video", src: "media/techno_party.mp4", poster: "media/techno_party.jpg", dur: 15, note: { ru: "AI-клип", en: "AI music video" },
+      meta: {
+        title: "Techno Party", sub: { ru: "AI-клип", en: "AI music video" },
+        text: { ru: "Короткий клип с вечеринки под техно: генерация кадров, монтаж в ритм и цвет.",
+                en: "A short techno party clip: shot generation, beat-cut editing and colour." },
+        role: { ru: "AI Creator, режиссёр монтажа", en: "AI Creator, editor" },
+        tools: "Kling, Seedance, Higgsfield, Krea, Premiere Pro",
+        year: "2026", codec: "H.264 · AAC", res: "1470×630", fps: 24
       } }
   ],
   /* папки с изображениями: каждая серия — своя папка в media/<id>/ (полный кадр + превью _t).
@@ -707,17 +716,17 @@ let openSeries = null;
 const UI = {
   ru: {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
-    tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все клипы последовательности", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
+    tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все работы", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующий клип", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
-    kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. клип", kFrame: "по кадрам", kVol: "громкость",
+    kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
     kAll: "все клавиши", kHelp: "Все сочетания клавиш (?)", kTitle: "Сочетания клавиш", kSet: "Набор клавиш: Andreev_Portfolio (по умолчанию)", kLgApp: "Монитор и таймлайн", kLgPnl: "Карусель изображений", kLgBoth: "Оба",
     kG: [
-      ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["K", "Стоп"], ["J|L", "Предыдущий / следующий клип"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"]]],
-      ["Таймлайн", [["@Клик по клипу V1", "Открыть работу в мониторе"], ["@Клик по главе V2", "Перейти к главе шоурила"], ["@Клик / тяни по линейке", "Перемотка плейхедом"]]],
+      ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["K", "Стоп"], ["J|L", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"]]],
+      ["Таймлайн", [["@Клик по работе в «Проекте»", "Открыть её на таймлайне"], ["@Клик по главе V2", "Перейти к главе шоурила"], ["@Клик / тяни по линейке", "Перемотка плейхедом"]]],
       ["Карусель изображений", [["←|→", "Предыдущее / следующее"], ["@Свайп", "Листать на телефоне"], ["Esc", "Закрыть карусель"]]],
       ["Общие", [["?", "Это окно"], ["Esc", "Закрыть окно"]]]
     ],
-    timeline: "Таймлайн", seq: "Последовательность 01", vis: "Видимость", tlHint: "Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.",
+    timeline: "Таймлайн", seq: "Последовательность", vis: "Видимость", tlHint: "Выбери работу в «Проекте» — она откроется на таймлайне. Плейхед можно перетаскивать.",
     project: "Проект:", filter: "Фильтр", fAll: "Все", fVideo: "Видео", fImage: "Изображения", ready: "Готово",
     secProfile: "Профиль", secTools: "Инструменты", secExp: "Опыт", secContact: "Экспорт · связаться",
     copy: "Копировать", cv: "Скачать резюме · PDF", cvOpen: "Открыть резюме в новой вкладке", copied: "Скопировано", selected: "Выделено — нажми Ctrl+C", reel: "Шоурил",
@@ -727,17 +736,17 @@ const UI = {
   },
   en: {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
-    tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All clips in the sequence", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
+    tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All works", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next clip", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
-    kSpace: "Space", kPlay: "play/pause", kClip: "prev/next clip", kFrame: "frame by frame", kVol: "volume",
+    kSpace: "Space", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
     kAll: "all shortcuts", kHelp: "All keyboard shortcuts (?)", kTitle: "Keyboard Shortcuts", kSet: "Keyboard layout preset: Andreev_Portfolio (default)", kLgApp: "Monitor & timeline", kLgPnl: "Image carousel", kLgBoth: "Both",
     kG: [
-      ["Program monitor", [["Space", "Play / pause"], ["K", "Stop"], ["J|L", "Previous / next clip"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"]]],
-      ["Timeline", [["@Click a V1 clip", "Open the work in the monitor"], ["@Click a V2 chapter", "Jump to a showreel chapter"], ["@Click / drag the ruler", "Scrub the playhead"]]],
+      ["Program monitor", [["Space", "Play / pause"], ["K", "Stop"], ["J|L", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"]]],
+      ["Timeline", [["@Click a work in Project", "Open it on the timeline"], ["@Click a V2 chapter", "Jump to a showreel chapter"], ["@Click / drag the ruler", "Scrub the playhead"]]],
       ["Image carousel", [["←|→", "Previous / next"], ["@Swipe", "Browse on a phone"], ["Esc", "Close the carousel"]]],
       ["General", [["?", "This window"], ["Esc", "Close the window"]]]
     ],
-    timeline: "Timeline", seq: "Sequence 01", vis: "Visibility", tlHint: "Tap a clip to open it in the monitor. You can drag the playhead.",
+    timeline: "Timeline", seq: "Sequence", vis: "Visibility", tlHint: "Pick a work in the Project panel to open it on the timeline. You can drag the playhead.",
     project: "Project:", filter: "Filter", fAll: "All", fVideo: "Video", fImage: "Images", ready: "Ready",
     secProfile: "Profile", secTools: "Tools", secExp: "Experience", secContact: "Export · contact",
     copy: "Copy", cv: "Download CV · PDF", cvOpen: "Open CV in a new tab", copied: "Copied", selected: "Selected — press Ctrl+C", reel: "Showreel",
@@ -767,7 +776,7 @@ const LIGHT = matchMedia("(max-width:900px)").matches || !!(navigator.connection
 const seq = [
   { ...CFG.reel, src: (LIGHT && CFG.reel.srcMobile) || CFG.reel.src, kind: "reel", type: "video", color: "--c6" },
   ...CFG.works.map((w, i) => ({ ...w, kind: "work", color: COLORS[i % COLORS.length] }))
-];
+].map(c => ({ ...c, start: 0 })); /* на таймлайне всегда одна работа — та, что выбрана в «Проекте» или меню */
 let T = 0, t = 0, cur = null, playing = false, filter = "all";
 const vid = $("#lVid");
 
@@ -799,7 +808,7 @@ function renderMeta() {
   const list = el("div", "meta-clips");
   seq.forEach((x, i) => { const b = el("button", "meta-clip" + (x === c ? " on" : "")); b.style.setProperty("--cc", `var(${x.color})`);
     b.append(el("i"), el("span", "", (x.meta && tr(x.meta.title)) || x.name), el("em", "", x === c ? L("mNow") : tcf(x.dur).slice(3)));
-    b.onclick = () => setTime(x.start, true); list.append(b); });
+    b.onclick = () => openClip(x); list.append(b); });
   root.append(head, section(L("mClip"), "fx", true, clip));
   if (about.length) root.append(section(L("mAbout"), "fx", true, about));
   if (cred.length) root.append(section(L("mCredits"), "fx", true, cred));
@@ -808,7 +817,7 @@ function renderMeta() {
     CFG.chapters.forEach((ch, i) => { const nx = CFG.chapters[i + 1], on = rel >= ch.t && (!nx || rel < nx.t);
       const b = el("button", "meta-clip" + (on ? " on" : "")); b.style.setProperty("--cc", `var(${COLORS[i % COLORS.length]})`);
       b.append(el("i"), el("span", "", `${ch.n} ${tr(ch)}`), el("em", "", tcf(ch.t).slice(3)));
-      b.onclick = () => setTime(c.start + ch.t, true); cl.append(b); });
+      b.onclick = () => setTime(ch.t, true); cl.append(b); });
     root.append(section(L("mChapters"), "▶", true, [cl]));
   }
   root.append(section(L("mAll"), "▶", true, [list]));
@@ -911,7 +920,7 @@ function renderBin() {
   list.forEach((c, k) => {
     const b = el("button", "item " + (c.type === "image" ? "img" : "vid")); if (c.type === "image") b.dataset.k = k; else b.dataset.i = seq.indexOf(c);
     b.append(thumbFor(c), el("span", "n", c.name)); if (c.type !== "image") b.append(el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
-    b.onclick = c.type === "image" ? () => openViewer(sr, k) : () => { setTime(c.start, true); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
+    b.onclick = c.type === "image" ? () => openViewer(sr, k) : () => { openClip(c); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
     /* превью при наведении: ролик беззвучно играет прямо в карточке, как скраб в бине */
     if (c.type !== "image" && c.src && matchMedia("(hover:hover)").matches) {
       let pv = null;
@@ -943,29 +952,29 @@ document.querySelectorAll(".filt").forEach(f => f.onclick = () => setFilter(f.da
 
 /* ---------- timeline ---------- */
 function layout() {
-  let s = 0; seq.forEach(c => { c.start = s; s += c.dur; }); T = s;
+  const c = cur || seq[0]; T = c.dur;
   const pct = x => (x / T * 100) + "%";
   const v1 = $("#laneV1"), v2 = $("#laneV2"), a1 = $("#laneA1"), ru = $("#ruler");
   [v1, v2, a1, ru].forEach(n => n.textContent = "");
 
-  seq.forEach((c, i) => {
-    const b = el("button", "clip"); b.dataset.i = i;
+  {
+    const b = el("button", "clip"); b.dataset.i = seq.indexOf(c);
     b.style.left = pct(c.start); b.style.width = `calc(${pct(c.dur)} - 2px)`; b.style.setProperty("--cc", `var(${c.color})`);
     if (c.type === "image") { b.classList.add("still"); b.style.backgroundImage = `url("${c.poster}")`; }
     else b.append(el("span", "cn", c.name), el("span", "cs", tcf(c.dur).slice(3)));
     if (c.kind === "reel") b.append(el("span", "fxb", "fx"));
     b.title = c.name; v1.append(b);
-  });
+  }
   /* V2: главы шоурила — подписанные клипы-маркеры, нажатие перематывает к главе */
-  const reel = seq[0], chs = CFG.chapters || [];
+  const reel = c, chs = c.kind === "reel" ? CFG.chapters || [] : [];
   chs.forEach((ch, i) => {
     const end = i + 1 < chs.length ? chs[i + 1].t : reel.dur, b = el("button", "clip v2 chap"); b.dataset.ch = i;
     b.style.left = pct(reel.start + ch.t); b.style.width = `calc(${pct(end - ch.t)} - 2px)`;
     b.style.setProperty("--cc", `var(${COLORS[i % COLORS.length]})`);
     b.append(el("span", "cn", `${ch.n} ${tr(ch)}`)); b.title = `${ch.n} — ${tr(ch)} · ${tcf(ch.t)}`; v2.append(b);
   });
-  const adj = el("div", "clip v2"); adj.style.left = pct(seq[1] ? seq[1].start : 0); adj.style.right = "0";
-  adj.style.setProperty("--cc", "#4a4d55"); adj.append(el("span", "cn", L("adj"))); v2.append(adj);
+  if (!chs.length) { const adj = el("div", "clip v2"); adj.style.left = "0"; adj.style.right = "0";
+    adj.style.setProperty("--cc", "#4a4d55"); adj.append(el("span", "cn", L("adj"))); v2.append(adj); }
 
   const au = el("div", "clip audio"); au.style.left = "0"; au.style.right = "0";
   const cv = el("canvas"); au.append(cv, el("span", "cn", "Music_mix.wav")); a1.append(au);
@@ -973,15 +982,15 @@ function layout() {
 
   const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300], step = steps.find(s => T / s <= 9) || 600;
   for (let x = 0; x < T - step * 0.6; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
-  const marked = seq;
-  marked.forEach(c => { const m = el("span", "mk"); m.style.left = pct(c.start); m.title = c.name; ru.append(m); });
+  { const m = el("span", "mk"); m.style.left = "0"; m.title = c.name; ru.append(m); }
   chs.slice(1).forEach(ch => { const m = el("span", "mk ch"); m.style.left = pct(reel.start + ch.t); m.title = `${ch.n} — ${tr(ch)}`; ru.append(m); });
 
   const sc = $("#scrub"); sc.querySelectorAll(".tick").forEach(n => n.remove());
-  marked.forEach(c => { if (c.start > 0) { const k = el("span", "tick"); k.style.left = pct(c.start); sc.append(k); } });
+  chs.slice(1).forEach(ch => { const k = el("span", "tick"); k.style.left = pct(ch.t); sc.append(k); });
 
   $("#durTc").textContent = tcf(T); $("#seqLen").textContent = tcf(T);
-  $("#statusLine").textContent = `${L("seq")} · ${L("clips")(seq.length)}`;
+  $("#seqName").textContent = c.name.replace(/\.\w+$/, "");
+  $("#statusLine").textContent = `${L("seq")}: ${c.name} · ${seq.indexOf(c) + 1} / ${seq.length}`;
   render();
 }
 function drawWave(cv) {
@@ -1006,15 +1015,19 @@ function scrubFrom(target, e) {
   const n = $(s); let down = false;
   n.addEventListener("pointerdown", e => { down = true; n.setPointerCapture(e.pointerId);
     const clip = e.target.closest(".clip[data-i]"), chap = e.target.closest(".clip[data-ch]");
-    if (clip) setTime(seq[+clip.dataset.i].start, true);
-    else if (chap) setTime(seq[0].start + CFG.chapters[+chap.dataset.ch].t, true);
+    if (chap) setTime(CFG.chapters[+chap.dataset.ch].t, true);
     else scrubFrom(n, e); });
-  n.addEventListener("pointermove", e => { if (down && !e.target.closest?.(".clip[data-i], .clip[data-ch]")) scrubFrom(n, e); });
+  n.addEventListener("pointermove", e => { if (down && !e.target.closest?.(".clip[data-ch]")) scrubFrom(n, e); });
   n.addEventListener("pointerup", () => down = false); n.addEventListener("pointercancel", () => down = false);
 });
 
 /* ---------- monitor ---------- */
-const clipAt = x => seq.find(c => x >= c.start && x < c.start + c.dur) || seq[seq.length - 1];
+/* открыть работу: таймлайн перестраивается под неё, плейхед — в начало (или на at секунд) */
+function openClip(c, at = 0) {
+  if (!c) return;
+  if (c === cur) { setTime(at, true); return; }
+  cur = c; t = 0; layout(); showClip(c); setTime(at, true);
+}
 function showClip(c) {
   queueScopes();
   if (metaTab) setTimeout(renderMeta);
@@ -1036,9 +1049,9 @@ function syncVid() { if (!cur || !cur.src || cur.type === "image") return; const
   if (vid.readyState >= 1) vid.currentTime = x; else vid.addEventListener("loadedmetadata", () => vid.currentTime = Math.max(0, t - cur.start), { once: true }); }
 
 function setTime(x, user) {
+  if (!cur) { openClip(seq[0], x); return; }
   t = Math.min(Math.max(0, x), T);
-  const c = clipAt(t);
-  if (c !== cur) { cur = c; showClip(c); } else if (user) syncVid();
+  if (user) syncVid();
   render();
 }
 function highlight() {
@@ -1057,7 +1070,7 @@ function render() {
   $("#scrub .fill").style.width = p + "%"; $("#scrub .head").style.left = p + "%";
   $("#tc").textContent = tcf(t); $("#statusTc").textContent = tcf(t) + " / " + tcf(T);
   const i = seq.indexOf(cur); if (i !== lastSel) { lastSel = i; highlight(); }
-  let ci = -1; if (cur === seq[0]) CFG.chapters.forEach((ch, k) => { if (t - seq[0].start >= ch.t) ci = k; });
+  let ci = -1; if (cur && cur.kind === "reel") CFG.chapters.forEach((ch, k) => { if (t >= ch.t) ci = k; });
   if (ci !== lastCh) { lastCh = ci; document.querySelectorAll(".clip.chap").forEach(n => n.classList.toggle("on", +n.dataset.ch === ci)); if (metaTab) renderMeta(); }
 }
 function setPlaying(p) {
@@ -1070,7 +1083,7 @@ function togglePlay() { if (!playing && t >= T - 1 / FPS) setTime(0, true); setP
 function jump(d) {
   const i = seq.indexOf(cur), into = t - cur.start > 0.5;
   const j = d < 0 ? (into ? i : i - 1) : i + 1;
-  if (j >= 0 && j < seq.length) setTime(seq[j].start, true);
+  if (j === i) setTime(0, true); else if (j >= 0 && j < seq.length) openClip(seq[j]);
 }
 
 let last = performance.now();
@@ -1080,10 +1093,8 @@ function frame(now) {
   if (playing && cur) {
     const isVid = cur.src && cur.type !== "image";
     if (isVid) { if (vid.readyState >= 2) t = cur.start + vid.currentTime; } else t += dt;
-    if (t >= cur.start + cur.dur - 1e-3 || (isVid && vid.ended)) {
-      const nx = seq[seq.indexOf(cur) + 1];
-      if (nx) setTime(nx.start, true); else { t = T; setPlaying(false); render(); }
-    } else render();
+    if (t >= cur.dur - 1e-3 || (isVid && vid.ended)) { t = T; setPlaying(false); render(); }
+    else render();
   }
   requestAnimationFrame(frame);
 }
@@ -1125,7 +1136,7 @@ $("#bFull").onclick = () => {
   } catch { fail(); }
 };
 $("#safeBtn").onclick = e => { const s = $("#safe"); s.hidden = !s.hidden; e.currentTarget.classList.toggle("on", !s.hidden); e.currentTarget.setAttribute("aria-pressed", !s.hidden); };
-vid.addEventListener("ended", () => { if (playing) { const nx = seq[seq.indexOf(cur) + 1]; nx ? setTime(nx.start, true) : setPlaying(false); } });
+vid.addEventListener("ended", () => { if (playing) { t = T; setPlaying(false); render(); } });
 
 /* ---------- окно «Сочетания клавиш» ---------- */
 const KB = [
@@ -1201,7 +1212,7 @@ navLinks.forEach(a => a.addEventListener("click", e => {
   if (h === "#reel" || h === "#works") {
     e.preventDefault();
     const target = h === "#works" ? seq.find(c => c.kind === "work") : seq[0];
-    if (target) setTime(target.start, true);
+    if (target) openClip(target);
     /* на телефоне, если монитор ушёл с экрана, — подкрутить к нему; на компьютере страница стоит на месте */
     const r = $("#reel").getBoundingClientRect(), top = $(".menubar").getBoundingClientRect().bottom;
     if (matchMedia("(max-width:900px)").matches && (r.top < top - 4 || r.bottom > innerHeight + 4)) $("#reel").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
@@ -1226,7 +1237,7 @@ navLinks.forEach(a => a.addEventListener("click", e => {
 seq.forEach(c => {
   if (!c.src || c.type === "image") return;
   const v = document.createElement("video"); v.preload = "metadata"; v.muted = true;
-  v.onloadedmetadata = () => { if (isFinite(v.duration) && v.duration > 0) { c.dur = v.duration; layout(); renderBin(); } };
+  v.onloadedmetadata = () => { if (isFinite(v.duration) && v.duration > 0) { c.dur = v.duration; if (c === cur) layout(); renderBin(); } };
   v.src = c.src;
 });
 
