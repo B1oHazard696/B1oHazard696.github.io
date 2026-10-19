@@ -538,7 +538,7 @@ button.tab:not(.on):hover{color:var(--fg)}
   </section>
 
   <section class="panel p-timeline" aria-label="Таймлайн" data-ta="timeline">
-    <div class="tabs"><span class="tab on" id="seqName">GennadyAndreev_Showreel_2026</span><span class="spacer"></span><span class="aux mono" id="seqLen"></span></div>
+    <div class="tabs"><span class="tab on" id="seqName">Шоурил 2026</span><span class="spacer"></span><span class="aux mono" id="seqLen"></span></div>
     <div class="tl-wrap">
       <div class="tl">
         <div class="heads">
@@ -691,7 +691,7 @@ const CFG = {
       } },
     { name: "Techno_Party_V2.mp4", type: "video", src: "media/techno_party_v2.mp4", poster: "media/techno_party_v2.jpg", dur: 15, note: { ru: "AI-клип", en: "AI music video" },
       meta: {
-        title: "Techno Party V2", sub: { ru: "AI-клип", en: "AI music video" },
+        title: "Techno Party", sub: { ru: "AI-клип", en: "AI music video" },
         text: { ru: "Короткий клип с вечеринки под техно: генерация кадров, монтаж в ритм и цвет.",
                 en: "A short techno party clip: shot generation, beat-cut editing and colour." },
         role: { ru: "AI Creator, режиссёр монтажа", en: "AI Creator, editor" },
@@ -796,8 +796,8 @@ function renderMeta() {
   const root = $("#metaPanel"); if (!metaTab) return; root.textContent = "";
   const c = cur || seq[0], m = c.meta || {};
   const head = el("div", "meta-head");
-  head.append(el("h2", "meta-title", tr(m.title) || c.name)); if (m.sub) head.append(el("p", "meta-sub", tr(m.sub)));
-  const clip = [prop(L("mFile"), c.name), prop(L("mDur"), tcf(c.dur))];
+  head.append(el("h2", "meta-title", nm(c))); if (m.sub) head.append(el("p", "meta-sub", tr(m.sub)));
+  const clip = [prop(L("mDur"), tcf(c.dur))];
   if (m.res || (c.type !== "image" && vid.videoWidth && vid.dataset.src === c.src)) clip.push(prop(L("mRes"), (vid.dataset.src === c.src && vid.videoWidth) ? `${vid.videoWidth}×${vid.videoHeight}` : m.res));
   if (m.fps) clip.push(prop(L("mFps"), m.fps + " fps"));
   if (m.codec) clip.push(prop(L("mCodec"), m.codec));
@@ -807,7 +807,7 @@ function renderMeta() {
   const cred = []; if (m.role) cred.push(prop(L("mRole"), tr(m.role))); if (m.tools) cred.push(prop(L("mTools"), m.tools));
   const list = el("div", "meta-clips");
   seq.forEach((x, i) => { const b = el("button", "meta-clip" + (x === c ? " on" : "")); b.style.setProperty("--cc", `var(${x.color})`);
-    b.append(el("i"), el("span", "", (x.meta && tr(x.meta.title)) || x.name), el("em", "", x === c ? L("mNow") : tcf(x.dur).slice(3)));
+    b.append(el("i"), el("span", "", nm(x)), el("em", "", x === c ? L("mNow") : tcf(x.dur).slice(3)));
     b.onclick = () => openClip(x); list.append(b); });
   root.append(head, section(L("mClip"), "fx", true, clip));
   if (about.length) root.append(section(L("mAbout"), "fx", true, about));
@@ -919,7 +919,7 @@ function renderBin() {
     bk.append(el("span", "", L("allFolders")), el("b", "", `${tr(sr.title)} · ${sr.items.length}`)); bk.onclick = () => { openSeries = null; renderBin(); }; bin.append(bk); }
   list.forEach((c, k) => {
     const b = el("button", "item " + (c.type === "image" ? "img" : "vid")); if (c.type === "image") b.dataset.k = k; else b.dataset.i = seq.indexOf(c);
-    b.append(thumbFor(c), el("span", "n", c.name)); if (c.type !== "image") b.append(el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
+    b.append(thumbFor(c), el("span", "n", nm(c))); if (c.type !== "image") b.append(el("span", "s", c.kind === "reel" ? L("reel") : tr(c.note)));
     b.onclick = c.type === "image" ? () => openViewer(sr, k) : () => { openClip(c); if (matchMedia("(max-width:900px)").matches) $("#reel").scrollIntoView({ behavior: "smooth" }); };
     /* превью при наведении: ролик беззвучно играет прямо в карточке, как скраб в бине */
     if (c.type !== "image" && c.src && matchMedia("(hover:hover)").matches) {
@@ -961,9 +961,9 @@ function layout() {
     const b = el("button", "clip"); b.dataset.i = seq.indexOf(c);
     b.style.left = pct(c.start); b.style.width = `calc(${pct(c.dur)} - 2px)`; b.style.setProperty("--cc", `var(${c.color})`);
     if (c.type === "image") { b.classList.add("still"); b.style.backgroundImage = `url("${c.poster}")`; }
-    else b.append(el("span", "cn", c.name), el("span", "cs", tcf(c.dur).slice(3)));
+    else b.append(el("span", "cn", nm(c)), el("span", "cs", tcf(c.dur).slice(3)));
     if (c.kind === "reel") b.append(el("span", "fxb", "fx"));
-    b.title = c.name; v1.append(b);
+    b.title = nm(c); v1.append(b);
   }
   /* V2: главы шоурила — подписанные клипы-маркеры, нажатие перематывает к главе */
   const reel = c, chs = c.kind === "reel" ? CFG.chapters || [] : [];
@@ -977,20 +977,20 @@ function layout() {
     adj.style.setProperty("--cc", "#4a4d55"); adj.append(el("span", "cn", L("adj"))); v2.append(adj); }
 
   const au = el("div", "clip audio"); au.style.left = "0"; au.style.right = "0";
-  const cv = el("canvas"); au.append(cv, el("span", "cn", "Music_mix.wav")); a1.append(au);
+  const cv = el("canvas"); au.append(cv, el("span", "cn", "Music mix")); a1.append(au);
   requestAnimationFrame(() => drawWave(cv));
 
   const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300], step = steps.find(s => T / s <= 9) || 600;
   for (let x = 0; x < T - step * 0.6; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
-  { const m = el("span", "mk"); m.style.left = "0"; m.title = c.name; ru.append(m); }
+  { const m = el("span", "mk"); m.style.left = "0"; m.title = nm(c); ru.append(m); }
   chs.slice(1).forEach(ch => { const m = el("span", "mk ch"); m.style.left = pct(reel.start + ch.t); m.title = `${ch.n} — ${tr(ch)}`; ru.append(m); });
 
   const sc = $("#scrub"); sc.querySelectorAll(".tick").forEach(n => n.remove());
   chs.slice(1).forEach(ch => { const k = el("span", "tick"); k.style.left = pct(ch.t); sc.append(k); });
 
   $("#durTc").textContent = tcf(T); $("#seqLen").textContent = tcf(T);
-  $("#seqName").textContent = c.name.replace(/\.\w+$/, "");
-  $("#statusLine").textContent = `${L("seq")}: ${c.name} · ${seq.indexOf(c) + 1} / ${seq.length}`;
+  $("#seqName").textContent = nm(c);
+  $("#statusLine").textContent = `${L("seq")}: ${nm(c)} · ${seq.indexOf(c) + 1} / ${seq.length}`;
   render();
 }
 function drawWave(cv) {
@@ -1022,6 +1022,8 @@ function scrubFrom(target, e) {
 });
 
 /* ---------- monitor ---------- */
+/* название для показа: заголовок работы, а не имя файла (без расширения и подчёркиваний) */
+const nm = c => (c.meta && tr(c.meta.title)) || c.name.replace(/\.\w+$/, "").replace(/_+/g, " ").replace(/\b[a-z]/g, x => x.toUpperCase());
 /* открыть работу: таймлайн перестраивается под неё, плейхед — в начало (или на at секунд) */
 function openClip(c, at = 0) {
   if (!c) return;
@@ -1032,7 +1034,7 @@ function showClip(c) {
   queueScopes();
   if (metaTab) setTimeout(renderMeta);
   ["#lBars", "#lOff", "#lImg", "#lVid"].forEach(s => $(s).hidden = true);
-  $("#progName").textContent = " " + c.name;
+  $("#progName").textContent = " " + nm(c);
   if (c.src && c.type === "image") { $("#lImg").src = c.src; $("#lImg").hidden = false; vid.pause(); }
   else if (c.src) {
     vid.hidden = false;
@@ -1040,9 +1042,9 @@ function showClip(c) {
     syncVid(); if (playing) vid.play().catch(() => {});
   } else {
     vid.pause();
-    if (c.kind === "reel") { $("#slateT").textContent = "SHOWREEL"; $("#slateS").textContent = c.name + " · " + L("noVideo");
+    if (c.kind === "reel") { $("#slateT").textContent = "SHOWREEL"; $("#slateS").textContent = nm(c) + " · " + L("noVideo");
       const sl = $("#slateLink"); sl.hidden = !c.link; if (c.link) sl.href = c.link; $("#lBars").hidden = false; }
-    else { $("#offName").textContent = c.name; $("#lOff").hidden = false; }
+    else { $("#offName").textContent = nm(c); $("#lOff").hidden = false; }
   }
 }
 function syncVid() { if (!cur || !cur.src || cur.type === "image") return; const x = Math.max(0, t - cur.start);
@@ -1321,12 +1323,12 @@ addEventListener("resize", queueScopes);
 let vk = 0, lastFocus = null, VS = SERIES[0], stripOf = null;
 function buildStrip() {
   const st = $("#vwStrip"); if (stripOf === VS.id) return; st.textContent = ""; stripOf = VS.id;
-  VS.items.forEach((c, k) => { const b = el("button"), i = el("img"); i.src = binImg(c.poster); i.alt = ""; i.loading = "lazy"; i.decoding = "async"; b.append(i); b.setAttribute("aria-label", c.name); b.onclick = () => { vk = k; showViewer(); }; st.append(b); });
+  VS.items.forEach((c, k) => { const b = el("button"), i = el("img"); i.src = binImg(c.poster); i.alt = ""; i.loading = "lazy"; i.decoding = "async"; b.append(i); b.setAttribute("aria-label", nm(c)); b.onclick = () => { vk = k; showViewer(); }; st.append(b); });
 }
 function showViewer() {
   const c = VS.items[vk];
   $("#vwImg").src = c.src; $("#vwImg").alt = `${tr(VS.title)} — ${vk + 1} / ${VS.items.length}`;
-  $("#vwName").textContent = c.name; $("#vwNote").textContent = tr(VS.title);
+  $("#vwName").textContent = nm(c); $("#vwNote").textContent = tr(VS.title);
   $("#vwCount").textContent = `${String(vk + 1).padStart(2, "0")} / ${VS.items.length}`;
   [VS.items[vk + 1], VS.items[vk - 1]].forEach(n => { if (n) new Image().src = n.src; });
   const st = $("#vwStrip");
