@@ -97,7 +97,7 @@ body::after{background:
 .cine-veil{position:fixed;inset:0;z-index:15;pointer-events:none;background:rgba(3,4,6,.62);opacity:0;transition:opacity .8s ease}
 :root[data-ui="light"] .cine-veil{background:rgba(12,14,20,.5)}
 html.cine .cine-veil{opacity:1}
-.p-program{position:relative;transition:box-shadow .8s ease}
+.p-program{position:relative}
 html.cine .p-program{z-index:16;box-shadow:0 30px 120px rgba(0,0,0,.6)}
 html.cine body::before,html.cine body::after{opacity:calc(var(--blob) * 1.25)}
 @keyframes drift1{to{transform:translate(4%,6%) rotate(8deg) scale(1.08)}}
@@ -457,6 +457,10 @@ button.tab:not(.on):hover{color:var(--fg)}
 @keyframes flashBlk{0%{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb, var(--accent) 10%, transparent)}100%{box-shadow:inset 0 0 0 2px transparent;background:transparent}}
 .fx.flash{animation:flashBlk 1.6s ease-out}
 .panel.flash{animation:flashBlk 1.6s ease-out}
+/* пока идёт видео, монитор подсвечен так же, как блоки при переходе по меню, только постоянно */
+.p-program{transition:box-shadow .6s ease,background-color .6s ease}
+.p-program.live{box-shadow:inset 0 0 0 2px var(--accent),0 0 32px color-mix(in srgb, var(--accent) 22%, transparent),var(--shadow);background-color:color-mix(in srgb, var(--accent) 7%, var(--panel))}
+html.cine .p-program.live{box-shadow:inset 0 0 0 2px var(--accent),0 0 40px color-mix(in srgb, var(--accent) 28%, transparent),0 30px 120px rgba(0,0,0,.6)}
 /* метаданные клипа */
 .meta-head{display:grid;gap:10px;padding:6px 14px 14px;border-bottom:1px solid var(--line)}
 .meta-thumb{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;overflow:hidden;background:#000}
@@ -1230,7 +1234,7 @@ function setPlaying(p, keepRate) {
   $("#bPlay").setAttribute("aria-label", L(p ? "tPause" : "tPlay"));
   const pb = $("#ppBig"); pb.firstChild.innerHTML = p ? '<path d="M4 3h3v10H4zm5 0h3v10H9z"/>' : '<path d="M4.5 2.5v11L13.5 8z"/>';
   pb.dataset.tt = p ? "tPause" : "tPlay"; pb.title = L(pb.dataset.tt); pb.setAttribute("aria-label", pb.title);
-  $("#screen").classList.toggle("is-playing", p); window.screenWake && screenWake(); cineCheck();
+  $("#screen").classList.toggle("is-playing", p); window.screenWake && screenWake(); cineCheck(); $("#reel").classList.toggle("live", p);
   if (cur && cur.src && cur.type !== "image") (p && rate > 0) ? vid.play().catch(() => {}) : vid.pause();
   spinCheck();
 }
