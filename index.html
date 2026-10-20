@@ -559,6 +559,8 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 .p-scopes .aux.on{color:var(--accent)}
 .p-scopes .tabs .tab{background:none;border:0;font:inherit;font-size:12px;cursor:pointer}
 .p-scopes .tabs .tab:not(.on):hover{color:var(--fg)}
+.sc-foot{padding:0 12px 10px;color:var(--dim);font-size:11px;line-height:1.4}
+.sc-foot[hidden]{display:none}
 .cw-reset{background:none;border:0;color:var(--mute);cursor:pointer;margin-right:10px;font-size:10.5px}
 .cw-reset:hover{color:var(--fg)}
 /* Color Wheels: три колеса как в Lumetri Color — тянешь точку, картинка в мониторе окрашивается */
@@ -756,17 +758,19 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
   </section>
 
   <section class="panel p-scopes" aria-label="Скоупы" data-ta="scopes">
-    <div class="tabs" role="tablist"><button class="tab on" id="tabScopes" role="tab" aria-selected="true">Lumetri Scopes</button><button class="tab" id="tabWheels" role="tab" aria-selected="false">Color Wheels</button><span class="spacer"></span><button class="aux mono cw-reset" id="cwReset" hidden data-t="cwReset">Сброс</button><span class="aux mono" id="scSig">Rec.709</span></div>
+    <div class="tabs" role="tablist"><button class="tab on" id="tabScopes" role="tab" aria-selected="true" data-tt="hScopesTab">Lumetri Scopes</button><button class="tab" id="tabWheels" role="tab" aria-selected="false" data-tt="hWheelsTab">Color Wheels</button><span class="spacer"></span><button class="aux mono cw-reset" id="cwReset" hidden data-t="cwReset">Сброс</button><span class="aux mono" id="scSig">Rec.709</span></div>
     <div class="wheels" id="wheels" hidden>
-      <div class="wheel" data-w="lift"><div class="wh-disc"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwShadows">Тени</span></div>
-      <div class="wheel" data-w="gamma"><div class="wh-disc"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwMids">Средние тона</span></div>
-      <div class="wheel" data-w="gain"><div class="wh-disc"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwHighs">Света</span></div>
+      <div class="wheel" data-w="lift"><div class="wh-disc" data-tt="hLift"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwShadows">Тени</span></div>
+      <div class="wheel" data-w="gamma"><div class="wh-disc" data-tt="hGamma"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwMids">Средние тона</span></div>
+      <div class="wheel" data-w="gain"><div class="wh-disc" data-tt="hGain"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwHighs">Света</span></div>
     </div>
     <div class="scopes">
-      <figure class="scope"><canvas id="scWave"></canvas><figcaption data-t="scWave">Вейвформ · яркость</figcaption></figure>
-      <figure class="scope sq"><canvas id="scVec"></canvas><figcaption data-t="scVec">Вектороскоп</figcaption></figure>
-      <figure class="scope"><canvas id="scHist"></canvas><figcaption data-t="scHist">Гистограмма RGB</figcaption></figure>
+      <figure class="scope" data-tt="hWave"><canvas id="scWave"></canvas><figcaption data-t="scWave">Вейвформ · яркость</figcaption></figure>
+      <figure class="scope sq" data-tt="hVec"><canvas id="scVec"></canvas><figcaption data-t="scVec">Вектороскоп</figcaption></figure>
+      <figure class="scope" data-tt="hHist"><canvas id="scHist"></canvas><figcaption data-t="scHist">Гистограмма RGB</figcaption></figure>
     </div>
+    <div class="sc-foot" id="scFoot"><span data-t="fScopes">Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут.</span></div>
+    <div class="sc-foot" id="cwFoot" hidden><span data-t="fWheels">Тяни точку на колесе — оттенок зоны, ползунок — её яркость. Двойной клик — сброс. Скоупы покажут результат.</span></div>
   </section>
 
   </div>
@@ -923,7 +927,7 @@ const UI = {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
     tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все работы", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующая работа", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
-    cwReset: "Сброс", cwLum: "Яркость", cwShadows: "Тени", cwMids: "Средние тона", cwHighs: "Света", razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
+    hScopesTab: "Графики сигнала по кадру в мониторе", hWheelsTab: "Цветокоррекция: тени, средние тона, света", hWave: "Вейвформ: яркость пикселей по ширине кадра, 0 — чёрный, 100 — белый", hVec: "Вектороскоп: какие цвета в кадре и насколько они насыщенные; пунктир — линия телесных тонов", hHist: "Гистограмма: сколько в кадре тёмного и светлого по каналам R, G, B", hLift: "Тени (Lift): окрашивает тёмные участки. Двойной клик — сброс", hGamma: "Средние тона (Gamma): окрашивает полутона. Двойной клик — сброс", hGain: "Света (Gain): окрашивает светлые участки. Двойной клик — сброс", fScopes: "Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут.", fWheels: "Тяни точку на колесе — оттенок зоны, ползунок — её яркость. Двойной клик — сброс. Скоупы покажут результат.", cwReset: "Сброс", cwLum: "Яркость", cwShadows: "Тени", cwMids: "Средние тона", cwHighs: "Света", razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
     kAll: "все клавиши", kHelp: "Все сочетания клавиш (?)", kTitle: "Сочетания клавиш", kSet: "Набор клавиш: Andreev_Portfolio (по умолчанию)", kLgApp: "Монитор и таймлайн", kLgPnl: "Карусель изображений", kLgBoth: "Оба",
     kG: [
       ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["L", "Вперёд; ещё раз — 2× · 4× · 8×"], ["J", "Назад; ещё раз — быстрее"], ["K", "Стоп"], ["PgUp|PgDn", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"], ["@Клик по картинке", "Пауза / продолжить"], ["@Свайп по видео", "Другая работа (телефон)"], ["@Двойной клик", "Во весь экран"]]],
@@ -943,7 +947,7 @@ const UI = {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
     tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All works", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next work", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
-    cwReset: "Reset", cwLum: "Luma", cwShadows: "Shadows", cwMids: "Midtones", cwHighs: "Highlights", razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
+    hScopesTab: "Signal graphs of the frame in the monitor", hWheelsTab: "Colour correction: shadows, midtones, highlights", hWave: "Waveform: pixel brightness across the frame width, 0 is black, 100 is white", hVec: "Vectorscope: which colours are in the frame and how saturated; the dashed line is the skin-tone line", hHist: "Histogram: how much dark and bright there is in the R, G, B channels", hLift: "Shadows (Lift): tints the dark areas. Double-click to reset", hGamma: "Midtones (Gamma): tints the midtones. Double-click to reset", hGain: "Highlights (Gain): tints the bright areas. Double-click to reset", fScopes: "Scopes analyse the frame in the monitor: brightness, colour and channel balance. Play the video and they come alive.", fWheels: "Drag the dot to tint a zone, the slider sets its brightness. Double-click resets. The scopes show the result.", cwReset: "Reset", cwLum: "Luma", cwShadows: "Shadows", cwMids: "Midtones", cwHighs: "Highlights", razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
     kAll: "all shortcuts", kHelp: "All keyboard shortcuts (?)", kTitle: "Keyboard Shortcuts", kSet: "Keyboard layout preset: Andreev_Portfolio (default)", kLgApp: "Monitor & timeline", kLgPnl: "Image carousel", kLgBoth: "Both",
     kG: [
       ["Program monitor", [["Space", "Play / pause"], ["L", "Play forward; again — 2× · 4× · 8×"], ["J", "Play backward; again — faster"], ["K", "Stop"], ["PgUp|PgDn", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"], ["@Click the picture", "Pause / resume"], ["@Swipe the video", "Another work (phone)"], ["@Double-click", "Full screen"]]],
@@ -1557,7 +1561,7 @@ document.querySelectorAll(".wheel").forEach(wh => {
 });
 $("#cwReset").onclick = () => { Object.values(CW).forEach(w => w.x = w.y = w.l = 0); cwUpdate(); };
 function setScTab(wheels) {
-  $("#wheels").hidden = !wheels; $(".p-scopes .scopes").hidden = wheels;
+  $("#wheels").hidden = !wheels; $(".p-scopes .scopes").hidden = wheels; $("#scFoot").hidden = wheels; $("#cwFoot").hidden = !wheels;
   $("#tabScopes").classList.toggle("on", !wheels); $("#tabWheels").classList.toggle("on", wheels);
   $("#tabScopes").setAttribute("aria-selected", !wheels); $("#tabWheels").setAttribute("aria-selected", wheels);
   if (wheels) cwUpdate(); else queueScopes();
