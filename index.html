@@ -265,6 +265,30 @@ button.tab:not(.on):hover{color:var(--fg)}
   border:3px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .screen:has(.spin:not([hidden])) .pp-big{opacity:0!important}
+/* пасхалка «vhs»: кассетный режим монитора */
+.screen>.vhs-osd{display:none;inset:auto;left:18px;top:14px;width:auto;height:auto;z-index:5;pointer-events:none;color:#fff;font-size:clamp(14px,2.2vw,22px);letter-spacing:.08em;text-shadow:2px 0 #f0f,-2px 0 #0ff}
+.screen>.vhs-osd .vhs-sp{margin-left:14px;opacity:.8}
+.screen.vhs>.vhs-osd{display:block;animation:osdBlink 1s steps(2) infinite}
+@keyframes osdBlink{50%{opacity:.75}}
+.screen.vhs video,.screen.vhs img{filter:url(#vhsF) saturate(1.45) contrast(1.12) brightness(1.05)!important;animation:vhsJit .18s steps(2) infinite}
+.screen.vhs::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px),linear-gradient(180deg,transparent 0 40%,rgba(255,255,255,.14) 44%,rgba(255,255,255,.02) 47%,transparent 52%);
+  background-size:100% 100%,100% 260%;animation:vhsTrack 3.2s linear infinite}
+@keyframes vhsJit{0%{transform:translateX(0)}50%{transform:translateX(1.5px)}}
+@keyframes vhsTrack{from{background-position:0 0,0 100%}to{background-position:0 0,0 -160%}}
+/* пасхалка «Media Offline» поверх видео */
+.screen>.offline.egg{z-index:6}
+/* пасхалка «bio»: биохазард в логотипе и зелёная вспышка */
+.bio-glow{position:fixed;inset:0;z-index:25;pointer-events:none;opacity:0;background:radial-gradient(60% 60% at 8% 0%,rgba(120,255,90,.28),transparent 70%)}
+.bio-glow.on{animation:bioGlow 2.6s ease-out}
+@keyframes bioGlow{0%,60%{opacity:1}100%{opacity:0}}
+.logo.bio{color:#7dff5a;border-color:#7dff5a;text-shadow:0 0 8px #7dff5a;box-shadow:0 0 18px rgba(125,255,90,.6);animation:bioPulse .5s ease-in-out 5 alternate}
+@keyframes bioPulse{to{box-shadow:0 0 4px rgba(125,255,90,.3)}}
+/* пасхалка C: лезвие, как в Premiere */
+.lanes.razor,.lanes.razor *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M5 3l14 9-14 9z' fill='%23fff' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M5 3v18' stroke='%23e5484d' stroke-width='2'/%3E%3C/svg%3E") 5 12,crosshair!important}
+.cut-l,.cut-r{position:absolute;pointer-events:none;z-index:4;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.cut-line{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 8px #fff;z-index:5;pointer-events:none;animation:cutFade .9s ease-out forwards}
+@keyframes cutFade{0%,50%{opacity:1}100%{opacity:0}}
 /* шаттл J/K/L: текущая скорость */
 .screen>.rate{inset:auto;left:12px;top:12px;width:auto;height:auto;z-index:4;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;pointer-events:none}
 /* при воспроизведении: мышь не двигается 2 с — прячем кнопку и курсор (и в обычном, и в полноэкранном режиме) */
@@ -496,6 +520,8 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 .scopes{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.8fr) minmax(0,1.25fr);gap:8px;padding:10px}
 .scope{margin:0;display:grid;grid-template-rows:auto auto;gap:6px;min-width:0}
 .scope canvas{width:100%;height:170px;max-width:100%;display:block;background:#07080a;border-radius:10px;border:1px solid var(--line)}
+.p-scopes .aux.on{color:var(--accent)}
+.p-scopes{user-select:none}
 .scope figcaption{font:10.5px var(--f-mono);color:var(--dim);letter-spacing:.04em}
 @media (max-width:900px){.scope canvas{height:140px}}
 @media (max-width:560px){.scopes{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px}.scope canvas{height:96px}.scope figcaption{font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
@@ -553,7 +579,18 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 <body>
 
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- Teal & Orange: тени уходят в бирюзу, света — в тёплый -->
+  <filter id="lookTO" color-interpolation-filters="sRGB"><feComponentTransfer>
+    <feFuncR type="table" tableValues="0 .08 .42 .82 1"/><feFuncG type="table" tableValues="0.03 .22 .5 .76 .93"/><feFuncB type="table" tableValues=".14 .36 .5 .56 .66"/></feComponentTransfer></filter>
+  <!-- VHS: красный канал уезжает вправо, зелёный с синим — влево -->
+  <filter id="vhsF" color-interpolation-filters="sRGB" x="-2%" width="104%">
+    <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/><feOffset in="r" dx="4" result="r2"/>
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="gb"/><feOffset in="gb" dx="-2" result="gb2"/>
+    <feBlend in="r2" in2="gb2" mode="screen"/></filter>
+</svg>
 <div class="bg-fx" aria-hidden="true"></div>
+<div class="bio-glow" aria-hidden="true"></div>
 <div class="cine-veil" aria-hidden="true"></div>
 <header class="menubar">
   <div class="brand">
@@ -610,6 +647,7 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
         <canvas class="xfade" id="xfade" aria-hidden="true"></canvas>
         <div class="spin" id="spin" hidden aria-hidden="true"></div>
         <span class="rate mono" id="rateBadge" hidden></span>
+        <div class="vhs-osd mono" aria-hidden="true"><span>PLAY ▶</span><span class="vhs-sp">SP</span></div>
         <button class="pp-big" id="ppBig" type="button" data-tt="tPlay" title="Воспроизвести" aria-label="Воспроизвести"><svg viewBox="0 0 16 16"><path d="M4.5 2.5v11L13.5 8z"/></svg></button>
       </div>
     </div>
@@ -821,13 +859,13 @@ const UI = {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
     tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все работы", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующая работа", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
-    kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
+    razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
     kAll: "все клавиши", kHelp: "Все сочетания клавиш (?)", kTitle: "Сочетания клавиш", kSet: "Набор клавиш: Andreev_Portfolio (по умолчанию)", kLgApp: "Монитор и таймлайн", kLgPnl: "Карусель изображений", kLgBoth: "Оба",
     kG: [
       ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["L", "Вперёд; ещё раз — 2× · 4× · 8×"], ["J", "Назад; ещё раз — быстрее"], ["K", "Стоп"], ["PgUp|PgDn", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"], ["@Клик по картинке", "Пауза / продолжить"], ["@Свайп по видео", "Другая работа (телефон)"], ["@Двойной клик", "Во весь экран"]]],
       ["Таймлайн", [["@Клик по работе в «Проекте»", "Открыть её на таймлайне"], ["@Клик по главе V2", "Перейти к главе шоурила"], ["@Клик / тяни по линейке", "Перемотка плейхедом"], ["@Наведи на линейку", "Превью кадра"]]],
       ["Карусель изображений", [["←|→", "Предыдущее / следующее"], ["@Свайп", "Листать на телефоне"], ["Esc", "Закрыть карусель"]]],
-      ["Общие", [["?", "Это окно"], ["Esc", "Закрыть окно"]]]
+      ["Общие", [["?", "Это окно"], ["Esc", "Закрыть окно"], ["@🤫", "На сайте спрятано несколько секретов"]]]
     ],
     timeline: "Таймлайн", seq: "Последовательность", vis: "Видимость", tlHint: "Выбери работу в «Проекте» — она откроется на таймлайне. Плейхед можно перетаскивать.",
     project: "Проект:", filter: "Фильтр", fAll: "Все", fVideo: "Видео", fImage: "Изображения", ready: "Готово",
@@ -841,13 +879,13 @@ const UI = {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
     tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All works", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next work", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
-    kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
+    razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
     kAll: "all shortcuts", kHelp: "All keyboard shortcuts (?)", kTitle: "Keyboard Shortcuts", kSet: "Keyboard layout preset: Andreev_Portfolio (default)", kLgApp: "Monitor & timeline", kLgPnl: "Image carousel", kLgBoth: "Both",
     kG: [
       ["Program monitor", [["Space", "Play / pause"], ["L", "Play forward; again — 2× · 4× · 8×"], ["J", "Play backward; again — faster"], ["K", "Stop"], ["PgUp|PgDn", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"], ["@Click the picture", "Pause / resume"], ["@Swipe the video", "Another work (phone)"], ["@Double-click", "Full screen"]]],
       ["Timeline", [["@Click a work in Project", "Open it on the timeline"], ["@Click a V2 chapter", "Jump to a showreel chapter"], ["@Click / drag the ruler", "Scrub the playhead"], ["@Hover the ruler", "Frame preview"]]],
       ["Image carousel", [["←|→", "Previous / next"], ["@Swipe", "Browse on a phone"], ["Esc", "Close the carousel"]]],
-      ["General", [["?", "This window"], ["Esc", "Close the window"]]]
+      ["General", [["?", "This window"], ["Esc", "Close the window"], ["@🤫", "A few secrets are hidden on this site"]]]
     ],
     timeline: "Timeline", seq: "Sequence", vis: "Visibility", tlHint: "Pick a work in the Project panel to open it on the timeline. You can drag the playhead.",
     project: "Project:", filter: "Filter", fAll: "All", fVideo: "Video", fImage: "Images", ready: "Ready",
@@ -1400,6 +1438,86 @@ $("#keysBtn").onclick = openKeys;
 $("#kdClose").onclick = closeKeys;
 $("#keysDlg").addEventListener("click", e => { if (e.target.id === "keysDlg") closeKeys(); });
 
+/* ================= пасхалки ================= */
+/* 4. Луки Lumetri: двойной клик по скоупам перебирает цветокоррекцию монитора; скоупы считают уже «прокрашенную» картинку */
+const LOOKS = [
+  { n: "Rec.709", f: "none" },
+  { n: "Teal & Orange", f: "url(#lookTO) saturate(1.15) contrast(1.06)" },
+  { n: "Bleach Bypass", f: "saturate(.4) contrast(1.38) brightness(1.04)" },
+  { n: "Noir", f: "grayscale(1) contrast(1.32) brightness(.96)" },
+  { n: "Film '70s", f: "sepia(.38) saturate(1.25) contrast(.92) brightness(1.06) hue-rotate(-8deg)" }
+];
+let lookI = 0;
+function setLook(i) {
+  lookI = i % LOOKS.length; const lk = LOOKS[lookI];
+  [vid, $("#lImg")].forEach(n => n.style.filter = lk.f === "none" ? "" : lk.f);
+  $("#scSig").textContent = lk.n; $("#scSig").classList.toggle("on", lookI > 0);
+  if (lookI) toast("Lumetri · " + lk.n); queueScopes();
+}
+$(".p-scopes").addEventListener("dblclick", e => { e.preventDefault(); getSelection().removeAllRanges(); setLook(lookI + 1); });
+
+/* 5. Media Offline: пять быстрых кликов по «Safe» — тот самый красный экран */
+{ let hits = [], offT = null; $("#safeBtn").addEventListener("click", () => {
+    const now = Date.now(); hits = hits.filter(x => now - x < 2000); hits.push(now); if (hits.length < 5) return; hits = [];
+    const o = $("#lOff"), was = o.hidden, sf = $("#safe"); sf.hidden = true; $("#safeBtn").classList.remove("on"); $("#safeBtn").setAttribute("aria-pressed", false);
+    $("#offName").textContent = nm(cur || seq[0]); o.classList.add("egg"); o.hidden = false; clearTimeout(offT);
+    offT = setTimeout(() => { o.classList.remove("egg"); o.hidden = was; }, 2600); }); }
+
+/* 6, 7. Набранные слова: «vhs» — кассетный режим, «bio» — биохазард (по физическим клавишам, работает и в русской раскладке) */
+let typed = "";
+function vhsMode() { const sc = $("#screen"); sc.classList.add("vhs"); clearTimeout(vhsMode.t); vhsMode.t = setTimeout(() => sc.classList.remove("vhs"), 7000); toast("▶ VHS · SP"); }
+function geiger(dur = 2.2) {
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume();
+    const now = actx.currentTime; let x = 0;
+    while (x < dur) { x += Math.random() * Math.random() * .18 + .012;
+      const b = actx.createBuffer(1, 220, actx.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 6);
+      const src = actx.createBufferSource(), g = actx.createGain(); src.buffer = b; g.gain.value = .35 * (1 - x / dur * .6); src.connect(g); g.connect(actx.destination); src.start(now + x); } } catch {}
+}
+function bioMode() {
+  const lg = $("#initials"); lg.textContent = "☣"; lg.classList.add("bio");
+  const gl = $(".bio-glow"); gl.classList.remove("on"); void gl.offsetWidth; gl.classList.add("on");
+  geiger(); toast("☣ B1oHazard · radioactive.wind");
+  clearTimeout(bioMode.t); bioMode.t = setTimeout(() => { lg.classList.remove("bio"); lg.textContent = tr(CFG.initials); }, 3000);
+}
+addEventListener("keydown", e => {
+  if (e.target.closest("input,textarea") || e.metaKey || e.ctrlKey || e.altKey || !/^Key[A-Z]$/.test(e.code)) return;
+  typed = (typed + e.code.slice(3)).slice(-8);
+  if (typed.endsWith("VHS")) vhsMode();
+  else if (typed.endsWith("BIO")) bioMode();
+});
+
+/* 1. Лезвие: C — инструмент «Подрезка», клик по клипу режет его; V или Esc — обратно к выделению */
+let razor = false;
+function setRazor(on) { razor = on; $("#lanes").classList.toggle("razor", on); toast(on ? L("razorOn") : L("razorOff")); }
+function snip() {
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume();
+    const b = actx.createBuffer(1, actx.sampleRate * .05, actx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    const src = actx.createBufferSource(), hp = actx.createBiquadFilter(), g = actx.createGain(); hp.type = "highpass"; hp.frequency.value = 2500; g.gain.value = .5;
+    src.buffer = b; src.connect(hp); hp.connect(g); g.connect(actx.destination); src.start(); } catch {}
+}
+function razorCut(clip, e) {
+  const lane = clip.parentElement, cr = clip.getBoundingClientRect(), lr = lane.getBoundingClientRect(), x = e.clientX - cr.left;
+  if (x < 6 || x > cr.width - 6) return;
+  const mk = (cls, a, b) => { const c = clip.cloneNode(true); c.className += " " + cls; c.style.clipPath = `inset(0 ${b}px 0 ${a}px)`; lane.append(c); return c; };
+  const left = mk("cut-l", 0, cr.width - x), right = mk("cut-r", x, 0); clip.style.visibility = "hidden";
+  const ln = el("div", "cut-line"); ln.style.left = (cr.left - lr.left + x) + "px"; lane.append(ln);
+  snip(); requestAnimationFrame(() => { left.style.transform = "translateX(-5px)"; right.style.transform = "translateX(5px)"; });
+  setTimeout(() => { left.style.transform = right.style.transform = ""; }, 650);
+  setTimeout(() => { left.remove(); right.remove(); ln.remove(); clip.style.visibility = ""; }, 1050);
+}
+$("#lanes").addEventListener("pointerdown", e => { if (!razor) return; const clip = e.target.closest(".clip"); if (clip && !clip.classList.contains("cut-l") && !clip.classList.contains("cut-r")) razorCut(clip, e); e.stopImmediatePropagation(); }, true);
+addEventListener("keydown", e => {
+  if (e.target.closest("input,textarea") || e.metaKey || e.ctrlKey || e.altKey || !$("#viewer").hidden || !$("#keysDlg").hidden) return;
+  if (e.code === "KeyC") setRazor(!razor);
+  else if (razor && (e.code === "KeyV" || e.key === "Escape")) setRazor(false);
+});
+
+/* 9. Привет тем, кто открыл консоль */
+try { console.log("%c☣ B1oHazard%c\nGennady Andreev · AI Creator · editor\n\nИщешь, как это сделано? Пиши в Telegram: @b1ohazard\nCurious how it's built? Ping me on Telegram: @b1ohazard\n\nP.S. try: C · V · double-click Lumetri Scopes · type “vhs” or “bio”",
+  "font:700 28px/1.2 system-ui;color:#7dff5a;text-shadow:0 0 8px #7dff5a", "font:13px/1.5 ui-monospace,monospace;color:#8b8f99"); } catch {}
+/* ============================================= */
+
 addEventListener("keydown", e => {
   if (!$("#keysDlg").hidden) {
     if (e.key === "Escape" || e.key === "?") { e.preventDefault(); closeKeys(); }
@@ -1531,7 +1649,7 @@ function drawScopes() {
   grid(gw, ww, wh); grid(gh, hw, hh);
   const src = scopeSource();
   let px;
-  try { if (!src) throw 0; scCtx.drawImage(src, 0, 0, SW, SH); px = scCtx.getImageData(0, 0, SW, SH).data; }
+  try { if (!src) throw 0; scCtx.filter = LOOKS[lookI].f; scCtx.drawImage(src, 0, 0, SW, SH); scCtx.filter = "none"; px = scCtx.getImageData(0, 0, SW, SH).data; }
   catch { noSignal(gw, ww, wh); noSignal(gh, hw, hh); return; }
   ambient(px);
   /* вейвформ и вектороскоп — накопление точек, гистограмма — по каналам */
