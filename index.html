@@ -232,6 +232,9 @@ button.tab:not(.on):hover{color:var(--fg)}
 .screen.is-playing .pp-big{opacity:0;transform:scale(.9);pointer-events:none}
 .screen.is-playing:hover .pp-big{opacity:.85;transform:none;pointer-events:auto}
 .screen.no-pp .pp-big{display:none}
+/* при воспроизведении: мышь не двигается 2 с — прячем кнопку и курсор (и в обычном, и в полноэкранном режиме) */
+.screen.is-playing.idle,.screen.is-playing.idle *{cursor:none}
+.screen.is-playing.idle .pp-big,.screen.is-playing.idle:hover .pp-big{opacity:0;transform:scale(.9);pointer-events:none}
 @media (hover:none){.screen.is-playing:hover .pp-big{opacity:0;pointer-events:none}}
 @media (max-width:560px){.screen>.pp-big{width:64px;height:64px;margin:-32px 0 0 -32px}.pp-big svg{width:24px;height:24px}}
 .screen{position:relative;width:min(100%, calc((100vh - 230px) * 16 / 9));width:min(100%, calc((100svh - 230px) * 16 / 9));min-width:min(100%, 320px);max-width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;border-radius:12px}
@@ -1103,7 +1106,7 @@ function setPlaying(p) {
   $("#bPlay").setAttribute("aria-label", L(p ? "tPause" : "tPlay"));
   const pb = $("#ppBig"); pb.firstChild.innerHTML = p ? '<path d="M4 3h3v10H4zm5 0h3v10H9z"/>' : '<path d="M4.5 2.5v11L13.5 8z"/>';
   pb.dataset.tt = p ? "tPause" : "tPlay"; pb.title = L(pb.dataset.tt); pb.setAttribute("aria-label", pb.title);
-  $("#screen").classList.toggle("is-playing", p);
+  $("#screen").classList.toggle("is-playing", p); window.screenWake && screenWake();
   if (cur && cur.src && cur.type !== "image") p ? vid.play().catch(() => {}) : vid.pause();
 }
 function togglePlay() { if (!playing && t >= T - 1 / FPS) setTime(0, true); setPlaying(!playing); }
@@ -1166,6 +1169,11 @@ $("#bFull").onclick = () => {
   $("#ppBig").addEventListener("click", e => { e.stopPropagation(); togglePlay(); });
   $("#ppBig").addEventListener("dblclick", e => e.stopPropagation());
   sc.addEventListener("click", e => { if (e.target.closest("a,button") || !cur || !cur.src) return; togglePlay(); });
+  let idleT = null;
+  const wake = () => { sc.classList.remove("idle"); clearTimeout(idleT); if (playing) idleT = setTimeout(() => { if (playing) sc.classList.add("idle"); }, 2000); };
+  ["mousemove", "pointerdown", "mouseenter"].forEach(ev => sc.addEventListener(ev, wake));
+  sc.addEventListener("mouseleave", () => clearTimeout(idleT));
+  window.screenWake = wake;
   /* двойной клик — во весь экран (пауза/плей от двух кликов взаимно гасятся) */
   sc.addEventListener("dblclick", e => { if (e.target.closest("a,button") || !cur || !cur.src) return; $("#bFull").click(); });
 }
