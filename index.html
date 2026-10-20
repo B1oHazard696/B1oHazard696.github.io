@@ -459,7 +459,8 @@ button.tab:not(.on):hover{color:var(--fg)}
 .panel.flash{animation:flashBlk 1.6s ease-out}
 /* пока идёт видео, монитор подсвечен так же, как блоки при переходе по меню, только постоянно */
 .p-program{transition:box-shadow .6s ease,background-color .6s ease}
-.p-program.live{box-shadow:inset 0 0 0 2px var(--accent),0 0 32px color-mix(in srgb, var(--accent) 22%, transparent),var(--shadow);background-color:color-mix(in srgb, var(--accent) 7%, var(--panel))}
+/* поднимаем над соседними панелями, иначе они закрывают свечение по бокам */
+.p-program.live{z-index:5;box-shadow:inset 0 0 0 2px var(--accent),0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent),0 0 28px 2px color-mix(in srgb, var(--accent) 26%, transparent),var(--shadow);background-color:color-mix(in srgb, var(--accent) 7%, var(--panel))}
 html.cine .p-program.live{box-shadow:inset 0 0 0 2px var(--accent),0 0 40px color-mix(in srgb, var(--accent) 28%, transparent),0 30px 120px rgba(0,0,0,.6)}
 /* метаданные клипа */
 .meta-head{display:grid;gap:10px;padding:6px 14px 14px;border-bottom:1px solid var(--line)}
