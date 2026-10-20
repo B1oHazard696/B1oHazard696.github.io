@@ -280,6 +280,18 @@ button.tab:not(.on):hover{color:var(--fg)}
   background-size:100% 100%,100% 260%;animation:vhsTrack 3.2s linear infinite}
 @keyframes vhsJit{0%{transform:translateX(0)}50%{transform:translateX(1.5px)}}
 @keyframes vhsTrack{from{background-position:0 0,0 100%}to{background-position:0 0,0 -160%}}
+/* «vhs» на весь сайт: строки развёртки, полоса трекинга, расхождение цветов и дрожание всей страницы */
+.vhs-veil{position:fixed;inset:0;z-index:27;pointer-events:none;display:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px),linear-gradient(180deg,transparent 0 42%,rgba(255,255,255,.12) 45%,rgba(255,255,255,.03) 48%,transparent 53%),radial-gradient(130% 100% at 50% 50%,transparent 60%,rgba(0,0,0,.45));
+  background-size:100% 100%,100% 240%,100% 100%;animation:vhsTrack 3.6s linear infinite}
+html.vhs .vhs-veil{display:block}
+html.vhs .screen.vhs>.vhs-osd{display:none}
+.vhs-veil span{position:absolute;color:#fff;font-size:clamp(16px,2.4vw,26px);letter-spacing:.08em;text-shadow:2px 0 #f0f,-2px 0 #0ff}
+.vhs-play{left:28px;top:calc(env(safe-area-inset-top,0px) + 70px);animation:osdBlink 1s steps(2) infinite}
+.vhs-ctr{right:28px;bottom:calc(env(safe-area-inset-bottom,0px) + 28px)}
+html.vhs .menubar,html.vhs main,html.vhs footer{filter:url(#vhsF) saturate(1.3) contrast(1.06);animation:vhsJit .2s steps(2) infinite}
+@media (max-width:900px){html.vhs .menubar,html.vhs main,html.vhs footer{filter:saturate(1.3) contrast(1.06)}}
+@media (prefers-reduced-motion:reduce){html.vhs .menubar,html.vhs main,html.vhs footer,.vhs-veil,.vhs-play{animation:none}}
 /* пасхалка «Media Offline» поверх видео */
 .screen>.offline.egg{z-index:6}
 /* пасхалка «bio»: биохазард в логотипе и зелёная вспышка */
@@ -636,6 +648,7 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 <div class="bg-fx" aria-hidden="true"></div>
 <div class="bio-glow" aria-hidden="true"></div>
 <div class="glitch-bars" aria-hidden="true"></div>
+<div class="vhs-veil" aria-hidden="true"><span class="vhs-play mono">PLAY ▶</span><span class="vhs-ctr mono" id="vhsCtr">SP 0:00:00</span></div>
 <div class="cine-veil" aria-hidden="true"></div>
 <header class="menubar">
   <div class="brand">
@@ -1561,7 +1574,11 @@ $(".p-scopes .scopes").addEventListener("dblclick", e => { e.preventDefault(); g
 
 /* 6, 7. Набранные слова: «vhs» — кассетный режим, «bio» — биохазард (по физическим клавишам, работает и в русской раскладке) */
 let typed = "";
-function vhsMode() { const sc = $("#screen"); sc.classList.add("vhs"); clearTimeout(vhsMode.t); vhsMode.t = setTimeout(() => sc.classList.remove("vhs"), 7000); toast("▶ VHS · SP"); }
+function vhsMode() {
+  const sc = $("#screen"), h = document.documentElement, t0 = Date.now(); sc.classList.add("vhs"); h.classList.add("vhs");
+  clearInterval(vhsMode.i); vhsMode.i = setInterval(() => { const x = Math.floor((Date.now() - t0) / 1000); $("#vhsCtr").textContent = `SP 0:00:${String(x).padStart(2, "0")}`; }, 250);
+  clearTimeout(vhsMode.t); vhsMode.t = setTimeout(() => { sc.classList.remove("vhs"); h.classList.remove("vhs"); clearInterval(vhsMode.i); }, 7000);
+}
 function geiger(dur = 2.2) {
   try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume();
     const now = actx.currentTime; let x = 0;
