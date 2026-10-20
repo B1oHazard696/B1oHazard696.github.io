@@ -521,6 +521,23 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 .scope{margin:0;display:grid;grid-template-rows:auto auto;gap:6px;min-width:0}
 .scope canvas{width:100%;height:170px;max-width:100%;display:block;background:#07080a;border-radius:10px;border:1px solid var(--line)}
 .p-scopes .aux.on{color:var(--accent)}
+.p-scopes .tabs .tab{background:none;border:0;font:inherit;font-size:12px;cursor:pointer}
+.p-scopes .tabs .tab:not(.on):hover{color:var(--fg)}
+.cw-reset{background:none;border:0;color:var(--mute);cursor:pointer;margin-right:10px;font-size:10.5px}
+.cw-reset:hover{color:var(--fg)}
+/* Color Wheels: три колеса как в Lumetri Color — тянешь точку, картинка в мониторе окрашивается */
+.wheels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;height:206px}
+.wheel{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.wh-disc{position:relative;height:138px;aspect-ratio:1;border-radius:50%;cursor:crosshair;touch-action:none;border:1px solid var(--line-2);
+  background:radial-gradient(circle,#7f7f7f 0,rgba(127,127,127,.85) 18%,rgba(127,127,127,0) 72%),conic-gradient(from 90deg,#f33,#f3f,#33f,#3ff,#3f3,#ff3,#f33);box-shadow:inset 0 0 0 6px var(--well),inset 0 0 14px rgba(0,0,0,.5)}
+.wh-disc::before,.wh-disc::after{content:"";position:absolute;left:50%;top:50%;background:rgba(0,0,0,.35);pointer-events:none}
+.wh-disc::before{width:1px;height:60%;transform:translate(-50%,-50%)}.wh-disc::after{height:1px;width:60%;transform:translate(-50%,-50%)}
+.wh-puck{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.35);box-shadow:0 0 0 1px rgba(0,0,0,.6);pointer-events:none;z-index:1}
+.wheel input{width:min(100%,138px);height:14px;accent-color:var(--tc);margin:0}
+.wheel span{font:10.5px var(--f-mono);color:var(--dim);letter-spacing:.04em}
+.wheels[hidden],.p-scopes .scopes[hidden]{display:none}
+@media (max-width:900px){.wheels{height:176px}.wh-disc{height:108px}}
+@media (max-width:560px){.wheels{height:136px;gap:4px;padding:8px}.wh-disc{height:76px}.wheel span{font-size:9.5px}}
 .p-scopes{user-select:none}
 .scope figcaption{font:10.5px var(--f-mono);color:var(--dim);letter-spacing:.04em}
 @media (max-width:900px){.scope canvas{height:140px}}
@@ -583,6 +600,9 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
   <!-- Teal & Orange: тени уходят в бирюзу, света — в тёплый -->
   <filter id="lookTO" color-interpolation-filters="sRGB"><feComponentTransfer>
     <feFuncR type="table" tableValues="0 .08 .42 .82 1"/><feFuncG type="table" tableValues="0.03 .22 .5 .76 .93"/><feFuncB type="table" tableValues=".14 .36 .5 .56 .66"/></feComponentTransfer></filter>
+  <!-- Color Wheels: lift / gamma / gain на канал — out = amplitude · in^exponent + offset -->
+  <filter id="cwF" color-interpolation-filters="sRGB"><feComponentTransfer>
+    <feFuncR type="gamma" amplitude="1" exponent="1" offset="0"/><feFuncG type="gamma" amplitude="1" exponent="1" offset="0"/><feFuncB type="gamma" amplitude="1" exponent="1" offset="0"/></feComponentTransfer></filter>
   <!-- VHS: красный канал уезжает вправо, зелёный с синим — влево -->
   <filter id="vhsF" color-interpolation-filters="sRGB" x="-2%" width="104%">
     <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/><feOffset in="r" dx="4" result="r2"/>
@@ -697,7 +717,12 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
   </section>
 
   <section class="panel p-scopes" aria-label="Скоупы" data-ta="scopes">
-    <div class="tabs"><span class="tab on">Lumetri Scopes</span><span class="spacer"></span><span class="aux mono" id="scSig">Rec.709</span></div>
+    <div class="tabs" role="tablist"><button class="tab on" id="tabScopes" role="tab" aria-selected="true">Lumetri Scopes</button><button class="tab" id="tabWheels" role="tab" aria-selected="false">Color Wheels</button><span class="spacer"></span><button class="aux mono cw-reset" id="cwReset" hidden data-t="cwReset">Сброс</button><span class="aux mono" id="scSig">Rec.709</span></div>
+    <div class="wheels" id="wheels" hidden>
+      <div class="wheel" data-w="lift"><div class="wh-disc"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwShadows">Тени</span></div>
+      <div class="wheel" data-w="gamma"><div class="wh-disc"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwMids">Средние тона</span></div>
+      <div class="wheel" data-w="gain"><div class="wh-disc"><i class="wh-puck"></i></div><input type="range" min="-1" max="1" step="0.01" value="0" data-tt="cwLum" aria-label="Яркость"><span data-t="cwHighs">Света</span></div>
+    </div>
     <div class="scopes">
       <figure class="scope"><canvas id="scWave"></canvas><figcaption data-t="scWave">Вейвформ · яркость</figcaption></figure>
       <figure class="scope sq"><canvas id="scVec"></canvas><figcaption data-t="scVec">Вектороскоп</figcaption></figure>
@@ -859,7 +884,7 @@ const UI = {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
     tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все работы", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующая работа", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
-    razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
+    cwReset: "Сброс", cwLum: "Яркость", cwShadows: "Тени", cwMids: "Средние тона", cwHighs: "Света", razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
     kAll: "все клавиши", kHelp: "Все сочетания клавиш (?)", kTitle: "Сочетания клавиш", kSet: "Набор клавиш: Andreev_Portfolio (по умолчанию)", kLgApp: "Монитор и таймлайн", kLgPnl: "Карусель изображений", kLgBoth: "Оба",
     kG: [
       ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["L", "Вперёд; ещё раз — 2× · 4× · 8×"], ["J", "Назад; ещё раз — быстрее"], ["K", "Стоп"], ["PgUp|PgDn", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"], ["@Клик по картинке", "Пауза / продолжить"], ["@Свайп по видео", "Другая работа (телефон)"], ["@Двойной клик", "Во весь экран"]]],
@@ -879,7 +904,7 @@ const UI = {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
     tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All works", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next work", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
-    razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
+    cwReset: "Reset", cwLum: "Luma", cwShadows: "Shadows", cwMids: "Midtones", cwHighs: "Highlights", razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
     kAll: "all shortcuts", kHelp: "All keyboard shortcuts (?)", kTitle: "Keyboard Shortcuts", kSet: "Keyboard layout preset: Andreev_Portfolio (default)", kLgApp: "Monitor & timeline", kLgPnl: "Image carousel", kLgBoth: "Both",
     kG: [
       ["Program monitor", [["Space", "Play / pause"], ["L", "Play forward; again — 2× · 4× · 8×"], ["J", "Play backward; again — faster"], ["K", "Stop"], ["PgUp|PgDn", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"], ["@Click the picture", "Pause / resume"], ["@Swipe the video", "Another work (phone)"], ["@Double-click", "Full screen"]]],
@@ -1448,13 +1473,56 @@ const LOOKS = [
   { n: "Film '70s", f: "sepia(.38) saturate(1.25) contrast(.92) brightness(1.06) hue-rotate(-8deg)" }
 ];
 let lookI = 0;
+/* итоговая цветокоррекция монитора: лук + Color Wheels; скоупы считают по ней же */
+let gradeF = "none";
+const CW = { lift: { x: 0, y: 0, l: 0 }, gamma: { x: 0, y: 0, l: 0 }, gain: { x: 0, y: 0, l: 0 } };
+const cwActive = () => Object.values(CW).some(w => w.x || w.y || w.l);
+function applyGrade() {
+  const lk = LOOKS[lookI].f, parts = [lk !== "none" ? lk : "", cwActive() ? "url(#cwF)" : ""].filter(Boolean);
+  gradeF = parts.length ? parts.join(" ") : "none";
+  [vid, $("#lImg")].forEach(n => n.style.filter = gradeF === "none" ? "" : gradeF);
+  $("#cwReset").hidden = !cwActive(); queueScopes();
+}
 function setLook(i) {
   lookI = i % LOOKS.length; const lk = LOOKS[lookI];
-  [vid, $("#lImg")].forEach(n => n.style.filter = lk.f === "none" ? "" : lk.f);
   $("#scSig").textContent = lk.n; $("#scSig").classList.toggle("on", lookI > 0);
-  if (lookI) toast("Lumetri · " + lk.n); queueScopes();
+  if (lookI) toast("Lumetri · " + lk.n); applyGrade();
 }
-$(".p-scopes").addEventListener("dblclick", e => { e.preventDefault(); getSelection().removeAllRanges(); setLook(lookI + 1); });
+/* Color Wheels: точка на колесе — оттенок и сила, ползунок — яркость зоны */
+function cwUpdate() {
+  const tint = w => { const r = Math.min(1, Math.hypot(w.x, w.y)), h = Math.atan2(-w.y, w.x) * 180 / Math.PI;
+    const c = [0, 8, 4].map(n => { const k = (n + h / 30 + 12) % 12; return .5 - .5 * Math.max(-1, Math.min(k - 3, 9 - k, 1)); });
+    const m = (c[0] + c[1] + c[2]) / 3; return c.map(v => (v - m) * r); };
+  const tl = tint(CW.lift), tm = tint(CW.gamma), th = tint(CW.gain);
+  ["R", "G", "B"].forEach((ch, i) => { const f = $("#cwF feFunc" + ch);
+    f.setAttribute("offset", (tl[i] * .2 + CW.lift.l * .15).toFixed(4));
+    f.setAttribute("exponent", Math.max(.25, Math.min(4, 1 / Math.max(.2, 1 + tm[i] * .8 + CW.gamma.l * .55))).toFixed(4));
+    f.setAttribute("amplitude", Math.max(0, 1 + th[i] * .5 + CW.gain.l * .4).toFixed(4)); });
+  document.querySelectorAll(".wheel").forEach(wh => { const w = CW[wh.dataset.w];
+    wh.querySelector(".wh-puck").style.transform = `translate(${w.x * wh.querySelector(".wh-disc").clientWidth / 2 * .82}px, ${w.y * wh.querySelector(".wh-disc").clientWidth / 2 * .82}px)`;
+    wh.querySelector("input").value = w.l; });
+  applyGrade();
+}
+document.querySelectorAll(".wheel").forEach(wh => {
+  const disc = wh.querySelector(".wh-disc"), w = CW[wh.dataset.w];
+  const move = e => { const r = disc.getBoundingClientRect(), R = r.width / 2 * .82;
+    let x = (e.clientX - r.left - r.width / 2) / R, y = (e.clientY - r.top - r.height / 2) / R; const d = Math.hypot(x, y); if (d > 1) { x /= d; y /= d; }
+    w.x = +x.toFixed(3); w.y = +y.toFixed(3); cwUpdate(); };
+  disc.addEventListener("pointerdown", e => { disc.setPointerCapture(e.pointerId); move(e); disc.onpointermove = move; });
+  disc.addEventListener("pointerup", () => disc.onpointermove = null); disc.addEventListener("pointercancel", () => disc.onpointermove = null);
+  disc.addEventListener("dblclick", e => { e.stopPropagation(); w.x = w.y = w.l = 0; cwUpdate(); });
+  wh.querySelector("input").addEventListener("input", e => { w.l = +e.target.value; cwUpdate(); });
+  wh.querySelector("input").addEventListener("dblclick", e => { e.stopPropagation(); w.l = 0; cwUpdate(); });
+});
+$("#cwReset").onclick = () => { Object.values(CW).forEach(w => w.x = w.y = w.l = 0); cwUpdate(); };
+function setScTab(wheels) {
+  $("#wheels").hidden = !wheels; $(".p-scopes .scopes").hidden = wheels;
+  $("#tabScopes").classList.toggle("on", !wheels); $("#tabWheels").classList.toggle("on", wheels);
+  $("#tabScopes").setAttribute("aria-selected", !wheels); $("#tabWheels").setAttribute("aria-selected", wheels);
+  if (wheels) cwUpdate(); else queueScopes();
+}
+$("#tabScopes").onclick = () => setScTab(false); $("#tabWheels").onclick = () => setScTab(true);
+$(".p-scopes .scopes").addEventListener("dblclick", e => { e.preventDefault(); getSelection().removeAllRanges(); setLook(lookI + 1); });
 
 /* 5. Media Offline: пять быстрых кликов по «Safe» — тот самый красный экран */
 { let hits = [], offT = null; $("#safeBtn").addEventListener("click", () => {
@@ -1630,6 +1698,9 @@ function ambient(px) {
   });
 }
 function drawScopes() {
+  /* вкладка Color Wheels открыта — скоупы не рисуем, но подсветку фона продолжаем считать */
+  if ($(".p-scopes .scopes").hidden) { const src = scopeSource();
+    try { if (!src) return; scCtx.filter = gradeF; scCtx.drawImage(src, 0, 0, SW, SH); scCtx.filter = "none"; ambient(scCtx.getImageData(0, 0, SW, SH).data); } catch {} return; }
   const gw = fitCanvas($("#scWave")), gv = fitCanvas($("#scVec")), gh = fitCanvas($("#scHist"));
   const [ww, wh] = [gw.canvas.width, gw.canvas.height], [vw, vh] = [gv.canvas.width, gv.canvas.height], [hw, hh] = [gh.canvas.width, gh.canvas.height];
   [gw, gv, gh].forEach(g => g.clearRect(0, 0, g.canvas.width, g.canvas.height));
@@ -1649,7 +1720,7 @@ function drawScopes() {
   grid(gw, ww, wh); grid(gh, hw, hh);
   const src = scopeSource();
   let px;
-  try { if (!src) throw 0; scCtx.filter = LOOKS[lookI].f; scCtx.drawImage(src, 0, 0, SW, SH); scCtx.filter = "none"; px = scCtx.getImageData(0, 0, SW, SH).data; }
+  try { if (!src) throw 0; scCtx.filter = gradeF; scCtx.drawImage(src, 0, 0, SW, SH); scCtx.filter = "none"; px = scCtx.getImageData(0, 0, SW, SH).data; }
   catch { noSignal(gw, ww, wh); noSignal(gh, hw, hh); return; }
   ambient(px);
   /* вейвформ и вектороскоп — накопление точек, гистограмма — по каналам */
