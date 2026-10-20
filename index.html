@@ -265,6 +265,10 @@ button.tab:not(.on):hover{color:var(--fg)}
   border:3px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .screen:has(.spin:not([hidden])) .pp-big{opacity:0!important}
+/* текущий лук Lumetri — по центру вверху монитора, пока он включён */
+.screen>.look-badge{inset:auto;left:50%;top:12px;transform:translateX(-50%);width:auto;height:auto;z-index:4;padding:4px 12px;border-radius:999px;
+  background:rgba(0,0,0,.6);color:#fff;font-size:12px;letter-spacing:.03em;white-space:nowrap;pointer-events:none;border:1px solid color-mix(in srgb, var(--accent) 60%, transparent)}
+.screen>.look-badge b{color:var(--tc);font-weight:500}
 /* пасхалка «vhs»: кассетный режим монитора */
 .screen>.vhs-osd{display:none;inset:auto;left:18px;top:14px;width:auto;height:auto;z-index:5;pointer-events:none;color:#fff;font-size:clamp(14px,2.2vw,22px);letter-spacing:.08em;text-shadow:2px 0 #f0f,-2px 0 #0ff}
 .screen>.vhs-osd .vhs-sp{margin-left:14px;opacity:.8}
@@ -284,6 +288,26 @@ button.tab:not(.on):hover{color:var(--fg)}
 @keyframes bioGlow{0%,60%{opacity:1}100%{opacity:0}}
 .logo.bio{color:#7dff5a;border-color:#7dff5a;text-shadow:0 0 8px #7dff5a;box-shadow:0 0 18px rgba(125,255,90,.6);animation:bioPulse .5s ease-in-out 5 alternate}
 @keyframes bioPulse{to{box-shadow:0 0 4px rgba(125,255,90,.3)}}
+/* «bio»: глитч по всему сайту — рывки, срезы и расхождение цветов ~1 с */
+html.glitch .menubar,html.glitch main,html.glitch footer{animation:siteGlitch .95s steps(1) both}
+@keyframes siteGlitch{
+  0%{transform:none;filter:none;clip-path:none}
+  8%{transform:translate(-6px,2px) skewX(-3deg);filter:drop-shadow(4px 0 0 rgba(255,0,80,.75)) drop-shadow(-4px 0 0 rgba(0,255,220,.75));clip-path:inset(12% 0 58% 0)}
+  16%{transform:translate(8px,-3px);filter:hue-rotate(90deg) saturate(2);clip-path:inset(46% 0 22% 0)}
+  24%{transform:translate(-3px,0) skewX(5deg);filter:drop-shadow(-6px 0 0 rgba(125,255,90,.8)) drop-shadow(6px 0 0 rgba(255,0,200,.7));clip-path:none}
+  32%{transform:translate(0,4px);filter:invert(1) hue-rotate(180deg);clip-path:inset(0 0 70% 0)}
+  40%{transform:translate(5px,-2px) scaleY(1.02);filter:drop-shadow(5px 0 0 rgba(0,255,220,.8));clip-path:inset(30% 0 30% 0)}
+  50%{transform:none;filter:contrast(1.6) saturate(0) brightness(1.2);clip-path:none}
+  58%{transform:translate(-7px,1px) skewX(-6deg);filter:drop-shadow(3px 0 0 rgba(255,0,80,.8)) drop-shadow(-3px 0 0 rgba(0,180,255,.8));clip-path:inset(62% 0 8% 0)}
+  68%{transform:translate(3px,0);filter:hue-rotate(-60deg);clip-path:none}
+  80%{transform:translate(-2px,-1px);filter:drop-shadow(2px 0 0 rgba(125,255,90,.7))}
+  90%,100%{transform:none;filter:none;clip-path:none}}
+.glitch-bars{position:fixed;inset:0;z-index:26;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:linear-gradient(180deg,transparent 0 14%,rgba(255,0,90,.5) 14% 16%,transparent 16% 41%,rgba(0,255,220,.45) 41% 42.5%,transparent 42.5% 67%,rgba(125,255,90,.5) 67% 69%,transparent 69%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 1px,transparent 1px 3px)}
+html.glitch .glitch-bars{animation:bars .95s steps(1) both}
+@keyframes bars{0%{opacity:0}8%{opacity:1;transform:translateY(0)}16%{opacity:.7;transform:translateY(22%)}24%{opacity:1;transform:translateY(-15%)}32%{opacity:.4}40%{opacity:1;transform:translateY(38%)}58%{opacity:.8;transform:translateY(-30%)}68%{opacity:.3}80%{opacity:.6;transform:translateY(10%)}90%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){html.glitch .menubar,html.glitch main,html.glitch footer,html.glitch .glitch-bars{animation:none}}
 /* пасхалка C: лезвие, как в Premiere */
 .lanes.razor,.lanes.razor *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M5 3l14 9-14 9z' fill='%23fff' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M5 3v18' stroke='%23e5484d' stroke-width='2'/%3E%3C/svg%3E") 5 12,crosshair!important}
 .cut-l,.cut-r{position:absolute;pointer-events:none;z-index:4;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
@@ -611,6 +635,7 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 </svg>
 <div class="bg-fx" aria-hidden="true"></div>
 <div class="bio-glow" aria-hidden="true"></div>
+<div class="glitch-bars" aria-hidden="true"></div>
 <div class="cine-veil" aria-hidden="true"></div>
 <header class="menubar">
   <div class="brand">
@@ -667,6 +692,7 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
         <canvas class="xfade" id="xfade" aria-hidden="true"></canvas>
         <div class="spin" id="spin" hidden aria-hidden="true"></div>
         <span class="rate mono" id="rateBadge" hidden></span>
+        <span class="look-badge mono" id="lookBadge" hidden></span>
         <div class="vhs-osd mono" aria-hidden="true"><span>PLAY ▶</span><span class="vhs-sp">SP</span></div>
         <button class="pp-big" id="ppBig" type="button" data-tt="tPlay" title="Воспроизвести" aria-label="Воспроизвести"><svg viewBox="0 0 16 16"><path d="M4.5 2.5v11L13.5 8z"/></svg></button>
       </div>
@@ -1482,11 +1508,13 @@ function applyGrade() {
   gradeF = parts.length ? parts.join(" ") : "none";
   [vid, $("#lImg")].forEach(n => n.style.filter = gradeF === "none" ? "" : gradeF);
   $("#cwReset").hidden = !cwActive(); queueScopes();
+  const names = [lookI ? LOOKS[lookI].n : "", cwActive() ? "Color Wheels" : ""].filter(Boolean), bd = $("#lookBadge");
+  bd.hidden = !names.length; bd.innerHTML = names.length ? "<b>Lumetri</b> · " + names.join(" + ") : "";
 }
 function setLook(i) {
   lookI = i % LOOKS.length; const lk = LOOKS[lookI];
   $("#scSig").textContent = lk.n; $("#scSig").classList.toggle("on", lookI > 0);
-  if (lookI) toast("Lumetri · " + lk.n); applyGrade();
+  applyGrade();
 }
 /* Color Wheels: точка на колесе — оттенок и сила, ползунок — яркость зоны */
 function cwUpdate() {
@@ -1545,6 +1573,8 @@ function bioMode() {
   const lg = $("#initials"); lg.textContent = "☣"; lg.classList.add("bio");
   const gl = $(".bio-glow"); gl.classList.remove("on"); void gl.offsetWidth; gl.classList.add("on");
   geiger(); toast("☣ B1oHazard · radioactive.wind");
+  const h = document.documentElement; h.classList.remove("glitch"); void h.offsetWidth; h.classList.add("glitch");
+  clearTimeout(bioMode.g); bioMode.g = setTimeout(() => h.classList.remove("glitch"), 1000);
   clearTimeout(bioMode.t); bioMode.t = setTimeout(() => { lg.classList.remove("bio"); lg.textContent = tr(CFG.initials); }, 3000);
 }
 addEventListener("keydown", e => {
