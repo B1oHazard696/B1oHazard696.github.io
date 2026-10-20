@@ -213,6 +213,12 @@ button.tab:not(.on):hover{color:var(--fg)}
 
 /* program monitor */
 .monitor{background:color-mix(in srgb, var(--well) 75%, transparent);padding:clamp(8px,1.4vw,16px);display:grid;place-items:center}
+/* клик по картинке — пауза/плей, как в веб-плеерах; по центру коротко мигает значок */
+.screen{cursor:pointer}
+.pp-flash{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:rgba(0,0,0,.55);display:grid;place-items:center;opacity:0;pointer-events:none;z-index:3}
+.pp-flash svg{width:26px;height:26px;fill:#fff}
+.pp-flash.go{animation:ppf .6s ease-out}
+@keyframes ppf{0%{opacity:1;transform:scale(.85)}100%{opacity:0;transform:scale(1.35)}}
 .screen{position:relative;width:min(100%, calc((100vh - 230px) * 16 / 9));width:min(100%, calc((100svh - 230px) * 16 / 9));min-width:min(100%, 320px);max-width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;border-radius:12px}
 .screen>*{position:absolute;inset:0;width:100%;height:100%}
 .screen video,.screen img{object-fit:contain;background:#000}
@@ -513,6 +519,7 @@ button.tab:not(.on):hover{color:var(--fg)}
         <img id="lImg" alt="" hidden>
         <video id="lVid" playsinline preload="metadata" hidden></video>
         <div class="safe" id="safe" hidden></div>
+        <div class="pp-flash" id="ppFlash" aria-hidden="true"><svg viewBox="0 0 16 16"></svg></div>
       </div>
     </div>
     <div class="scrub" id="scrub"><div class="fill"></div><div class="head"></div></div>
@@ -721,7 +728,7 @@ const UI = {
     kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
     kAll: "все клавиши", kHelp: "Все сочетания клавиш (?)", kTitle: "Сочетания клавиш", kSet: "Набор клавиш: Andreev_Portfolio (по умолчанию)", kLgApp: "Монитор и таймлайн", kLgPnl: "Карусель изображений", kLgBoth: "Оба",
     kG: [
-      ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["K", "Стоп"], ["J|L", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"]]],
+      ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["K", "Стоп"], ["J|L", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"], ["@Клик по картинке", "Пауза / продолжить"], ["@Двойной клик", "Во весь экран"]]],
       ["Таймлайн", [["@Клик по работе в «Проекте»", "Открыть её на таймлайне"], ["@Клик по главе V2", "Перейти к главе шоурила"], ["@Клик / тяни по линейке", "Перемотка плейхедом"]]],
       ["Карусель изображений", [["←|→", "Предыдущее / следующее"], ["@Свайп", "Листать на телефоне"], ["Esc", "Закрыть карусель"]]],
       ["Общие", [["?", "Это окно"], ["Esc", "Закрыть окно"]]]
@@ -741,7 +748,7 @@ const UI = {
     kSpace: "Space", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
     kAll: "all shortcuts", kHelp: "All keyboard shortcuts (?)", kTitle: "Keyboard Shortcuts", kSet: "Keyboard layout preset: Andreev_Portfolio (default)", kLgApp: "Monitor & timeline", kLgPnl: "Image carousel", kLgBoth: "Both",
     kG: [
-      ["Program monitor", [["Space", "Play / pause"], ["K", "Stop"], ["J|L", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"]]],
+      ["Program monitor", [["Space", "Play / pause"], ["K", "Stop"], ["J|L", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"], ["@Click the picture", "Pause / resume"], ["@Double-click", "Full screen"]]],
       ["Timeline", [["@Click a work in Project", "Open it on the timeline"], ["@Click a V2 chapter", "Jump to a showreel chapter"], ["@Click / drag the ruler", "Scrub the playhead"]]],
       ["Image carousel", [["←|→", "Previous / next"], ["@Swipe", "Browse on a phone"], ["Esc", "Close the carousel"]]],
       ["General", [["?", "This window"], ["Esc", "Close the window"]]]
@@ -1137,6 +1144,14 @@ $("#bFull").onclick = () => {
     else fail();
   } catch { fail(); }
 };
+{ const sc = $("#screen"), fl = $("#ppFlash");
+  const flash = () => { fl.firstChild.innerHTML = playing ? '<path d="M4 2.5v11L13.5 8z"/>' : '<path d="M4 3h3v10H4zm5 0h3v10H9z"/>';
+    fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go"); };
+  sc.addEventListener("click", e => { if (e.target.closest("a,button") || !cur || !cur.src) return;
+    togglePlay(); flash(); });
+  /* двойной клик — во весь экран (пауза/плей от двух кликов взаимно гасятся) */
+  sc.addEventListener("dblclick", e => { if (e.target.closest("a,button") || !cur || !cur.src) return; $("#bFull").click(); });
+}
 $("#safeBtn").onclick = e => { const s = $("#safe"); s.hidden = !s.hidden; e.currentTarget.classList.toggle("on", !s.hidden); e.currentTarget.setAttribute("aria-pressed", !s.hidden); };
 vid.addEventListener("ended", () => { if (playing) { t = T; setPlaying(false); render(); } });
 
