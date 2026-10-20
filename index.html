@@ -65,17 +65,41 @@
   --shadow:0 8px 30px rgba(30,40,70,.10); --blob:.30;
 }
 *{box-sizing:border-box}
+/* эмбилайт: цвета пятен берутся из кадра в мониторе и плавно перетекают (регистрация нужна для анимации переменных) */
+@property --amb1{syntax:"<color>";inherits:true;initial-value:#7b72d4}
+@property --amb2{syntax:"<color>";inherits:true;initial-value:#3d8bfd}
+@property --amb3{syntax:"<color>";inherits:true;initial-value:#2a9d98}
+@property --amb4{syntax:"<color>";inherits:true;initial-value:#c45f8b}
+@property --amb5{syntax:"<color>";inherits:true;initial-value:#d18f34}
+:root{--amb1:var(--c1);--amb2:var(--accent);--amb3:var(--c2);--amb4:var(--c4);--amb5:var(--c3);transition:--amb1 1.6s ease,--amb2 1.6s ease,--amb3 1.6s ease,--amb4 1.6s ease,--amb5 1.6s ease}
 /* живой фон: цветные пятна, как блики на грейдинге, медленно плывут за панелями */
-body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:none;inset:-20%;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
+body::before,body::after{content:"";position:fixed;z-index:-2;pointer-events:none;inset:-20%;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
 body::before{background:
-  radial-gradient(38% 42% at 18% 22%, color-mix(in srgb, var(--c1) 55%, transparent), transparent 70%),
-  radial-gradient(34% 40% at 82% 18%, color-mix(in srgb, var(--accent) 45%, transparent), transparent 70%),
-  radial-gradient(40% 45% at 70% 85%, color-mix(in srgb, var(--c2) 45%, transparent), transparent 70%);
+  radial-gradient(38% 42% at 18% 22%, color-mix(in srgb, var(--amb1) 55%, transparent), transparent 70%),
+  radial-gradient(34% 40% at 82% 18%, color-mix(in srgb, var(--amb2) 45%, transparent), transparent 70%),
+  radial-gradient(40% 45% at 70% 85%, color-mix(in srgb, var(--amb3) 45%, transparent), transparent 70%);
   opacity:var(--blob);animation:drift1 38s ease-in-out infinite alternate}
 body::after{background:
-  radial-gradient(30% 36% at 30% 80%, color-mix(in srgb, var(--c4) 45%, transparent), transparent 70%),
-  radial-gradient(26% 30% at 92% 60%, color-mix(in srgb, var(--c3) 35%, transparent), transparent 70%);
+  radial-gradient(30% 36% at 30% 80%, color-mix(in srgb, var(--amb4) 45%, transparent), transparent 70%),
+  radial-gradient(26% 30% at 92% 60%, color-mix(in srgb, var(--amb5) 35%, transparent), transparent 70%);
   opacity:calc(var(--blob) * .8);animation:drift2 46s ease-in-out infinite alternate}
+/* плёночное зерно и виньетка — за панелями, поверх цветных пятен */
+.bg-fx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.bg-fx::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%)}
+.bg-fx::after{content:"";position:absolute;inset:-60px;opacity:.07;mix-blend-mode:overlay;will-change:transform;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .5s steps(5) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-23px,17px)}40%{transform:translate(31px,-12px)}60%{transform:translate(-14px,-29px)}80%{transform:translate(19px,26px)}100%{transform:translate(0,0)}}
+:root[data-ui="light"] .bg-fx::before{background:radial-gradient(120% 90% at 50% 45%, transparent 60%, rgba(30,40,70,.16) 100%)}
+:root[data-ui="light"] .bg-fx::after{opacity:.05;mix-blend-mode:multiply}
+@media (max-width:900px){.bg-fx::after{animation:none;opacity:.05}}
+/* режим кинозала: пока идёт видео, всё вокруг монитора приглушается; движение мыши вне монитора или прокрутка — возвращают яркость */
+.cine-veil{position:fixed;inset:0;z-index:15;pointer-events:none;background:rgba(3,4,6,.62);opacity:0;transition:opacity .8s ease}
+:root[data-ui="light"] .cine-veil{background:rgba(12,14,20,.5)}
+html.cine .cine-veil{opacity:1}
+.p-program{position:relative;transition:box-shadow .8s ease}
+html.cine .p-program{z-index:16;box-shadow:0 30px 120px rgba(0,0,0,.6)}
+html.cine body::before,html.cine body::after{opacity:calc(var(--blob) * 1.25)}
 @keyframes drift1{to{transform:translate(4%,6%) rotate(8deg) scale(1.08)}}
 @keyframes drift2{to{transform:translate(-6%,-4%) rotate(-10deg) scale(1.12)}}
 body{background:var(--bg);color:var(--fg);font:500 14px/1.5 var(--f-ui);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
@@ -510,12 +534,14 @@ button.tab:not(.on):hover{color:var(--fg)}
 @media (max-width:760px){.kd-kb,.kd-legend{display:none}.kd-list{grid-template-columns:1fr}.kd-set{display:none}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel-2);border:1px solid var(--line-2);
   padding:9px 18px;border-radius:999px;font-size:12px;z-index:30}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}body::before,body::after{animation:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}body::before,body::after,.bg-fx::after{animation:none}}
 </style>
 </head>
 <body>
 
 
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="cine-veil" aria-hidden="true"></div>
 <header class="menubar">
   <div class="brand">
     <span class="logo" id="initials" role="button" tabindex="0" aria-label="Дзынь!">ИФ</span>
@@ -1177,6 +1203,14 @@ function dissolveFrom() {
   const go = () => { clearTimeout(xfT); cv.classList.add("out"); xfT = setTimeout(() => cv.className = "xfade", 600); };
   vid.addEventListener("loadeddata", go, { once: true }); xfT = setTimeout(go, 700);
 }
+/* кинозал: затемнение вокруг монитора во время воспроизведения */
+let cineAway = 0, cineT = null;
+function cineCheck() { document.documentElement.classList.toggle("cine", playing && Date.now() - cineAway > 2200 && $("#viewer").hidden && $("#keysDlg").hidden);
+  clearTimeout(cineT); if (playing) cineT = setTimeout(cineCheck, Math.max(200, 2300 - (Date.now() - cineAway))); }
+const cineWake = () => { cineAway = Date.now(); document.documentElement.classList.remove("cine"); if (playing) { clearTimeout(cineT); cineT = setTimeout(cineCheck, 2300); } };
+addEventListener("pointermove", e => { if (e.pointerType === "mouse" && !e.target.closest(".p-program")) cineWake(); }, { passive: true });
+addEventListener("scroll", () => { if (!document.fullscreenElement) cineWake(); }, { passive: true });
+addEventListener("keydown", e => { if (e.key === "Tab") cineWake(); });
 /* шаттл J/K/L: rate > 0 — вперёд (1, 2, 4, 8×), rate < 0 — назад */
 let rate = 1;
 function setRate(r) {
@@ -1196,7 +1230,7 @@ function setPlaying(p, keepRate) {
   $("#bPlay").setAttribute("aria-label", L(p ? "tPause" : "tPlay"));
   const pb = $("#ppBig"); pb.firstChild.innerHTML = p ? '<path d="M4 3h3v10H4zm5 0h3v10H9z"/>' : '<path d="M4.5 2.5v11L13.5 8z"/>';
   pb.dataset.tt = p ? "tPause" : "tPlay"; pb.title = L(pb.dataset.tt); pb.setAttribute("aria-label", pb.title);
-  $("#screen").classList.toggle("is-playing", p); window.screenWake && screenWake();
+  $("#screen").classList.toggle("is-playing", p); window.screenWake && screenWake(); cineCheck();
   if (cur && cur.src && cur.type !== "image") (p && rate > 0) ? vid.play().catch(() => {}) : vid.pause();
   spinCheck();
 }
@@ -1444,6 +1478,24 @@ function grid(g, w, h) {
   [0, 25, 50, 75, 100].forEach(v => { const y = Math.round(h - 6 - v / 100 * (h - 12)) + .5; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); g.fillText(v, 4, v === 100 ? y + fs + 2 : y - 3); });
 }
 function noSignal(g, w, h) { g.fillStyle = "rgba(255,255,255,.28)"; g.font = `${Math.round(12 * (w / Math.max(1, g.canvas.clientWidth)))}px ui-monospace, monospace`; g.textAlign = "center"; g.fillText(L("noSignal"), w / 2, h / 2); g.textAlign = "start"; }
+/* эмбилайт: средний насыщенный цвет пяти зон кадра → переменные --amb1…5 фона */
+let ambLast = 0;
+function ambient(px) {
+  const now = performance.now(); if (now - ambLast < 450) return; ambLast = now;
+  const zones = [[0, 0, .45, .55], [.55, 0, 1, .55], [.4, .45, 1, 1], [0, .45, .6, 1], [.7, .25, 1, .8]];
+  zones.forEach(([x0, y0, x1, y1], k) => {
+    let r = 0, g = 0, b = 0, w = 0;
+    for (let y = Math.floor(y0 * SH); y < y1 * SH; y += 3) for (let x = Math.floor(x0 * SW); x < x1 * SW; x += 3) {
+      const i = (y * SW + x) * 4, R = px[i], G = px[i + 1], B = px[i + 2], mx = Math.max(R, G, B), mn = Math.min(R, G, B);
+      const wt = (mx - mn + 8) * (mx + 16) / 255; r += R * wt; g += G * wt; b += B * wt; w += wt; }
+    if (!w) return; r /= w; g /= w; b /= w;
+    /* поднять насыщенность и яркость, чтобы цвет читался как подсветка, а не как грязь */
+    const mx = Math.max(r, g, b) || 1, mn = Math.min(r, g, b), sat = (mx - mn) / mx;
+    if (sat < .12) return; /* почти серый кадр — оставляем прежний цвет */
+    const k2 = 230 / mx, boost = v => Math.round(Math.min(255, Math.max(0, (mn + (v - mn) * 1.5) * k2)));
+    document.documentElement.style.setProperty("--amb" + (k + 1), `rgb(${boost(r)},${boost(g)},${boost(b)})`);
+  });
+}
 function drawScopes() {
   const gw = fitCanvas($("#scWave")), gv = fitCanvas($("#scVec")), gh = fitCanvas($("#scHist"));
   const [ww, wh] = [gw.canvas.width, gw.canvas.height], [vw, vh] = [gv.canvas.width, gv.canvas.height], [hw, hh] = [gh.canvas.width, gh.canvas.height];
@@ -1466,6 +1518,7 @@ function drawScopes() {
   let px;
   try { if (!src) throw 0; scCtx.drawImage(src, 0, 0, SW, SH); px = scCtx.getImageData(0, 0, SW, SH).data; }
   catch { noSignal(gw, ww, wh); noSignal(gh, hw, hh); return; }
+  ambient(px);
   /* вейвформ и вектороскоп — накопление точек, гистограмма — по каналам */
   const wImg = gw.getImageData(0, 0, ww, wh), wd = wImg.data, vImg = gv.getImageData(0, 0, vw, vh), vd = vImg.data;
   const hR = new Uint32Array(256), hG = new Uint32Array(256), hB = new Uint32Array(256);
