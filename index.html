@@ -94,6 +94,11 @@ a{color:var(--tc)}
 /* шапка во всю ширину экрана, без полос по краям */
 .menubar{margin-left:calc(-1 * var(--gl));margin-right:calc(-1 * var(--gr));padding-left:var(--gl);padding-right:var(--gr);position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
   background:color-mix(in srgb, var(--bg) 94%, transparent);padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:6px}
+/* пасхалка: логотип по клику делает несколько оборотов и звенит */
+.logo{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.logo.spin{animation:logoSpin 1.3s cubic-bezier(.2,.75,.25,1)}
+@keyframes logoSpin{0%{transform:rotate(0) scale(1)}15%{transform:rotate(90deg) scale(1.18)}100%{transform:rotate(1080deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.logo.spin{animation:none}}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .logo{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--panel-2);border:1px solid var(--line-2);
   font:600 11px var(--f-display);color:var(--tc)}
@@ -479,7 +484,7 @@ button.tab:not(.on):hover{color:var(--fg)}
 
 <header class="menubar">
   <div class="brand">
-    <span class="logo" id="initials">ИФ</span>
+    <span class="logo" id="initials" role="button" tabindex="0" aria-label="Дзынь!">ИФ</span>
     <span class="proj"><b id="projName">Portfolio_2026</b>.prproj</span>
   </div>
   <nav class="workspaces" aria-label="Разделы" data-ta="nav">
@@ -1435,6 +1440,25 @@ function applyLang(next, save) {
 document.querySelectorAll(".lang button").forEach(b => b.onclick = () => { if (b.dataset.lang !== lang) applyLang(b.dataset.lang, true); });
 
 $("#projName").textContent = CFG.project;
+/* звонкий «дзынь» синтезируется прямо в браузере: колокольчик из нескольких обертонов с затуханием */
+let actx = null;
+function ding() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume();
+    const now = actx.currentTime, out = actx.createGain(); out.gain.value = 0.22; out.connect(actx.destination);
+    [[1568, 1, 1.6], [3136, .35, 1.1], [4325, .22, .8], [6272, .1, .5], [2093, .5, 1.4]].forEach(([f, a, d], i) => {
+      const o = actx.createOscillator(), g = actx.createGain(), t0 = now + (i === 4 ? .12 : 0);
+      o.type = "sine"; o.frequency.value = f; g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(a, t0 + .005); g.gain.exponentialRampToValueAtTime(.0001, t0 + d);
+      o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + d + .05);
+    });
+  } catch {}
+}
+{ const lg = $("#initials");
+  const go = () => { lg.classList.remove("spin"); void lg.offsetWidth; lg.classList.add("spin"); ding(); };
+  lg.addEventListener("click", go);
+  lg.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); go(); } });
+  lg.addEventListener("animationend", () => lg.classList.remove("spin")); }
 /* ---------- тема ---------- */
 let ui = (() => { try { const v = localStorage.getItem("ui-theme"); if (v === "light" || v === "dark") return v; } catch {} return "dark"; })();
 function applyTheme(next, save) {
