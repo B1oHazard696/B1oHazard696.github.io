@@ -232,6 +232,17 @@ button.tab:not(.on):hover{color:var(--fg)}
 .screen.is-playing .pp-big{opacity:0;transform:scale(.9);pointer-events:none}
 .screen.is-playing:hover .pp-big{opacity:.85;transform:none;pointer-events:auto}
 .screen.no-pp .pp-big{display:none}
+/* cross dissolve при смене работы: последний кадр старой плавно растворяется */
+.screen>.xfade{pointer-events:none;z-index:2;opacity:0;object-fit:contain}
+.screen>.xfade.on{opacity:1}
+.screen>.xfade.out{opacity:0;transition:opacity .5s ease}
+/* загрузка видео */
+.screen>.spin{inset:auto;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;z-index:4;pointer-events:none;
+  border:3px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.screen:has(.spin:not([hidden])) .pp-big{opacity:0!important}
+/* шаттл J/K/L: текущая скорость */
+.screen>.rate{inset:auto;left:12px;top:12px;width:auto;height:auto;z-index:4;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;pointer-events:none}
 /* при воспроизведении: мышь не двигается 2 с — прячем кнопку и курсор (и в обычном, и в полноэкранном режиме) */
 .screen.is-playing.idle,.screen.is-playing.idle *{cursor:none}
 .screen.is-playing.idle .pp-big,.screen.is-playing.idle:hover .pp-big{opacity:0;transform:scale(.9);pointer-events:none}
@@ -349,7 +360,7 @@ button.tab:not(.on):hover{color:var(--fg)}
 
 /* timeline */
 .tl-wrap{overflow-x:auto}
-.tl{display:grid;grid-template-columns:104px minmax(0,1fr);min-width:680px;padding-bottom:10px;user-select:none}
+.tl{display:grid;grid-template-columns:104px minmax(0,1fr) 46px;min-width:680px;padding-bottom:10px;user-select:none}
 .heads,.lanes{display:grid;grid-template-rows:28px 34px 58px 46px;gap:3px 0}
 .heads>div:first-child{background:none}
 .heads>div{display:flex;align-items:center;gap:6px;padding:0 8px;margin-right:6px;border-radius:8px;background:var(--panel-2);font:11px var(--f-mono);color:var(--mute)}
@@ -375,6 +386,19 @@ button.tab:not(.on):hover{color:var(--fg)}
 .clip.chap:hover,.clip.chap.on{background:color-mix(in srgb,var(--cc) 75%,#000);color:#fff}
 .ruler .mk.ch{width:6px;height:6px;transform:translateX(-3px);background:var(--c3)}
 .clip.audio{background:#1f5a4a;padding:0}
+/* аудиометры справа от дорожек, как в Premiere */
+.meters{margin-left:8px;border-radius:8px;background:var(--well);padding:4px 3px}
+.meters canvas{width:100%;height:100%;display:block}
+/* V1: раскадровка ролика вдоль клипа */
+.clip.film{padding:0;background:#000}
+.clip.film .strip{position:absolute;inset:0;display:flex;overflow:hidden;opacity:.9}
+.clip.film .strip i{flex:none;height:100%;background-repeat:no-repeat;border-right:1px solid rgba(0,0,0,.55)}
+.clip.film .lbl{position:absolute;left:0;top:0;right:0;padding:3px 8px 10px;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 88%,#000) 0,color-mix(in srgb,var(--cc) 70%,transparent) 65%,transparent);z-index:1}
+.clip.film .fxb{z-index:2}
+/* превью кадра при наведении на линейку / таймлайн / полосу прокрутки */
+.hprev{position:fixed;z-index:40;pointer-events:none;border-radius:10px;overflow:hidden;border:1px solid var(--line-2);background:#000;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.hprev i{display:block;background-repeat:no-repeat}
+.hprev span{position:absolute;left:0;right:0;bottom:0;text-align:center;font:10px var(--f-mono);color:#fff;padding:2px 0;background:rgba(0,0,0,.6)}
 .clip.audio canvas{position:absolute;inset:0;width:100%;height:100%}
 .clip.audio .cn{position:relative;padding:3px 6px}
 .playhead{position:absolute;top:0;bottom:0;width:0;pointer-events:none;z-index:3}
@@ -538,6 +562,9 @@ button.tab:not(.on):hover{color:var(--fg)}
         <img id="lImg" alt="" hidden>
         <video id="lVid" playsinline preload="metadata" hidden></video>
         <div class="safe" id="safe" hidden></div>
+        <canvas class="xfade" id="xfade" aria-hidden="true"></canvas>
+        <div class="spin" id="spin" hidden aria-hidden="true"></div>
+        <span class="rate mono" id="rateBadge" hidden></span>
         <button class="pp-big" id="ppBig" type="button" data-tt="tPlay" title="Воспроизвести" aria-label="Воспроизвести"><svg viewBox="0 0 16 16"><path d="M4.5 2.5v11L13.5 8z"/></svg></button>
       </div>
     </div>
@@ -549,7 +576,7 @@ button.tab:not(.on):hover{color:var(--fg)}
         <button class="ib" id="bBack" title="Кадр назад (←)" aria-label="Кадр назад" data-tt="tBack"><svg viewBox="0 0 16 16"><path d="M10 3v10L3 8zM11 3h2v10h-2z"/></svg></button>
         <button class="ib play" id="bPlay" title="Воспроизведение (пробел)" aria-label="Воспроизвести" data-tt="tPlay"><svg viewBox="0 0 16 16" id="playIco"><path d="M4 2.5v11L13.5 8z"/></svg></button>
         <button class="ib" id="bFwd" title="Кадр вперёд (→)" aria-label="Кадр вперёд" data-tt="tFwd"><svg viewBox="0 0 16 16"><path d="M3 3h2v10H3zM6 3v10l7-5z"/></svg></button>
-        <button class="ib" id="bNext" title="Следующий клип (L)" aria-label="Следующий клип" data-tt="tNext"><svg viewBox="0 0 16 16"><path d="M3 3v10l7-5zM11 3h2v10h-2z"/></svg></button>
+        <button class="ib" id="bNext" title="Следующая работа" aria-label="Следующая работа" data-tt="tNext"><svg viewBox="0 0 16 16"><path d="M3 3v10l7-5zM11 3h2v10h-2z"/></svg></button>
       </div>
       <span class="dur mono">
         <span id="durTc">00:00:00:00</span>
@@ -560,7 +587,7 @@ button.tab:not(.on):hover{color:var(--fg)}
         <button class="ib" id="bFull" title="Во весь экран" aria-label="Во весь экран" data-tt="tFull"><svg viewBox="0 0 16 16"><path d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"/></svg></button>
       </span>
     </div>
-    <div class="keys"><span><kbd data-t="kSpace">Пробел</kbd> <span data-t="kPlay">плей/пауза</span></span><span><kbd>J</kbd> <kbd>L</kbd> <span data-t="kClip">пред./след. клип</span></span><span><kbd>←</kbd> <kbd>→</kbd> <span data-t="kFrame">по кадрам</span></span><span><kbd>↑</kbd> <kbd>↓</kbd> <span data-t="kVol">громкость</span></span><button class="keys-help" id="keysBtn" type="button" data-tt="kHelp" title="Все сочетания клавиш (?)" aria-label="Все сочетания клавиш"><kbd>?</kbd> <span data-t="kAll">все клавиши</span></button></div>
+    <div class="keys"><span><kbd data-t="kSpace">Пробел</kbd> <span data-t="kPlay">плей/пауза</span></span><span><kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd> <span data-t="kShuttle">шаттл</span></span><span><kbd>PgUp</kbd> <kbd>PgDn</kbd> <span data-t="kClip">пред./след. работа</span></span><span><kbd>←</kbd> <kbd>→</kbd> <span data-t="kFrame">по кадрам</span></span><span><kbd>↑</kbd> <kbd>↓</kbd> <span data-t="kVol">громкость</span></span><button class="keys-help" id="keysBtn" type="button" data-tt="kHelp" title="Все сочетания клавиш (?)" aria-label="Все сочетания клавиш"><kbd>?</kbd> <span data-t="kAll">все клавиши</span></button></div>
   </section>
 
   <section class="panel p-timeline" aria-label="Таймлайн" data-ta="timeline">
@@ -580,6 +607,7 @@ button.tab:not(.on):hover{color:var(--fg)}
           <div class="lane" id="laneA1"></div>
           <div class="playhead" id="playhead"></div>
         </div>
+        <div class="meters" aria-hidden="true"><canvas id="meters"></canvas></div>
       </div>
     </div>
     <div class="tl-foot"><span data-t="tlHint">Нажми на клип, чтобы открыть работу в мониторе. Плейхед можно перетаскивать.</span><span class="mono">30 fps</span></div>
@@ -738,17 +766,21 @@ const SERIES = CFG.series.map(sr => ({ ...sr, items: sr.files.map((f, i) => ({ n
 const IMG_TOTAL = SERIES.reduce((n, sr) => n + sr.items.length, 0);
 let openSeries = null;
 
+/* @generated tools/media_data.py: огибающая звука и раскадровка роликов */
+const MEDIA = {"media/showreel.mp4":{"peaks":"BxYkLTdAS09NTU5QT1FPT3TIv3uGg3pIV6BzWlpdU1VUwsWcYkpAMiZ4n1w4Hy8jHSTtoFc0MiwkHqB/TS0uMCUbuce4bVpLOy9gq2g7ITQtJz+3mXRPq4NYPaCMWDiVl1w/g6JfQGetZ0ottW9ILLB3TzSrg1I4oYtYR5eYXIaVn1JCbKtnRim2bkkvsXdMMqqCT0ZQSUA3MDIoMystLDMjLSYxIysgLygrLS8tLSEvLiosMkLE2MSBp7VuUIC/b09Hy3tXOf6xbjvBjV49uJhgQtXWg1KcsGlOg7xyVmf/o2o3yYJYNcGLWj/mx3hLrqJkQJ+xa0qa6ZNdW8d3UTTKgFM77rRsRbiXXD+uomRFoa1pSjIXFhl2/umQYVNBMy03LiciNDIlHa+iYkWjrGpGjrdwT2jGdlg/yIFiScWMXEG9lV9EsqFiRsneiluPuW9Ub8Z2WTnKgVs88LByRem8dkrk0oJRLBwdHa3+6IOI04ReQNiIWkHUkV9HiWVIPzo0LSkmJiIlKicgIjhnPyofJh0mHyQkJB4hHiUcIiEgICEdHiEeHBwiHyEeKEXkvoJnV0g/OjYzLC0iKS4oKS8oKS0nKCcsJykqKScnJiUqKysnLScpIh0aFxAIBAEA","strip":"media/showreel_strip.webp","n":30,"ar":1.7778},"media/pink_wolf.mp4":{"peaks":"AwgNERQYGx8iJSUpMS4zO0JRVltjbYmVkZ+ap4qFdKuHuJRyp6Wjk8mfhKOoin6V9tacqIuf6tW7xo+xqpGcnJOTjKqgnJCT9b+ynpij/929kZ2NjpiEe4V6e393b3ZtdXRucGhsaG1yaW5yZGZjYGBrWl9lY2RhW2BbXl1bZWBhYldnaGRhZGFdVjojEgYB7fyl49/BzemorMaTupiqnZ+h48zC3Mm5uKeQkZirnIR73M66waqWemlvbH51flA51+WMxNDJyMi4vbWnrqmorqWo4tHS2822hXiYnp2YlIVt2Ni2uKSpopiI29vRn4ly3NbDv6Wwp5+cpKSVmaOZnJig1eDQoMyBrLKQkJmilIpw29nAp6GZl36Ke351cFE41M7emp7Pv52vvbGlrLaprKqs3dXhv2u0x7CBnK2unYp/2du3tampnZuS4uTIvpd9zvSexs/Tw72+sKupnaahmKGb2eO/3dS/sqWNj4eDjXpt0uO/w7WTc2RMOzEpGxURzfitz+Xh1dnQxsm+uMC3vb60vrq2v7i4vbi+v8S539rWzZCwm6mMsn6gYIBcZlxjeoOOeZGPjItmZHFZalFXSExHPT8rNy41LSMnHiMdGhUWExkXDQwLBwcFBAMDAQAA","strip":"media/pink_wolf_strip.webp","n":30,"ar":1.7778},"media/pink_noise.mp4":{"peaks":"ADteVEk/NS8rIyQgIB8eIS8wMDMzNTIvKygnKCgmJmFcTEY+ODAtLCcmIB0gKDg1LCwxLi4wMSonIiQnTF9VS0M7NTIpKCcmJSgiMTQ0OTg2MSwtLzY2NC4mZFlRSUM8ODUvMCwzNzQ1PkBBQEBHPj87RUVGR0ao1Y3zz3BqaHNuhJmoinbN28W6oGeidT94ZT5dV0PXz6axc4dxPmJbLkVEMHPYxK6OhHRaWFhFPEE6NaDSvauLgWZXXUhHRUc9P8DPtqGOfGFVVzs+OTcwJtPJsJqLdWBZUUY9Ny0scdjBr5WCbGRXTks4PTcwoNG+qpB9cVpUU0VDPjo0ydGsyZ5MPYKrglq+v3R2pVqAlU2AfkZ6akhyU1VnQFJZNlJLM04+OUUuOi2z17XJmGSjcnCSa3CCa29vYGRpYF1dfrWxg4KEZjVTUDNCRjE3Qjg/Oj8+OTjVtLj/zVF5fVs+kNLXtJvNzcuO0JRXm4dGbXBMV7vKu5SPh1FobUNNTT07PcXFto+OZmVgSUdIMzY7UNO7q5R5aGZKSUQ5OjMyj8+3oot7Z1ZTPzM3PC8sq8m0mopyYFlRPzg3NjQsyMKwlYFoYlFMPzc5NzFFyL2xsaCSeXBvZGheUUg/OC4nHhYO","strip":"media/pink_noise_strip.webp","n":30,"ar":1.3429},"media/techno_party_v2.mp4":{"peaks":"W2lpa2FXXF9fZG5cb2lqi5CHdn9tXmJVX2ZlWWdwfXx6eHFyYGloeHtydm56jqB9g3VicGh2f4F6eWuAh4OBenVubmh5b2RgZXl/eYhxd3FrYFJaal9kYGl8iH2BY2hkXXJ3f2puaYeEhXGFbm5xanmAcHZsYXx7hnF3XUyDbH58bmJxhX15b398fGZkT1Zqb1tueoOKdXFoYl9gaW56cHxpjISbhX1pY3Jrcm9qb2VuhXp2c31mUmVjbXpreml4hpGHg3J2XllmbGxoY2dpgYB1eG51ZFZmcXN7eGeNjZOIiGpabGZvgHR9dm94h351eWxmdGRteWVnaHtcRUA9PkFEOy01Qzc5SG8/OTo8QjtDPzUySUdOWms6Qz8+QTlHRENAPkM3blM8NTEyOz5HPjA7MzAyZ2diZVpRPS0qMTEwKywoSlNPTk9IPTE0UTgvJzU5P11iXFhIOT87O0E+Rj5LXEpSUUdNUldYRkNIS0qkuczRqdLJloza/7Kzy76yr8yarsq9lLF9nauJp3+fsrm4kZmQe3yWlJKWkZd8iI6NiYqBaniFdoWBcn55hHmKhHVVZ3tiaWl8aW1ze3R1dFdjYWhuY212b4OCh4SFdmRcb3Bwem1if2p6hZqKYEYU","strip":"media/techno_party_v2_strip.webp","n":30,"ar":2.2963},"media/showreel_m.mp4":{"peaks":"BxYkLTdAS09NTU5QT1FPT3TIv3uGg3pIV6BzWlpdU1VUwsWcYkpAMiZ4n1w4Hy8jHSTtoFc0MiwkHqB/TS0uMCUbuce4bVpLOy9gq2g7ITQtJz+3mXRPq4NYPaCMWDiVl1w/g6JfQGetZ0ottW9ILLB3TzSrg1I4oYtYR5eYXIaVn1JCbKtnRim2bkkvsXdMMqqCT0ZQSUA3MDIoMystLDMjLSYxIysgLygrLS8tLSEvLiosMkLE2MSBp7VuUIC/b09Hy3tXOf6xbjvBjV49uJhgQtXWg1KcsGlOg7xyVmf/o2o3yYJYNcGLWj/mx3hLrqJkQJ+xa0qa6ZNdW8d3UTTKgFM77rRsRbiXXD+uomRFoa1pSjIXFhl2/umQYVNBMy03LiciNDIlHa+iYkWjrGpGjrdwT2jGdlg/yIFiScWMXEG9lV9EsqFiRsneiluPuW9Ub8Z2WTnKgVs88LByRem8dkrk0oJRLBwdHa3+6IOI04ReQNiIWkHUkV9HiWVIPzo0LSkmJiIlKicgIjhnPyofJh0mHyQkJB4hHiUcIiEgICEdHiEeHBwiHyEeKEXkvoJnV0g/OjYzLC0iKS4oKS8oKS0nKCcsJykqKScnJiUqKysnLScpIh0aFxAIBAEA","strip":"media/showreel_strip.webp","n":30,"ar":1.7778}};
+/* @end */
+
 /* интерфейс */
 const UI = {
   ru: {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
     tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все работы", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
-    tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующий клип", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
-    kSpace: "Пробел", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
+    tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующая работа", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
+    kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
     kAll: "все клавиши", kHelp: "Все сочетания клавиш (?)", kTitle: "Сочетания клавиш", kSet: "Набор клавиш: Andreev_Portfolio (по умолчанию)", kLgApp: "Монитор и таймлайн", kLgPnl: "Карусель изображений", kLgBoth: "Оба",
     kG: [
-      ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["K", "Стоп"], ["J|L", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"], ["@Клик по картинке", "Пауза / продолжить"], ["@Двойной клик", "Во весь экран"]]],
-      ["Таймлайн", [["@Клик по работе в «Проекте»", "Открыть её на таймлайне"], ["@Клик по главе V2", "Перейти к главе шоурила"], ["@Клик / тяни по линейке", "Перемотка плейхедом"]]],
+      ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["L", "Вперёд; ещё раз — 2× · 4× · 8×"], ["J", "Назад; ещё раз — быстрее"], ["K", "Стоп"], ["PgUp|PgDn", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"], ["@Клик по картинке", "Пауза / продолжить"], ["@Свайп по видео", "Другая работа (телефон)"], ["@Двойной клик", "Во весь экран"]]],
+      ["Таймлайн", [["@Клик по работе в «Проекте»", "Открыть её на таймлайне"], ["@Клик по главе V2", "Перейти к главе шоурила"], ["@Клик / тяни по линейке", "Перемотка плейхедом"], ["@Наведи на линейку", "Превью кадра"]]],
       ["Карусель изображений", [["←|→", "Предыдущее / следующее"], ["@Свайп", "Листать на телефоне"], ["Esc", "Закрыть карусель"]]],
       ["Общие", [["?", "Это окно"], ["Esc", "Закрыть окно"]]]
     ],
@@ -763,12 +795,12 @@ const UI = {
   en: {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
     tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All works", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
-    tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next clip", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
-    kSpace: "Space", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
+    tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next work", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
+    kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
     kAll: "all shortcuts", kHelp: "All keyboard shortcuts (?)", kTitle: "Keyboard Shortcuts", kSet: "Keyboard layout preset: Andreev_Portfolio (default)", kLgApp: "Monitor & timeline", kLgPnl: "Image carousel", kLgBoth: "Both",
     kG: [
-      ["Program monitor", [["Space", "Play / pause"], ["K", "Stop"], ["J|L", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"], ["@Click the picture", "Pause / resume"], ["@Double-click", "Full screen"]]],
-      ["Timeline", [["@Click a work in Project", "Open it on the timeline"], ["@Click a V2 chapter", "Jump to a showreel chapter"], ["@Click / drag the ruler", "Scrub the playhead"]]],
+      ["Program monitor", [["Space", "Play / pause"], ["L", "Play forward; again — 2× · 4× · 8×"], ["J", "Play backward; again — faster"], ["K", "Stop"], ["PgUp|PgDn", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"], ["@Click the picture", "Pause / resume"], ["@Swipe the video", "Another work (phone)"], ["@Double-click", "Full screen"]]],
+      ["Timeline", [["@Click a work in Project", "Open it on the timeline"], ["@Click a V2 chapter", "Jump to a showreel chapter"], ["@Click / drag the ruler", "Scrub the playhead"], ["@Hover the ruler", "Frame preview"]]],
       ["Image carousel", [["←|→", "Previous / next"], ["@Swipe", "Browse on a phone"], ["Esc", "Close the carousel"]]],
       ["General", [["?", "This window"], ["Esc", "Close the window"]]]
     ],
@@ -986,7 +1018,9 @@ function layout() {
   {
     const b = el("button", "clip"); b.dataset.i = seq.indexOf(c);
     b.style.left = pct(c.start); b.style.width = `calc(${pct(c.dur)} - 2px)`; b.style.setProperty("--cc", `var(${c.color})`);
+    const md = MEDIA[c.src];
     if (c.type === "image") { b.classList.add("still"); b.style.backgroundImage = `url("${c.poster}")`; }
+    else if (md) { b.classList.add("film"); const lb = el("div", "lbl"); lb.append(el("span", "cn", nm(c)), el("span", "cs", tcf(c.dur).slice(3))); b.append(el("div", "strip"), lb); }
     else b.append(el("span", "cn", nm(c)), el("span", "cs", tcf(c.dur).slice(3)));
     if (c.kind === "reel") b.append(el("span", "fxb", "fx"));
     b.title = nm(c); v1.append(b);
@@ -1004,7 +1038,7 @@ function layout() {
 
   const au = el("div", "clip audio"); au.style.left = "0"; au.style.right = "0";
   const cv = el("canvas"); au.append(cv, el("span", "cn", "Music mix")); a1.append(au);
-  requestAnimationFrame(() => drawWave(cv));
+  requestAnimationFrame(() => { drawWave(cv); drawStrip(); });
 
   const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300], step = steps.find(s => T / s <= 9) || 600;
   for (let x = 0; x < T - step * 0.6; x += step) { const l = el("span", "lb", tcf(x)); l.style.left = pct(x); ru.append(l); }
@@ -1019,10 +1053,24 @@ function layout() {
   $("#statusLine").textContent = `${L("seq")}: ${nm(c)} · ${seq.indexOf(c) + 1} / ${seq.length}`;
   render();
 }
+/* огибающая звука текущей работы (из tools/media_data.py): 0…1 */
+const peaksOf = c => { const md = c && MEDIA[c.src]; if (!md) return null; if (!md.pk) md.pk = Uint8Array.from(atob(md.peaks), ch => ch.charCodeAt(0)); return md.pk; };
+const levelAt = (c, x) => { const pk = peaksOf(c); if (!pk || !c.dur) return 0; const f = Math.min(pk.length - 1, Math.max(0, x / c.dur * pk.length)), i = Math.floor(f); return (pk[i] + ((pk[i + 1] ?? pk[i]) - pk[i]) * (f - i)) / 255; };
+function drawStrip() {
+  const c = cur || seq[0], md = MEDIA[c.src], b = document.querySelector("#laneV1 .clip.film"); if (!md || !b) return;
+  const st = b.querySelector(".strip"), h = b.clientHeight, w = b.clientWidth; if (!h || !w) return;
+  const tw = h * md.ar, n = Math.max(1, Math.ceil(w / tw)); st.textContent = "";
+  for (let i = 0; i < n; i++) { const k = Math.min(md.n - 1, Math.floor((i + .5) / n * md.n)), d = el("i");
+    d.style.width = tw + "px"; d.style.backgroundImage = `url("${md.strip}")`; d.style.backgroundSize = `${md.n * tw}px ${h}px`; d.style.backgroundPosition = `${-k * tw}px 0`; st.append(d); }
+}
 function drawWave(cv) {
   const r = cv.getBoundingClientRect(), dpr = devicePixelRatio || 1;
   cv.width = Math.max(1, r.width * dpr); cv.height = Math.max(1, r.height * dpr);
   const g = cv.getContext("2d"), mid = cv.height / 2, n = Math.floor(cv.width / (3 * dpr));
+  const c = cur || seq[0];
+  if (peaksOf(c)) { g.fillStyle = "#58c79c";
+    for (let i = 0; i < n; i++) { const h = Math.max(1, levelAt(c, (i + .5) / n * c.dur) * mid * .92); g.fillRect(i * 3 * dpr, mid - h, 2 * dpr, h * 2); }
+    return; }
   g.fillStyle = "#58c79c"; let seed = 7;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   for (let i = 0; i < n; i++) {
@@ -1031,7 +1079,7 @@ function drawWave(cv) {
     g.fillRect(i * 3 * dpr, mid - h, 2 * dpr, h * 2);
   }
 }
-let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { const c = document.querySelector(".clip.audio canvas"); c && drawWave(c); }, 120); });
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { const c = document.querySelector(".clip.audio canvas"); c && drawWave(c); drawStrip(); }, 120); });
 
 function scrubFrom(target, e) {
   const r = target.getBoundingClientRect();
@@ -1047,6 +1095,16 @@ function scrubFrom(target, e) {
   n.addEventListener("pointerup", () => down = false); n.addEventListener("pointercancel", () => down = false);
 });
 
+/* превью кадра при наведении мышью на таймлайн и полосу прокрутки монитора */
+{ const hp = el("div", "hprev"), im = el("i"), tc = el("span"); hp.append(im, tc); hp.hidden = true; document.body.append(hp);
+  const show = (n, e) => { const c = cur, md = c && MEDIA[c.src]; if (!md || e.pointerType === "touch" || e.buttons) { hp.hidden = true; return; }
+    const r = n.getBoundingClientRect(), f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), x = f * c.dur;
+    const h = 90, w = Math.round(h * md.ar), k = Math.min(md.n - 1, Math.floor(f * md.n));
+    im.style.width = w + "px"; im.style.height = h + "px"; im.style.backgroundImage = `url("${md.strip}")`; im.style.backgroundSize = `${md.n * w}px ${h}px`; im.style.backgroundPosition = `${-k * w}px 0`;
+    tc.textContent = tcf(x); hp.hidden = false;
+    hp.style.left = Math.min(innerWidth - w - 8, Math.max(8, e.clientX - w / 2)) + "px"; hp.style.top = Math.max(8, r.top - h - 12) + "px"; };
+  ["#lanes", "#scrub"].forEach(s => { const n = $(s); n.addEventListener("pointermove", e => show(n, e)); n.addEventListener("pointerleave", () => hp.hidden = true); n.addEventListener("pointerdown", () => hp.hidden = true); });
+}
 /* ---------- monitor ---------- */
 /* название для показа: заголовок работы, а не имя файла (без расширения и подчёркиваний) */
 const nm = c => (c.meta && tr(c.meta.title)) || c.name.replace(/\.\w+$/, "").replace(/_+/g, " ").replace(/\b[a-z]/g, x => x.toUpperCase());
@@ -1054,6 +1112,7 @@ const nm = c => (c.meta && tr(c.meta.title)) || c.name.replace(/\.\w+$/, "").rep
 function openClip(c, at = 0) {
   if (!c) return;
   if (c === cur) { setTime(at, true); return; }
+  dissolveFrom(); if (rate !== 1) setRate(1);
   cur = c; t = 0; layout(); showClip(c); setTime(at, true);
 }
 function showClip(c) {
@@ -1101,15 +1160,46 @@ function render() {
   let ci = -1; if (cur && cur.kind === "reel") CFG.chapters.forEach((ch, k) => { if (t >= ch.t) ci = k; });
   if (ci !== lastCh) { lastCh = ci; document.querySelectorAll(".clip.chap").forEach(n => n.classList.toggle("on", +n.dataset.ch === ci)); if (metaTab) renderMeta(); }
 }
-function setPlaying(p) {
+/* cross dissolve: снимок последнего кадра поверх монитора гаснет, пока грузится новая работа */
+let xfT = null;
+function dissolveFrom() {
+  const cv = $("#xfade"); clearTimeout(xfT); cv.className = "xfade";
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const srcEl = (!vid.hidden && vid.readyState >= 2) ? vid : null; if (!srcEl) return;
+  try { cv.width = vid.videoWidth; cv.height = vid.videoHeight; cv.getContext("2d").drawImage(vid, 0, 0); } catch { return; }
+  cv.classList.add("on");
+  const go = () => { clearTimeout(xfT); cv.classList.add("out"); xfT = setTimeout(() => cv.className = "xfade", 600); };
+  vid.addEventListener("loadeddata", go, { once: true }); xfT = setTimeout(go, 700);
+}
+/* шаттл J/K/L: rate > 0 — вперёд (1, 2, 4, 8×), rate < 0 — назад */
+let rate = 1;
+function setRate(r) {
+  rate = r; vid.playbackRate = r > 0 ? r : 1;
+  const bd = $("#rateBadge"); bd.hidden = r === 1; bd.textContent = r < 0 ? `◀◀ ${-r}×` : `▶▶ ${r}×`;
+}
+function shuttle(d) {
+  if (!cur || !cur.src) return;
+  if (d > 0) setRate(!playing || rate < 0 ? 1 : Math.min(8, rate * 2));
+  else { if (!playing && t <= 0) return; setRate(!playing || rate > 0 ? -1 : Math.max(-8, rate * 2)); }
+  setPlaying(true, true);
+}
+function setPlaying(p, keepRate) {
+  if (!keepRate) setRate(1);
   playing = p;
   $("#playIco").innerHTML = p ? '<path d="M4 3h3v10H4zm5 0h3v10H9z"/>' : '<path d="M4 2.5v11L13.5 8z"/>';
   $("#bPlay").setAttribute("aria-label", L(p ? "tPause" : "tPlay"));
   const pb = $("#ppBig"); pb.firstChild.innerHTML = p ? '<path d="M4 3h3v10H4zm5 0h3v10H9z"/>' : '<path d="M4.5 2.5v11L13.5 8z"/>';
   pb.dataset.tt = p ? "tPause" : "tPlay"; pb.title = L(pb.dataset.tt); pb.setAttribute("aria-label", pb.title);
   $("#screen").classList.toggle("is-playing", p); window.screenWake && screenWake();
-  if (cur && cur.src && cur.type !== "image") p ? vid.play().catch(() => {}) : vid.pause();
+  if (cur && cur.src && cur.type !== "image") (p && rate > 0) ? vid.play().catch(() => {}) : vid.pause();
+  spinCheck();
 }
+/* индикатор загрузки: только если видео реально ждёт данные дольше 250 мс */
+let spT = null;
+function spinCheck() { clearTimeout(spT); const need = playing && rate > 0 && cur && cur.src && !vid.hidden && vid.readyState < 3;
+  if (!need) { $("#spin").hidden = true; return; } spT = setTimeout(() => { $("#spin").hidden = !(playing && vid.readyState < 3); }, 250); }
+["waiting", "stalled", "loadstart"].forEach(ev => vid.addEventListener(ev, spinCheck));
+["playing", "canplay", "canplaythrough", "pause", "seeked", "error"].forEach(ev => vid.addEventListener(ev, () => { clearTimeout(spT); $("#spin").hidden = true; if (ev === "seeked" && playing && rate > 0) spinCheck(); }));
 function togglePlay() { if (!playing && t >= T - 1 / FPS) setTime(0, true); setPlaying(!playing); }
 function jump(d) {
   const i = seq.indexOf(cur), into = t - cur.start > 0.5;
@@ -1117,15 +1207,46 @@ function jump(d) {
   if (j === i) setTime(0, true); else if (j >= 0 && j < seq.length) openClip(seq[j]);
 }
 
+/* аудиометры L/R: уровень берётся из огибающей настоящего звука ролика, с учётом громкости; пик держится 1 с */
+const MT = { l: 0, r: 0, pl: 0, pr: 0, tl: 0, tr: 0 };
+function drawMeters(dt, now) {
+  const cv = $("#meters"); if (!cv) return; const r = cv.getBoundingClientRect(); if (!r.width) return;
+  const d = Math.min(2, devicePixelRatio || 1), W = Math.round(r.width * d), H = Math.round(r.height * d);
+  if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+  const g = cv.getContext("2d"), on = playing && cur && cur.src && rate > 0 && !vid.paused && vid.readyState >= 2;
+  const gain = vid.muted ? 0 : vid.volume, base = on ? levelAt(cur, t) * gain : 0;
+  const tgtL = base * (0.9 + 0.1 * Math.sin(now / 97)), tgtR = base * (0.9 + 0.1 * Math.cos(now / 113));
+  const db = v => v <= 0.001 ? 0 : Math.max(0, 1 + (20 * Math.log10(v)) / 48);   /* шкала −48…0 dB */
+  ["l", "r"].forEach(ch => { const v = db(ch === "l" ? tgtL : tgtR);
+    MT[ch] = v > MT[ch] ? v : Math.max(v, MT[ch] - dt * 1.6);
+    const pk = "p" + ch, pt = "t" + ch; if (MT[ch] >= MT[pk]) { MT[pk] = MT[ch]; MT[pt] = now; } else if (now - MT[pt] > 1000) MT[pk] = Math.max(MT[ch], MT[pk] - dt * .8); });
+  g.clearRect(0, 0, W, H);
+  const top = 6 * d, bot = H - 14 * d, hh = bot - top, bw = Math.floor((W - 16 * d) / 2) , gap = 3 * d, x0 = W - bw * 2 - gap;
+  const grad = g.createLinearGradient(0, bot, 0, top); grad.addColorStop(0, "#2fbf71"); grad.addColorStop(.72, "#2fbf71"); grad.addColorStop(.86, "#e8c33a"); grad.addColorStop(1, "#e5484d");
+  g.font = `${7 * d}px ui-monospace, monospace`; g.textAlign = "right"; g.fillStyle = "rgba(160,165,175,.75)";
+  [0, -6, -12, -24, -36, -48].forEach(v => { const y = bot - (1 + v / 48) * hh; g.fillText(String(v), x0 - 2 * d, y + 2.5 * d); });
+  [MT.l, MT.r].forEach((v, i) => { const x = x0 + i * (bw + gap);
+    g.fillStyle = "rgba(255,255,255,.06)"; g.fillRect(x, top, bw, hh);
+    g.fillStyle = grad; const h = v * hh; g.fillRect(x, bot - h, bw, h);
+    const pv = i ? MT.pr : MT.pl; if (pv > 0.01) { g.fillStyle = pv > .9 ? "#e5484d" : "#d9dbe1"; g.fillRect(x, bot - pv * hh - d, bw, 1.5 * d); } });
+  g.fillStyle = "rgba(160,165,175,.85)"; g.textAlign = "center";
+  g.fillText("L", x0 + bw / 2, H - 3 * d); g.fillText("R", x0 + bw * 1.5 + gap, H - 3 * d);
+}
 let last = performance.now();
 function frame(now) {
   if (playing && now - scLast > 90) { scLast = now; drawScopes(); }
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  drawMeters(dt, now);
   if (playing && cur) {
     const isVid = cur.src && cur.type !== "image";
-    if (isVid) { if (vid.readyState >= 2) t = cur.start + vid.currentTime; } else t += dt;
-    if (t >= cur.dur - 1e-3 || (isVid && vid.ended)) { t = T; setPlaying(false); render(); }
-    else render();
+    if (isVid && rate < 0) { /* назад: видео стоит, плейхед едет влево, монитор догоняет перемоткой */
+      t = Math.max(0, t + rate * dt); if (!vid.seeking) vid.currentTime = t;
+      if (t <= 0) { setPlaying(false); setTime(0, true); } else render();
+    } else {
+      if (isVid) { if (vid.readyState >= 2) t = cur.start + vid.currentTime; } else t += dt;
+      if (t >= cur.dur - 1e-3 || (isVid && vid.ended)) { t = T; setPlaying(false); render(); }
+      else render();
+    }
   }
   requestAnimationFrame(frame);
 }
@@ -1169,7 +1290,13 @@ $("#bFull").onclick = () => {
 { const sc = $("#screen");
   $("#ppBig").addEventListener("click", e => { e.stopPropagation(); togglePlay(); });
   $("#ppBig").addEventListener("dblclick", e => e.stopPropagation());
-  sc.addEventListener("click", e => { if (e.target.closest("a,button") || !cur || !cur.src) return; togglePlay(); });
+  let swiped = 0, sx = null, sy = 0;
+  sc.addEventListener("click", e => { if (Date.now() - swiped < 400 || e.target.closest("a,button") || !cur || !cur.src) return; togglePlay(); });
+  /* телефон: свайп влево/вправо по видео — следующая/предыдущая работа */
+  sc.addEventListener("touchstart", e => { if (e.touches.length !== 1) { sx = null; return; } sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  sc.addEventListener("touchend", e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+    if (Math.abs(dx) > 60 && Math.abs(dy) < 50) { swiped = Date.now(); const j = seq.indexOf(cur) + (dx < 0 ? 1 : -1);
+      if (j >= 0 && j < seq.length) { openClip(seq[j]); toast(nm(seq[j])); } } }, { passive: true });
   let idleT = null;
   const wake = () => { sc.classList.remove("idle"); clearTimeout(idleT); if (playing) idleT = setTimeout(() => { if (playing) sc.classList.add("idle"); }, 2000); };
   ["mousemove", "pointerdown", "mouseenter"].forEach(ev => sc.addEventListener(ev, wake));
@@ -1189,7 +1316,7 @@ const KB = [
   ["Shift:2.3", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "? /", "Shift:2.6"],
   ["Ctrl:1.3", "⌥:1.2", "⌘:1.3", "Space:6.5", "⌘:1.3", "⌥:1.2", "Ctrl:1.3"]
 ];
-const KB_HI = { "Space": "app", "J": "app", "K": "app", "L": "app", "Home": "app", "↑": "app", "↓": "app", "←": "both", "→": "both", "Esc": "pnl", "? /": "app" };
+const KB_HI = { "PgUp": "app", "PgDn": "app", "Space": "app", "J": "app", "K": "app", "L": "app", "Home": "app", "↑": "app", "↓": "app", "←": "both", "→": "both", "Esc": "pnl", "? /": "app" };
 let kdBuilt = false, kdFocus = null;
 function buildKeysKb() {
   if (kdBuilt) return; kdBuilt = true;
@@ -1198,7 +1325,7 @@ function buildKeysKb() {
     row.forEach(k => { const [lab, w] = k.split(/:(?=[\d.]+$)/), b = el("span", "kk " + (KB_HI[lab] || ""), lab); if (w) b.style.flexGrow = w; r.append(b); });
     main.append(r); });
   const side = el("div", "kd-side");
-  [["Home", 1, 2], ["↑", 4, 2], ["←", 5, 1], ["↓", 5, 2], ["→", 5, 3]].forEach(([lab, row, col]) => {
+  [["Home", 1, 2], ["PgUp", 1, 3], ["PgDn", 2, 3], ["↑", 4, 2], ["←", 5, 1], ["↓", 5, 2], ["→", 5, 3]].forEach(([lab, row, col]) => {
     const b = el("span", "kk " + (KB_HI[lab] || ""), lab); b.style.gridArea = `${row}/${col}`; side.append(b); });
   kb.append(main, side);
 }
@@ -1237,8 +1364,10 @@ addEventListener("keydown", e => {
   const k = e.key.toLowerCase();
   if (k === " " && !e.target.closest("button,a")) { e.preventDefault(); togglePlay(); }
   else if (k === "k" || k === "л") setPlaying(false);
-  else if (k === "l" || k === "д") jump(1);
-  else if (k === "j" || k === "о") jump(-1);
+  else if (k === "l" || k === "д") shuttle(1);
+  else if (k === "j" || k === "о") shuttle(-1);
+  else if (k === "pagedown") { e.preventDefault(); jump(1); }
+  else if (k === "pageup") { e.preventDefault(); jump(-1); }
   else if (k === "arrowleft") { e.preventDefault(); setPlaying(false); setTime(t - 1 / FPS, true); }
   else if (k === "arrowright") { e.preventDefault(); setPlaying(false); setTime(t + 1 / FPS, true); }
   else if (k === "home") setTime(0, true);
