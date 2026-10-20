@@ -164,7 +164,7 @@ a{color:var(--tc)}
 }
 .col-r{display:flex;flex-direction:column;gap:8px;min-width:0}
 
-.panel{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 70px);background:color-mix(in srgb, var(--panel) 88%, transparent);box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);border:1px solid color-mix(in srgb, var(--line) 80%, transparent);border-radius:16px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.panel{position:relative;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 70px);background:color-mix(in srgb, var(--panel) 88%, transparent);box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);border:1px solid color-mix(in srgb, var(--line) 80%, transparent);border-radius:16px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .tabs{display:flex;align-items:center;gap:2px;padding:0 8px;height:32px;border-bottom:1px solid var(--line);flex:none}
 .tab{padding:0 10px;height:100%;display:flex;align-items:center;color:var(--dim);font-size:12px;white-space:nowrap}
 .tab.on{min-width:0}
@@ -456,12 +456,20 @@ button.tab:not(.on):hover{color:var(--fg)}
   box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent)}
 @keyframes flashBlk{0%{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb, var(--accent) 10%, transparent)}100%{box-shadow:inset 0 0 0 2px transparent;background:transparent}}
 .fx.flash{animation:flashBlk 1.6s ease-out}
-.panel.flash{animation:flashBlk 1.6s ease-out}
+.panel.flash{animation:flashBg 1.6s ease-out}
+/* рамка вспышки — слоем поверх содержимого, чтобы светились и боковые края */
+.panel::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:7;border:2px solid var(--accent);opacity:0}
+.panel.flash::before{animation:flashRing 1.6s ease-out}
+@keyframes flashBg{0%{background-color:color-mix(in srgb, var(--accent) 10%, var(--panel))}100%{background-color:color-mix(in srgb, var(--panel) 88%, transparent)}}
+@keyframes flashRing{0%{opacity:1}100%{opacity:0}}
 /* пока идёт видео, монитор подсвечен так же, как блоки при переходе по меню, только постоянно */
 .p-program{transition:box-shadow .6s ease,background-color .6s ease}
 /* поднимаем над соседними панелями, иначе они закрывают свечение по бокам */
-.p-program.live{z-index:5;box-shadow:inset 0 0 0 2px var(--accent),0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent),0 0 28px 2px color-mix(in srgb, var(--accent) 26%, transparent),var(--shadow);background-color:color-mix(in srgb, var(--accent) 7%, var(--panel))}
-html.cine .p-program.live{box-shadow:inset 0 0 0 2px var(--accent),0 0 40px color-mix(in srgb, var(--accent) 28%, transparent),0 30px 120px rgba(0,0,0,.6)}
+.p-program.live{z-index:5;box-shadow:0 0 28px 2px color-mix(in srgb, var(--accent) 26%, transparent),var(--shadow);background-color:color-mix(in srgb, var(--accent) 7%, var(--panel))}
+html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accent) 30%, transparent),0 30px 120px rgba(0,0,0,.6)}
+/* рамка — отдельным слоем поверх содержимого: внутренняя тень панели пряталась под фоном монитора и была видна только сверху */
+.p-program::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:7;border:2px solid var(--accent);opacity:0;transition:opacity .6s ease}
+.p-program.live::after{opacity:1}
 /* метаданные клипа */
 .meta-head{display:grid;gap:10px;padding:6px 14px 14px;border-bottom:1px solid var(--line)}
 .meta-thumb{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;overflow:hidden;background:#000}
@@ -1430,6 +1438,8 @@ navLinks.forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
     const target = h === "#works" ? seq.find(c => c.kind === "work") : seq[0];
     if (target) openClip(target);
+    /* «AI-работы» — подсветить панель «Проект», как блоки «Обо мне» и «Контакты» */
+    if (h === "#works") { const pnl = $("#works"); pnl.classList.remove("flash"); void pnl.offsetWidth; pnl.classList.add("flash"); }
     /* на телефоне, если монитор ушёл с экрана, — подкрутить к нему; на компьютере страница стоит на месте */
     const r = $("#reel").getBoundingClientRect(), top = $(".menubar").getBoundingClientRect().bottom;
     if (matchMedia("(max-width:900px)").matches && (r.top < top - 4 || r.bottom > innerHeight + 4)) $("#reel").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
