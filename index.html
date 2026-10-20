@@ -280,15 +280,21 @@ button.tab:not(.on):hover{color:var(--fg)}
 .ib.play{width:44px;height:44px;background:var(--panel-2)}
 .ib.play:hover{background:var(--line-2)}
 .ib.on{color:var(--tc)}
-.vol{display:inline-flex;align-items:center;gap:2px}
-.vol-range{-webkit-appearance:none;appearance:none;width:0;opacity:0;height:20px;margin:0;background:transparent;cursor:pointer;transition:width .2s,opacity .2s;--p:100%}
-.vol:hover .vol-range,.vol:focus-within .vol-range{width:84px;opacity:1}
-.vol-range::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(90deg,var(--tc) var(--p),var(--line-2) var(--p))}
-.vol-range::-moz-range-track{height:4px;border-radius:4px;background:var(--line-2)}
-.vol-range::-moz-range-progress{height:4px;border-radius:4px;background:var(--tc)}
-.vol-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-top:-4px;border-radius:50%;background:var(--tc);border:0;box-shadow:0 0 0 3px var(--panel)}
+/* громкость: вертикальная шкала всплывает над динамиком при наведении */
+.vol{position:relative;display:inline-flex;align-items:center}
+.vol-pop{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);padding-bottom:8px;z-index:6;opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s}
+.vol:hover .vol-pop,.vol:focus-within .vol-pop{opacity:1;visibility:visible}
+.vol-box{display:flex;flex-direction:column;align-items:center;gap:6px;width:40px;height:136px;padding:8px 0 10px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line-2);box-shadow:var(--shadow)}
+.vol-box b{font-size:10px;font-weight:500;color:var(--mute)}
+.vol-box .vol-range{flex:1;width:100%;position:relative}
+.vol-range{-webkit-appearance:none;appearance:none;margin:0;background:transparent;cursor:pointer;--p:100%;
+  writing-mode:vertical-lr;direction:rtl;width:20px;height:96px}
+.vol-range::-webkit-slider-runnable-track{width:4px;border-radius:4px;background:linear-gradient(0deg,var(--tc) var(--p),var(--line-2) var(--p))}
+.vol-range::-moz-range-track{width:4px;border-radius:4px;background:var(--line-2)}
+.vol-range::-moz-range-progress{width:4px;border-radius:4px;background:var(--tc)}
+.vol-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-left:-4px;border-radius:50%;background:var(--tc);border:0;box-shadow:0 0 0 3px var(--panel-2)}
 .vol-range::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--tc);border:0}
-@media (hover:none),(max-width:560px){.vol-range{display:none}}
+@media (hover:none),(max-width:560px){.vol-pop{display:none}}
 .keys{color:var(--dim);font-size:11px;padding:0 12px 10px;display:flex;gap:12px;flex-wrap:wrap}
 .keys kbd{font:10px var(--f-mono);border:1px solid var(--line-2);border-radius:6px;padding:0 4px;color:var(--mute)}
 @media (max-width:560px){
@@ -582,7 +588,7 @@ button.tab:not(.on):hover{color:var(--fg)}
         <span id="durTc">00:00:00:00</span>
         <span class="vol">
         <button class="ib" id="bMute" title="Звук" aria-label="Звук" data-tt="tMute"><svg viewBox="0 0 16 16" id="muteIco"></svg></button>
-        <input type="range" id="volRange" class="vol-range" min="0" max="1" step="0.05" value="1" data-tt="tVol" aria-label="Громкость">
+        <span class="vol-pop"><span class="vol-box"><b class="mono" id="volPct">100</b><input type="range" id="volRange" class="vol-range" min="0" max="1" step="0.05" value="1" data-tt="tVol" aria-label="Громкость"></span></span>
         </span>
         <button class="ib" id="bFull" title="Во весь экран" aria-label="Во весь экран" data-tt="tFull"><svg viewBox="0 0 16 16"><path d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"/></svg></button>
       </span>
@@ -1261,7 +1267,7 @@ let volLast = 1;
 try { const v = parseFloat(localStorage.getItem("vol")); if (v >= 0 && v <= 1) volLast = v || 1, vid.volume = v, vid.muted = v === 0; } catch {}
 function volUI() {
   const v = vid.muted ? 0 : vid.volume, r = $("#volRange");
-  r.value = v; r.style.setProperty("--p", (v * 100) + "%");
+  r.value = v; r.style.setProperty("--p", (v * 100) + "%"); $("#volPct").textContent = Math.round(v * 100);
   $("#bMute").classList.toggle("on", v > 0);
   $("#muteIco").innerHTML = '<path d="M2 6h3l4-3v10L5 10H2z" fill="currentColor"/>' + (v === 0
     ? '<path d="m11 6 4 4m0-4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>'
