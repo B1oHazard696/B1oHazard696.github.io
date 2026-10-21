@@ -769,8 +769,8 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
       <figure class="scope sq" data-tt="hVec"><canvas id="scVec"></canvas><figcaption data-t="scVec">Вектороскоп</figcaption></figure>
       <figure class="scope" data-tt="hHist"><canvas id="scHist"></canvas><figcaption data-t="scHist">Гистограмма RGB</figcaption></figure>
     </div>
-    <div class="sc-foot" id="scFoot"><span data-t="fScopes">Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут. Двойной клик по графикам — пресеты цвета: Teal & Orange, Bleach Bypass, Noir, «плёнка 70-х».</span></div>
-    <div class="sc-foot" id="cwFoot" hidden><span data-t="fWheels">Тяни точку на колесе — оттенок зоны, ползунок — её яркость. Двойной клик — сброс. Скоупы покажут результат.</span></div>
+    <div class="sc-foot" id="scFoot"><span data-t="fScopes">Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут. Двойной клик по графикам — пресеты цвета сайта: Teal & Orange, Bleach Bypass, Noir, «плёнка 70-х».</span></div>
+    <div class="sc-foot" id="cwFoot" hidden><span data-t="fWheels">Колёса красят сам сайт: тяни точку — оттенок, ползунок — яркость. Двойной клик — сброс.</span></div>
   </section>
 
   </div>
@@ -927,7 +927,7 @@ const UI = {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
     tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все работы", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующая работа", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
-    hScopesTab: "Графики сигнала по кадру в мониторе. Двойной клик по графикам — пресеты цвета", hWheelsTab: "Цветокоррекция: тени, средние тона, света", hWave: "Вейвформ: яркость пикселей по ширине кадра, 0 — чёрный, 100 — белый", hVec: "Вектороскоп: какие цвета в кадре и насколько они насыщенные; пунктир — линия телесных тонов", hHist: "Гистограмма: сколько в кадре тёмного и светлого по каналам R, G, B", hLift: "Тени (Lift): окрашивает тёмные участки. Двойной клик — сброс", hGamma: "Средние тона (Gamma): окрашивает полутона. Двойной клик — сброс", hGain: "Света (Gain): окрашивает светлые участки. Двойной клик — сброс", fScopes: "Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут. Двойной клик по графикам — пресеты цвета: Teal & Orange, Bleach Bypass, Noir, «плёнка 70-х».", fWheels: "Тяни точку на колесе — оттенок зоны, ползунок — её яркость. Двойной клик — сброс. Скоупы покажут результат.", cwReset: "Сброс", cwLum: "Яркость", cwShadows: "Тени", cwMids: "Средние тона", cwHighs: "Света", razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
+    hScopesTab: "Графики сигнала по кадру в мониторе. Двойной клик по графикам — пресеты цвета сайта", hWheelsTab: "Цветокоррекция сайта: тени, средние тона, света", hWave: "Вейвформ: яркость пикселей по ширине кадра, 0 — чёрный, 100 — белый", hVec: "Вектороскоп: какие цвета в кадре и насколько они насыщенные; пунктир — линия телесных тонов", hHist: "Гистограмма: сколько в кадре тёмного и светлого по каналам R, G, B", hLift: "Тени (Lift): окрашивает тёмное в интерфейсе — фон и панели. Двойной клик — сброс", hGamma: "Средние тона (Gamma): окрашивает линии, подписи, акценты. Двойной клик — сброс", hGain: "Света (Gain): окрашивает светлое — текст и яркие элементы. Двойной клик — сброс", fScopes: "Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут. Двойной клик по графикам — пресеты цвета сайта: Teal & Orange, Bleach Bypass, Noir, «плёнка 70-х».", fWheels: "Колёса красят сам сайт: тяни точку — оттенок, ползунок — яркость. Двойной клик — сброс.", cwReset: "Сброс", cwLum: "Яркость", cwShadows: "Тени", cwMids: "Средние тона", cwHighs: "Света", razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
     kAll: "все клавиши", kHelp: "Все сочетания клавиш (?)", kTitle: "Сочетания клавиш", kSet: "Набор клавиш: Andreev_Portfolio (по умолчанию)", kLgApp: "Монитор и таймлайн", kLgPnl: "Карусель изображений", kLgBoth: "Оба",
     kG: [
       ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["L", "Вперёд; ещё раз — 2× · 4× · 8×"], ["J", "Назад; ещё раз — быстрее"], ["K", "Стоп"], ["PgUp|PgDn", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"], ["@Клик по картинке", "Пауза / продолжить"], ["@Свайп по видео", "Другая работа (телефон)"], ["@Двойной клик", "Во весь экран"]]],
@@ -947,7 +947,7 @@ const UI = {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
     tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All works", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next work", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
-    hScopesTab: "Signal graphs of the frame in the monitor. Double-click the graphs for colour presets", hWheelsTab: "Colour correction: shadows, midtones, highlights", hWave: "Waveform: pixel brightness across the frame width, 0 is black, 100 is white", hVec: "Vectorscope: which colours are in the frame and how saturated; the dashed line is the skin-tone line", hHist: "Histogram: how much dark and bright there is in the R, G, B channels", hLift: "Shadows (Lift): tints the dark areas. Double-click to reset", hGamma: "Midtones (Gamma): tints the midtones. Double-click to reset", hGain: "Highlights (Gain): tints the bright areas. Double-click to reset", fScopes: "Scopes analyse the frame in the monitor: brightness, colour and channel balance. Play the video and they come alive. Double-click the graphs for colour presets: Teal & Orange, Bleach Bypass, Noir, Film ’70s.", fWheels: "Drag the dot to tint a zone, the slider sets its brightness. Double-click resets. The scopes show the result.", cwReset: "Reset", cwLum: "Luma", cwShadows: "Shadows", cwMids: "Midtones", cwHighs: "Highlights", razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
+    hScopesTab: "Signal graphs of the frame in the monitor. Double-click the graphs for site colour presets", hWheelsTab: "Site colour correction: shadows, midtones, highlights", hWave: "Waveform: pixel brightness across the frame width, 0 is black, 100 is white", hVec: "Vectorscope: which colours are in the frame and how saturated; the dashed line is the skin-tone line", hHist: "Histogram: how much dark and bright there is in the R, G, B channels", hLift: "Shadows (Lift): tints the dark parts of the UI — background and panels. Double-click to reset", hGamma: "Midtones (Gamma): tints lines, labels and accents. Double-click to reset", hGain: "Highlights (Gain): tints the bright parts — text and highlights. Double-click to reset", fScopes: "Scopes analyse the frame in the monitor: brightness, colour and channel balance. Play the video and they come alive. Double-click the graphs for site colour presets: Teal & Orange, Bleach Bypass, Noir, Film ’70s.", fWheels: "The wheels grade the site itself: drag the dot to tint, the slider sets brightness. Double-click resets.", cwReset: "Reset", cwLum: "Luma", cwShadows: "Shadows", cwMids: "Midtones", cwHighs: "Highlights", razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
     kAll: "all shortcuts", kHelp: "All keyboard shortcuts (?)", kTitle: "Keyboard Shortcuts", kSet: "Keyboard layout preset: Andreev_Portfolio (default)", kLgApp: "Monitor & timeline", kLgPnl: "Image carousel", kLgBoth: "Both",
     kG: [
       ["Program monitor", [["Space", "Play / pause"], ["L", "Play forward; again — 2× · 4× · 8×"], ["J", "Play backward; again — faster"], ["K", "Stop"], ["PgUp|PgDn", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"], ["@Click the picture", "Pause / resume"], ["@Swipe the video", "Another work (phone)"], ["@Double-click", "Full screen"]]],
@@ -1509,22 +1509,47 @@ $("#keysDlg").addEventListener("click", e => { if (e.target.id === "keysDlg") cl
 /* ================= пасхалки ================= */
 /* 4. Луки Lumetri: двойной клик по скоупам перебирает цветокоррекцию монитора; скоупы считают уже «прокрашенную» картинку */
 const LOOKS = [
-  { n: "Rec.709", f: "none" },
-  { n: "Teal & Orange", f: "url(#lookTO) saturate(1.15) contrast(1.06)" },
-  { n: "Bleach Bypass", f: "saturate(.4) contrast(1.38) brightness(1.04)" },
-  { n: "Noir", f: "grayscale(1) contrast(1.32) brightness(.96)" },
-  { n: "Film '70s", f: "sepia(.38) saturate(1.25) contrast(.92) brightness(1.06) hue-rotate(-8deg)" }
+  { n: "Rec.709", ops: [] },
+  { n: "Teal & Orange", ops: [["table", [0, .08, .42, .82, 1], [.03, .22, .5, .76, .93], [.14, .36, .5, .56, .66]], ["sat", 1.25]] },
+  { n: "Bleach Bypass", ops: [["sat", .35], ["con", 1.3]] },
+  { n: "Noir", ops: [["sat", 0], ["con", 1.25]] },
+  { n: "Film '70s", ops: [["sepia", .45], ["sat", 1.3], ["hue", -10], ["con", .95]] }
 ];
 let lookI = 0;
 /* итоговая цветокоррекция монитора: лук + Color Wheels; скоупы считают по ней же */
 let gradeF = "none";
 const CW = { lift: { x: 0, y: 0, l: 0 }, gamma: { x: 0, y: 0, l: 0 }, gain: { x: 0, y: 0, l: 0 } };
 const cwActive = () => Object.values(CW).some(w => w.x || w.y || w.l);
+let cwParams = { O: [0, 0, 0], E: [1, 1, 1], A: [1, 1, 1] };
+/* цветокоррекция САЙТА: пресет и колёса пересчитывают цвета интерфейса (токены темы), видео не трогаем */
+const GRADE_TOKENS = ["--bg", "--panel", "--panel-2", "--well", "--line", "--line-2", "--fg", "--mute", "--dim", "--accent", "--accent-fill", "--tc", "--playhead", "--marker", "--c1", "--c2", "--c3", "--c4", "--c5", "--c6"];
+const hex2rgb = h => { h = h.trim().replace("#", ""); if (h.length === 3) h = [...h].map(c => c + c).join(""); return /^[0-9a-f]{6}$/i.test(h) ? [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255) : null; };
+const lumaOf = ([r, g, b]) => .2126 * r + .7152 * g + .0722 * b;
+function gradeColor(c, ops, cw) {
+  let [r, g, b] = c;
+  for (const [op, a, b2, c2] of ops) {
+    if (op === "table") { const tb = (t, v) => { const f = Math.min(t.length - 1.0001, Math.max(0, v * (t.length - 1))), i = Math.floor(f); return t[i] + (t[i + 1] - t[i]) * (f - i); }; [r, g, b] = [tb(a, r), tb(b2, g), tb(c2, b)]; }
+    else if (op === "sat") { const y = lumaOf([r, g, b]); [r, g, b] = [r, g, b].map(v => y + (v - y) * a); }
+    else if (op === "con") [r, g, b] = [r, g, b].map(v => .5 + (v - .5) * a);
+    else if (op === "sepia") { const sr = .393 * r + .769 * g + .189 * b, sg = .349 * r + .686 * g + .168 * b, sb = .272 * r + .534 * g + .131 * b; [r, g, b] = [r + (sr - r) * a, g + (sg - g) * a, b + (sb - b) * a]; }
+    else if (op === "hue") { const t = a * Math.PI / 180, co = Math.cos(t), si = Math.sin(t);
+      const m = [.213 + co * .787 - si * .213, .715 - co * .715 - si * .715, .072 - co * .072 + si * .928, .213 - co * .213 + si * .143, .715 + co * .285 + si * .14, .072 - co * .072 - si * .283, .213 - co * .213 - si * .787, .715 - co * .715 + si * .715, .072 + co * .928 + si * .072];
+      [r, g, b] = [m[0] * r + m[1] * g + m[2] * b, m[3] * r + m[4] * g + m[5] * b, m[6] * r + m[7] * g + m[8] * b]; }
+    [r, g, b] = [r, g, b].map(v => Math.min(1, Math.max(0, v)));
+  }
+  if (cw) [r, g, b] = [r, g, b].map((v, i) => Math.min(1, Math.max(0, cw.A[i] * Math.pow(v, cw.E[i]) + cw.O[i])));
+  return "#" + [r, g, b].map(v => Math.round(v * 255).toString(16).padStart(2, "0")).join("");
+}
+let gradeBase = null, gradeBaseUi = null;
 function applyGrade() {
-  const lk = LOOKS[lookI].f, parts = [lk !== "none" ? lk : "", cwActive() ? "url(#cwF)" : ""].filter(Boolean);
-  gradeF = parts.length ? parts.join(" ") : "none";
-  [vid, $("#lImg")].forEach(n => n.style.filter = gradeF === "none" ? "" : gradeF);
-  $("#cwReset").hidden = !cwActive(); queueScopes();
+  const root = document.documentElement, ops = LOOKS[lookI].ops, on = ops.length || cwActive();
+  GRADE_TOKENS.forEach(k => root.style.removeProperty(k));
+  if (on) {
+    if (!gradeBase || gradeBaseUi !== ui) { const cs = getComputedStyle(root); gradeBase = {}; GRADE_TOKENS.forEach(k => { const c = hex2rgb(cs.getPropertyValue(k)); if (c) gradeBase[k] = c; }); gradeBaseUi = ui; }
+    const cw = cwActive() ? cwParams : null;
+    Object.entries(gradeBase).forEach(([k, c]) => root.style.setProperty(k, gradeColor(c, ops, cw)));
+  }
+  $("#cwReset").hidden = !cwActive();
   const names = [lookI ? LOOKS[lookI].n : "", cwActive() ? "Color Wheels" : ""].filter(Boolean), bd = $("#lookBadge");
   bd.hidden = !names.length; bd.innerHTML = names.length ? "<b>Lumetri</b> · " + names.join(" + ") : "";
 }
@@ -1539,10 +1564,7 @@ function cwUpdate() {
     const c = [0, 8, 4].map(n => { const k = (n + h / 30 + 12) % 12; return .5 - .5 * Math.max(-1, Math.min(k - 3, 9 - k, 1)); });
     const m = (c[0] + c[1] + c[2]) / 3; return c.map(v => (v - m) * r); };
   const tl = tint(CW.lift), tm = tint(CW.gamma), th = tint(CW.gain);
-  ["R", "G", "B"].forEach((ch, i) => { const f = $("#cwF feFunc" + ch);
-    f.setAttribute("offset", (tl[i] * .2 + CW.lift.l * .15).toFixed(4));
-    f.setAttribute("exponent", Math.max(.25, Math.min(4, 1 / Math.max(.2, 1 + tm[i] * .8 + CW.gamma.l * .55))).toFixed(4));
-    f.setAttribute("amplitude", Math.max(0, 1 + th[i] * .5 + CW.gain.l * .4).toFixed(4)); });
+  cwParams = { O: [0, 1, 2].map(i => tl[i] * .3 + CW.lift.l * .18), E: [0, 1, 2].map(i => Math.max(.25, Math.min(4, 1 / Math.max(.2, 1 + tm[i] * 1.2 + CW.gamma.l * .6)))), A: [0, 1, 2].map(i => Math.max(0, 1 + th[i] * .6 + CW.gain.l * .4)) };
   document.querySelectorAll(".wheel").forEach(wh => { const w = CW[wh.dataset.w];
     wh.querySelector(".wh-puck").style.transform = `translate(${w.x * wh.querySelector(".wh-disc").clientWidth / 2 * .82}px, ${w.y * wh.querySelector(".wh-disc").clientWidth / 2 * .82}px)`;
     wh.querySelector("input").value = w.l; });
@@ -1921,6 +1943,7 @@ function applyTheme(next, save) {
   b.title = t; b.setAttribute("aria-label", t); b.setAttribute("aria-pressed", ui === "light");
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", ui === "light" ? "#eceef3" : "#111215");
   const c = document.querySelector(".clip.audio canvas"); c && drawWave(c);
+  try { if (LOOKS[lookI].ops.length || cwActive()) { gradeBase = null; applyGrade(); } } catch {}
 }
 $("#themeBtn").onclick = () => applyTheme(ui === "light" ? "dark" : "light", true);
 
