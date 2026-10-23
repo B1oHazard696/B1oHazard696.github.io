@@ -504,8 +504,7 @@ html.glitch .glitch-bars{animation:bars .95s steps(1) both}
 /* status bar */
 .status{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;color:var(--dim);font-size:11px;padding:6px 2px}
 .status .ok::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--marker);margin-right:6px}
-.status .copyr{opacity:.85}
-@media (max-width:900px){.status .copyr{margin-left:auto;text-align:right}}
+.status .copyr{opacity:.85;margin-left:auto;text-align:right}
 .status .views{opacity:.7;font-size:10.5px;letter-spacing:.02em}
 .status .r{margin-left:auto}
 /* переключатель «Информация / Метаданные» — капсула, как фильтр в «Проекте» */
@@ -800,7 +799,6 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
   <span class="ok" data-t="ready">Готово</span>
   <span id="statusLine"></span>
   <span class="views mono" id="views" hidden></span>
-  <span class="r mono" id="statusTc"></span>
   <span class="copyr" data-t="copyright">© 2026 Геннадий Андреев. Все права защищены.</span>
 </footer>
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vwName">
@@ -1315,7 +1313,7 @@ function render() {
   const p = T ? t / T * 100 : 0;
   $("#playhead").style.left = p + "%";
   $("#scrub .fill").style.width = p + "%"; $("#scrub .head").style.left = p + "%";
-  $("#tc").textContent = tcf(t); $("#statusTc").textContent = tcf(t) + " / " + tcf(T);
+  $("#tc").textContent = tcf(t);
   const i = seq.indexOf(cur); if (i !== lastSel) { lastSel = i; highlight(); }
   let ci = -1; if (cur && cur.kind === "reel") CFG.chapters.forEach((ch, k) => { if (t >= ch.t) ci = k; });
   if (ci !== lastCh) { lastCh = ci; document.querySelectorAll(".clip.chap").forEach(n => n.classList.toggle("on", +n.dataset.ch === ci)); if (metaTab) renderMeta(); }
