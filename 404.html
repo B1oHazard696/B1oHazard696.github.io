@@ -2,6 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Медиаданные не найдены · Геннадий Андреев</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
@@ -33,11 +35,12 @@ a.btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
   <div class="bar"><span class="tc">00:00:04:04</span><a class="btn" href="/" id="b">← Вернуться к проекту</a></div>
 </main>
 <script>
-document.getElementById("p").textContent = "Файл не найден: " + decodeURIComponent(location.pathname);
+function safePath(){ try { return decodeURIComponent(location.pathname); } catch (e) { return location.pathname; } }
+document.getElementById("p").textContent = "Файл не найден: " + safePath();
 if (!/^ru|^uk|^be|^kk/i.test(navigator.language || "")) {
   document.documentElement.lang = "en"; document.title = "Media not found · Gennady Andreev";
   document.getElementById("h").textContent = "Media offline";
-  document.getElementById("p").textContent = "File not found: " + decodeURIComponent(location.pathname);
+  document.getElementById("p").textContent = "File not found: " + safePath();
   document.getElementById("b").textContent = "← Back to the project"; document.getElementById("b").href = "/#en";
 }
 </script>
