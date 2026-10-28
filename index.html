@@ -294,6 +294,24 @@ html.vhs .screen.vhs>.vhs-osd{display:none}
 html.vhs .menubar,html.vhs main,html.vhs footer{filter:url(#vhsF) saturate(1.3) contrast(1.06);animation:vhsJit .2s steps(2) infinite}
 @media (max-width:900px){html.vhs .menubar,html.vhs main,html.vhs footer{filter:saturate(1.3) contrast(1.06)}}
 @media (prefers-reduced-motion:reduce){html.vhs .menubar,html.vhs main,html.vhs footer,.vhs-veil,.vhs-play{animation:none}}
+/* «game»: импорт в мониторе и игра поверх сайта */
+.screen>.imp{z-index:8;display:grid;place-items:center;background:rgba(0,0,0,.55)}
+.screen>.imp[hidden]{display:none}
+.imp-box{width:min(78%,360px);padding:16px 18px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line-2);box-shadow:var(--shadow);display:grid;gap:8px;color:var(--fg)}
+.imp-box span{font-size:11px;color:var(--mute)}
+.imp-box b{font-size:13px;font-weight:500;color:var(--tc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.imp-box i{display:block;height:6px;border-radius:6px;background:var(--well);overflow:hidden}
+.imp-box em{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#d77fa0,#e0b25c)}
+.imp-box .imp-pct{justify-self:end}
+.game-dlg{position:fixed;inset:0;z-index:55;display:grid;grid-template-rows:auto minmax(0,1fr);background:rgba(7,8,10,.94);
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);animation:gdIn .35s ease}
+.game-dlg[hidden]{display:none}
+@keyframes gdIn{from{opacity:0;transform:scale(.98)}}
+.gd-top{display:flex;align-items:center;gap:12px;padding:10px 14px;color:#fff}
+.gd-top b{font:600 15px var(--f-display)}
+.gd-top span{flex:1;color:#e0b25c;font-size:11px;letter-spacing:.06em}
+.game-dlg iframe{width:min(100%,560px);height:100%;margin:0 auto 10px;border:0;border-radius:16px;background:#2b1530;box-shadow:0 20px 70px rgba(0,0,0,.5)}
+@media (max-width:600px){.game-dlg iframe{margin:0;border-radius:0}}
 /* пасхалка «Media Offline» поверх видео */
 .screen>.offline.egg{z-index:6}
 /* пасхалка «bio»: биохазард в логотипе и зелёная вспышка */
@@ -715,6 +733,7 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
         <div class="spin" id="spin" hidden aria-hidden="true"></div>
         <span class="rate mono" id="rateBadge" hidden></span>
         <span class="look-badge mono" id="lookBadge" hidden></span>
+        <div class="imp" id="imp" hidden aria-hidden="true"><div class="imp-box"><span class="mono" data-t="impTitle">Импорт медиаданных</span><b class="mono">Nika_Style_Studio.game</b><i><em></em></i><span class="mono imp-pct">0%</span></div></div>
         <div class="vhs-osd mono" aria-hidden="true"><span>PLAY ▶</span><span class="vhs-sp">SP</span></div>
         <button class="pp-big" id="ppBig" type="button" data-tt="tPlay" title="Воспроизвести" aria-label="Воспроизвести"><svg viewBox="0 0 16 16"><path d="M4.5 2.5v11L13.5 8z"/></svg></button>
       </div>
@@ -822,6 +841,11 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
     <div class="kd-legend" id="kdLegend"></div>
     <div class="kd-list" id="kdList"></div>
   </div>
+</div>
+<div class="game-dlg" id="gameDlg" hidden role="dialog" aria-modal="true" aria-label="Nika Style Studio">
+  <div class="gd-top"><b>Nika Style Studio</b><span class="mono" data-t="gameNote">секретный уровень</span>
+    <button class="ib vw-btn" id="gameClose" data-tt="close" title="Закрыть" aria-label="Закрыть"><svg viewBox="0 0 16 16"><path d="M3.5 2.1 8 6.6l4.5-4.5 1.4 1.4L9.4 8l4.5 4.5-1.4 1.4L8 9.4l-4.5 4.5-1.4-1.4L6.6 8 2.1 3.5z"/></svg></button></div>
+  <iframe id="gameFrame" title="Nika Style Studio" allow="autoplay; fullscreen"></iframe>
 </div>
 <div class="toast" id="toast" hidden></div>
 
@@ -934,7 +958,7 @@ const UI = {
     title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
     tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все работы", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующая работа", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
-    hScopesTab: "Графики сигнала по кадру в мониторе. Двойной клик по графикам — пресеты цвета сайта", hWheelsTab: "Цветокоррекция сайта: тени, средние тона, света", hWave: "Вейвформ: яркость пикселей по ширине кадра, 0 — чёрный, 100 — белый", hVec: "Вектороскоп: какие цвета в кадре и насколько они насыщенные; пунктир — линия телесных тонов", hHist: "Гистограмма: сколько в кадре тёмного и светлого по каналам R, G, B", hLift: "Тени (Lift): окрашивает тёмное в интерфейсе — фон и панели. Двойной клик — сброс", hGamma: "Средние тона (Gamma): окрашивает линии, подписи, акценты. Двойной клик — сброс", hGain: "Света (Gain): окрашивает светлое — текст и яркие элементы. Двойной клик — сброс", fScopes: "Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут. Двойной клик по графикам — пресеты цвета сайта: Teal & Orange, Bleach Bypass, Noir, «плёнка 70-х».", fWheels: "Колёса красят сам сайт: тяни точку — оттенок, ползунок — яркость. Двойной клик — сброс.", copyright: "© 2026 Геннадий Андреев. Все права защищены.", cwReset: "Сброс", hReset: "Сбросить пресет и колёса — вернуть исходные цвета сайта", resetDone: "Цвета сайта сброшены", cwLum: "Яркость", cwShadows: "Тени", cwMids: "Средние тона", cwHighs: "Света", razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
+    hScopesTab: "Графики сигнала по кадру в мониторе. Двойной клик по графикам — пресеты цвета сайта", hWheelsTab: "Цветокоррекция сайта: тени, средние тона, света", hWave: "Вейвформ: яркость пикселей по ширине кадра, 0 — чёрный, 100 — белый", hVec: "Вектороскоп: какие цвета в кадре и насколько они насыщенные; пунктир — линия телесных тонов", hHist: "Гистограмма: сколько в кадре тёмного и светлого по каналам R, G, B", hLift: "Тени (Lift): окрашивает тёмное в интерфейсе — фон и панели. Двойной клик — сброс", hGamma: "Средние тона (Gamma): окрашивает линии, подписи, акценты. Двойной клик — сброс", hGain: "Света (Gain): окрашивает светлое — текст и яркие элементы. Двойной клик — сброс", fScopes: "Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут. Двойной клик по графикам — пресеты цвета сайта: Teal & Orange, Bleach Bypass, Noir, «плёнка 70-х».", fWheels: "Колёса красят сам сайт: тяни точку — оттенок, ползунок — яркость. Двойной клик — сброс.", copyright: "© 2026 Геннадий Андреев. Все права защищены.", cwReset: "Сброс", hReset: "Сбросить пресет и колёса — вернуть исходные цвета сайта", resetDone: "Цвета сайта сброшены", cwLum: "Яркость", cwShadows: "Тени", cwMids: "Средние тона", cwHighs: "Света", gameNote: "секретный уровень", impTitle: "Импорт медиаданных", razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
     kAll: "все клавиши", kHelp: "Все сочетания клавиш (?)", kTitle: "Сочетания клавиш", kSet: "Набор клавиш: Andreev_Portfolio (по умолчанию)", kLgApp: "Монитор и таймлайн", kLgPnl: "Карусель изображений", kLgBoth: "Оба",
     kG: [
       ["Монитор программы", [["Space", "Воспроизведение / пауза"], ["L", "Вперёд; ещё раз — 2× · 4× · 8×"], ["J", "Назад; ещё раз — быстрее"], ["K", "Стоп"], ["PgUp|PgDn", "Предыдущая / следующая работа"], ["←|→", "Кадр назад / вперёд"], ["Home", "К началу последовательности"], ["↑|↓", "Громче / тише"], ["@Колесо мыши над 🔊", "Плавная громкость"], ["@Клик по картинке", "Пауза / продолжить"], ["@Свайп по видео", "Другая работа (телефон)"], ["@Двойной клик", "Во весь экран"]]],
@@ -954,7 +978,7 @@ const UI = {
     title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
     tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All works", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next work", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
-    hScopesTab: "Signal graphs of the frame in the monitor. Double-click the graphs for site colour presets", hWheelsTab: "Site colour correction: shadows, midtones, highlights", hWave: "Waveform: pixel brightness across the frame width, 0 is black, 100 is white", hVec: "Vectorscope: which colours are in the frame and how saturated; the dashed line is the skin-tone line", hHist: "Histogram: how much dark and bright there is in the R, G, B channels", hLift: "Shadows (Lift): tints the dark parts of the UI — background and panels. Double-click to reset", hGamma: "Midtones (Gamma): tints lines, labels and accents. Double-click to reset", hGain: "Highlights (Gain): tints the bright parts — text and highlights. Double-click to reset", fScopes: "Scopes analyse the frame in the monitor: brightness, colour and channel balance. Play the video and they come alive. Double-click the graphs for site colour presets: Teal & Orange, Bleach Bypass, Noir, Film ’70s.", fWheels: "The wheels grade the site itself: drag the dot to tint, the slider sets brightness. Double-click resets.", copyright: "© 2026 Gennady Andreev. All rights reserved.", cwReset: "Reset", hReset: "Reset the preset and wheels — back to the original site colours", resetDone: "Site colours reset", cwLum: "Luma", cwShadows: "Shadows", cwMids: "Midtones", cwHighs: "Highlights", razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
+    hScopesTab: "Signal graphs of the frame in the monitor. Double-click the graphs for site colour presets", hWheelsTab: "Site colour correction: shadows, midtones, highlights", hWave: "Waveform: pixel brightness across the frame width, 0 is black, 100 is white", hVec: "Vectorscope: which colours are in the frame and how saturated; the dashed line is the skin-tone line", hHist: "Histogram: how much dark and bright there is in the R, G, B channels", hLift: "Shadows (Lift): tints the dark parts of the UI — background and panels. Double-click to reset", hGamma: "Midtones (Gamma): tints lines, labels and accents. Double-click to reset", hGain: "Highlights (Gain): tints the bright parts — text and highlights. Double-click to reset", fScopes: "Scopes analyse the frame in the monitor: brightness, colour and channel balance. Play the video and they come alive. Double-click the graphs for site colour presets: Teal & Orange, Bleach Bypass, Noir, Film ’70s.", fWheels: "The wheels grade the site itself: drag the dot to tint, the slider sets brightness. Double-click resets.", copyright: "© 2026 Gennady Andreev. All rights reserved.", cwReset: "Reset", hReset: "Reset the preset and wheels — back to the original site colours", resetDone: "Site colours reset", cwLum: "Luma", cwShadows: "Shadows", cwMids: "Midtones", cwHighs: "Highlights", gameNote: "secret level", impTitle: "Importing media", razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
     kAll: "all shortcuts", kHelp: "All keyboard shortcuts (?)", kTitle: "Keyboard Shortcuts", kSet: "Keyboard layout preset: Andreev_Portfolio (default)", kLgApp: "Monitor & timeline", kLgPnl: "Image carousel", kLgBoth: "Both",
     kG: [
       ["Program monitor", [["Space", "Play / pause"], ["L", "Play forward; again — 2× · 4× · 8×"], ["J", "Play backward; again — faster"], ["K", "Stop"], ["PgUp|PgDn", "Previous / next work"], ["←|→", "Step back / forward one frame"], ["Home", "Go to sequence start"], ["↑|↓", "Volume up / down"], ["@Mouse wheel over 🔊", "Fine volume"], ["@Click the picture", "Pause / resume"], ["@Swipe the video", "Another work (phone)"], ["@Double-click", "Full screen"]]],
@@ -1632,7 +1656,27 @@ addEventListener("keydown", e => {
   typed = (typed + e.code.slice(3)).slice(-8);
   if (typed.endsWith("VHS")) vhsMode();
   else if (typed.endsWith("BIO")) bioMode();
+  else if (typed.endsWith("GAME")) gameMode();
 });
+
+/* «game»: монитор «импортирует» игру Ники, потом она открывается поверх сайта */
+let gameT = null, gameFocus = null;
+function gameMode() {
+  if (!$("#gameDlg").hidden || !$("#imp").hidden) return;
+  setPlaying(false); const im = $("#imp"), bar = im.querySelector("em"), pc = im.querySelector(".imp-pct"), t0 = performance.now();
+  im.hidden = false;
+  const step = now => { const k = Math.min(1, (now - t0) / 1300), e = 1 - Math.pow(1 - k, 2); bar.style.width = e * 100 + "%"; pc.textContent = Math.round(e * 100) + "%";
+    if (k < 1) requestAnimationFrame(step); else setTimeout(() => { im.hidden = true; openGame(); }, 220); };
+  requestAnimationFrame(step);
+}
+function openGame() {
+  gameFocus = document.activeElement; const f = $("#gameFrame");
+  if (!f.src) f.src = "nika/game/";
+  $("#gameDlg").hidden = false; document.body.style.overflow = "hidden"; $("#gameClose").focus();
+}
+function closeGame() { $("#gameDlg").hidden = true; document.body.style.overflow = ""; gameFocus?.focus?.(); }
+$("#gameClose").onclick = closeGame;
+addEventListener("keydown", e => { if (e.key === "Escape" && !$("#gameDlg").hidden) { e.stopImmediatePropagation(); closeGame(); } }, true);
 
 /* 1. Лезвие: C — инструмент «Подрезка», клик по клипу режет его; V или Esc — обратно к выделению */
 let razor = false;
@@ -1662,7 +1706,7 @@ addEventListener("keydown", e => {
 });
 
 /* 9. Привет тем, кто открыл консоль */
-try { console.log("%c☣ B1oHazard%c\nGennady Andreev · AI Creator · editor\n\nИщешь, как это сделано? Пиши в Telegram: @b1ohazard\nCurious how it's built? Ping me on Telegram: @b1ohazard\n\nP.S. try: C · V · double-click Lumetri Scopes · type “vhs” or “bio”",
+try { console.log("%c☣ B1oHazard%c\nGennady Andreev · AI Creator · editor\n\nИщешь, как это сделано? Пиши в Telegram: @b1ohazard\nCurious how it's built? Ping me on Telegram: @b1ohazard\n\nP.S. try: C · V · double-click Lumetri Scopes · type “vhs”, “bio” or “game”",
   "font:700 28px/1.2 system-ui;color:#7dff5a;text-shadow:0 0 8px #7dff5a", "font:13px/1.5 ui-monospace,monospace;color:#8b8f99"); } catch {}
 /* ============================================= */
 
