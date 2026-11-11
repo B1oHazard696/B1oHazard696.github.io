@@ -161,7 +161,7 @@ a{color:var(--tc)}
 .p-bin .bin{grid-template-columns:repeat(2,minmax(0,1fr));overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
 @media (max-width:1199px){
   .ws{grid-template-columns:minmax(280px,340px) minmax(0,1fr);grid-template-areas:"insp mid" "insp bin"}
-  .panel.p-bin{position:relative;max-height:none}
+  .panel.p-bin{position:relative;top:auto;max-height:none}
   .p-bin .bin{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));overflow:visible}
 }
 .col-r{display:flex;flex-direction:column;gap:8px;min-width:0}
@@ -345,6 +345,37 @@ html.glitch .glitch-bars{animation:bars .95s steps(1) both}
 .cut-l,.cut-r{position:absolute;pointer-events:none;z-index:4;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 .cut-line{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 8px #fff;z-index:5;pointer-events:none;animation:cutFade .9s ease-out forwards}
 @keyframes cutFade{0%,50%{opacity:1}100%{opacity:0}}
+/* ===== анимации интерфейса ===== */
+/* 1. открытие проекта: панели собираются по очереди, один раз за визит */
+html.intro .menubar{animation:introBar .5s cubic-bezier(.2,.8,.2,1) both}
+html.intro .panel{animation:introPanel .6s cubic-bezier(.2,.8,.2,1) both}
+html.intro .p-program{animation-delay:.08s}html.intro .p-timeline{animation-delay:.2s}html.intro .p-inspector{animation-delay:.27s}html.intro .p-scopes{animation-delay:.32s}html.intro .p-bin{animation-delay:.36s}
+html.intro .status{animation:introFade .5s .6s both}
+@keyframes introPanel{from{opacity:0;transform:translateY(16px) scale(.985)}}
+@keyframes introBar{from{opacity:0;transform:translateY(-100%)}}
+@keyframes introFade{from{opacity:0}}
+/* 2. имя выезжает из-под маски по буквам, роль печатается */
+.hero-name h1 .nm-w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.1em;margin-bottom:-.1em}
+.hero-name h1 .nm-l{display:inline-block;animation:nmUp .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes nmUp{from{transform:translateY(110%)}}
+.hero-role.typing::after{content:"▌";margin-left:2px;animation:osdBlink .6s steps(2) infinite}
+html.intro .hero-name p{animation:introFade .6s 1s both}
+/* 3. скользящие индикаторы: «таблетка» в переключателях и полоска под пунктом меню */
+.has-thumb{position:relative}
+.has-thumb>button,.has-thumb>a{position:relative;z-index:1}
+.sl-thumb{position:absolute;left:0;top:0;z-index:0;border-radius:999px;background:var(--accent-fill);box-shadow:0 2px 8px color-mix(in srgb, var(--accent) 45%, transparent);pointer-events:none;opacity:0}
+.sl-thumb.live{transition:transform .32s cubic-bezier(.3,.9,.3,1),width .32s cubic-bezier(.3,.9,.3,1),height .2s,opacity .2s}
+.lang.has-thumb button[aria-pressed="true"],.insp-tabgroup.has-thumb .tab.on,.filt-group.has-thumb .filt[aria-pressed="true"]{background:none;box-shadow:none}
+.workspaces.has-thumb a.on::after{display:none}
+.workspaces .sl-thumb{height:3px!important;border-radius:3px 3px 0 0;background:var(--accent);box-shadow:none}
+/* 6. выбранная работа «падает» на дорожку, главы выстраиваются каскадом, волна прорисовывается */
+.clip.in-drop{animation:clipDrop .5s cubic-bezier(.2,.9,.25,1.2) both}
+@keyframes clipDrop{0%{opacity:0;transform:translateY(-22px) scale(1.03)}55%{opacity:1}100%{transform:none}}
+.clip.in-chap{animation:chapIn .36s cubic-bezier(.2,.8,.2,1) both;transform-origin:left center}
+@keyframes chapIn{from{opacity:0;transform:translateY(-8px) scaleX(.3)}}
+.clip.in-wave{animation:waveIn .75s ease-out both}
+@keyframes waveIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@media (prefers-reduced-motion:reduce){.sl-thumb.live{transition:none}.clip.in-drop,.clip.in-chap,.clip.in-wave,.hero-name h1 .nm-l{animation:none}}
 /* шаттл J/K/L: текущая скорость */
 .screen>.rate{inset:auto;left:12px;top:12px;width:auto;height:auto;z-index:4;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;pointer-events:none}
 /* при воспроизведении: мышь не двигается 2 с — прячем кнопку и курсор (и в обычном, и в полноэкранном режиме) */
@@ -412,6 +443,7 @@ html.glitch .glitch-bars{animation:bars .95s steps(1) both}
   .proj{font-size:12px}
   .workspaces{gap:0}
   .workspaces a{padding:5px 9px;font-size:12px}
+  @media (max-width:400px){.workspaces a{padding:5px 6px;font-size:11.5px}}
   .hero-name h1{font-size:26px}
 }
 @media (hover:none){.keys{display:none}}
@@ -650,6 +682,27 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 .kd-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:13px}
 .kd-row kbd{font:11px var(--f-mono);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:6px;padding:1px 6px;color:var(--fg);background:var(--panel-2);margin-right:4px;white-space:nowrap}
 .kd-row .kd-m{color:var(--mute);font-size:12px}
+/* окно «Прайс» */
+.pr-win{width:min(820px,100%)}
+.pr-body{padding:6px 20px 20px}
+.pr-body h3{font:600 13px var(--f-display);margin:18px 0 8px;letter-spacing:.02em}
+.pr-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pr-table th{text-align:left;font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute);background:var(--panel-2);padding:8px 12px}
+.pr-table td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top;line-height:1.4}
+.pr-table td:first-child{font-weight:600;width:26%}
+.pr-table td:nth-child(2){color:var(--mute)}
+.pr-table td:last-child{width:30%;white-space:normal}
+.pr-table b{color:var(--tc);font-weight:600}
+.pr-note{margin:8px 2px 0;font-size:12px;color:var(--mute)}
+.pr-terms{margin:0;padding-left:18px;font-size:13px;line-height:1.6}
+.pr-terms b{color:var(--tc)}
+.pr-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.pr-cta a{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:999px;text-decoration:none;font-weight:600;font-size:13px;border:1px solid var(--line-2);color:var(--fg);background:var(--panel-2)}
+.pr-cta a.main{background:var(--accent-fill);border-color:transparent;color:#fff}
+.pr-cta a:hover{filter:brightness(1.1)}
+.pr-cta svg{width:15px;height:15px;fill:currentColor}
+@media (max-width:600px){.pr-body{padding:4px 12px 16px}.pr-table thead{display:none}.pr-table tr{display:grid;grid-template-columns:1fr auto;border-top:1px solid var(--line)}.pr-table tr:first-child{border-top:0}
+  .pr-table td{border-top:0;width:auto!important;padding:8px 12px}.pr-table td:first-child{padding-bottom:0}.pr-table td:nth-child(2){grid-column:1/-1;grid-row:2;padding-top:2px}.pr-table td:last-child{grid-column:2;grid-row:1;text-align:right;padding-bottom:0}}
 @media (max-width:760px){.kd-kb,.kd-legend{display:none}.kd-list{grid-template-columns:1fr}.kd-set{display:none}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel-2);border:1px solid var(--line-2);
   padding:9px 18px;border-radius:999px;font-size:12px;z-index:30}
@@ -677,6 +730,7 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 <div class="glitch-bars" aria-hidden="true"></div>
 <div class="vhs-veil" aria-hidden="true"><span class="vhs-play mono">PLAY ▶</span><span class="vhs-ctr mono" id="vhsCtr">SP 0:00:00</span></div>
 <div class="cine-veil" aria-hidden="true"></div>
+<script>try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("intro")){document.documentElement.classList.add("intro");sessionStorage.setItem("intro","1")}}catch(e){}</script>
 <header class="menubar">
   <div class="brand">
     <span class="logo" id="initials" role="button" tabindex="0" aria-label="Дзынь!">ИФ</span>
@@ -686,6 +740,7 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
     <a href="#reel" class="on" data-t="navReel">Шоурил</a>
     <a href="#works" data-t="navWorks">AI-работы</a>
     <a href="#about" data-t="navAbout">Обо мне</a>
+    <a href="#prices" data-t="navPrices">Прайс</a>
     <a href="#contact" data-t="navContact">Контакты</a>
   </nav>
   <div class="lang" role="group" aria-label="Язык / Language">
@@ -833,6 +888,13 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
   </div>
   <div class="vw-strip" id="vwStrip"></div>
 </div>
+<div class="kdlg" id="priceDlg" hidden role="dialog" aria-modal="true" aria-labelledby="prTitle">
+  <div class="kd-win pr-win">
+    <div class="kd-top"><b id="prTitle" data-t="prTitle">Прайс</b><span class="kd-set mono" data-t="prSub">видеомонтаж и AI-видеопродакшн</span>
+      <button class="ib kd-x" id="prClose" data-tt="close" title="Закрыть" aria-label="Закрыть"><svg viewBox="0 0 16 16"><path d="M3.5 2.1 8 6.6l4.5-4.5 1.4 1.4L9.4 8l4.5 4.5-1.4 1.4L8 9.4l-4.5 4.5-1.4-1.4L6.6 8 2.1 3.5z"/></svg></button></div>
+    <div class="pr-body" id="prBody"></div>
+  </div>
+</div>
 <div class="kdlg" id="keysDlg" hidden role="dialog" aria-modal="true" aria-labelledby="kdTitle">
   <div class="kd-win">
     <div class="kd-top"><b id="kdTitle" data-t="kTitle">Сочетания клавиш</b><span class="kd-set mono" data-t="kSet">Набор клавиш: Andreev_Portfolio (по умолчанию)</span>
@@ -882,6 +944,28 @@ const CFG = {
   primary: { label: { ru: "Написать в Telegram · @b1ohazard", en: "Message on Telegram · @b1ohazard" }, href: "https://t.me/b1ohazard" },
   copy: ["radioactive.wind@gmail.com", "+7 (926) 169-03-23"],
   cv: { ru: "media/Andreev_Gennady_CV.pdf", en: "media/Andreev_Gennady_CV_EN.pdf" },
+  /* прайс: окно из пункта «Прайс» в шапке; PDF — для скачивания */
+  prices: {
+    pdf: "media/Andreev_Gennady_Prices.pdf",
+    groups: [
+      { title: { ru: "Монтаж", en: "Editing" }, rows: [
+        [{ ru: "Рилс / Shorts", en: "Reels / Shorts" }, { ru: "Вертикаль 9:16, до 90 секунд", en: "Vertical 9:16, up to 90 seconds" }, { ru: "<b>7 000 ₽</b> за ролик", en: "<b>7,000 ₽</b> per video" }],
+        [{ ru: "Короткий формат", en: "Short format" }, { ru: "Горизонталь, 1–5 минут: промо, интервью, корпоративные ролики", en: "Horizontal, 1–5 minutes: promos, interviews, corporate videos" }, { ru: "<b>15 000 ₽</b> за ролик", en: "<b>15,000 ₽</b> per video" }],
+        [{ ru: "Длинный формат", en: "Long format" }, { ru: "От 10 минут: YouTube, интервью, документальное кино", en: "10+ minutes: YouTube, interviews, documentaries" }, { ru: "<b>2 500 ₽</b> за минуту готового видео, минимум 30 000 ₽", en: "<b>2,500 ₽</b> per finished minute, minimum 30,000 ₽" }],
+        [{ ru: "Нарезка рилсов", en: "Reels from long video" }, { ru: "Вертикальные ролики из уже смонтированного длинного видео", en: "Vertical cut-downs from an already edited long video" }, { ru: "<b>4 000 ₽</b> за ролик", en: "<b>4,000 ₽</b> per video" }]
+      ] },
+      { title: { ru: "AI-видео", en: "AI video" }, note: { ru: "Расходы на генерацию (кредиты нейросетей) оплачиваются отдельно по согласованной смете.", en: "Generation costs (AI service credits) are billed separately under an agreed estimate." }, rows: [
+        [{ ru: "AI-клип", en: "AI clip" }, { ru: "До 15 секунд: генерация и монтаж", en: "Up to 15 seconds: generation and editing" }, { ru: "<b>15 000 ₽</b>", en: "<b>15,000 ₽</b>" }],
+        [{ ru: "AI-ролик", en: "AI video" }, { ru: "До 60 секунд: сценарий, генерация, монтаж, звук", en: "Up to 60 seconds: script, generation, editing, sound" }, { ru: "<b>40 000 ₽</b>", en: "<b>40,000 ₽</b>" }],
+        [{ ru: "AI-ролик длиннее минуты", en: "AI video over a minute" }, { ru: "Под задачу, по смете", en: "Scoped per project" }, { ru: "от <b>40 000 ₽</b> за минуту", en: "from <b>40,000 ₽</b> per minute" }]
+      ] }
+    ],
+    terms: [
+      { ru: "В стоимость входят два круга правок.", en: "Two rounds of revisions are included." },
+      { ru: "Дополнительные правки и нестандартные задачи — <b>3 500 ₽ в час</b>.", en: "Extra revisions and non-standard tasks — <b>3,500 ₽ per hour</b>." },
+      { ru: "Работаю как самозанятый (НПД), цены без НДС, на каждую оплату выдаю чек.", en: "I work as a registered self-employed professional in Russia; prices exclude VAT and every payment comes with a receipt." }
+    ]
+  },
   links: [],
   /* уведомления о заходах в Telegram: адрес Cloudflare Worker (см. notify/README). Пусто — выключено */
   notify: "",
@@ -955,7 +1039,7 @@ const MEDIA = {"media/showreel.mp4":{"peaks":"BxYkLTdAS09NTU5QT1FPT3TIv3uGg3pIV6
 /* интерфейс */
 const UI = {
   ru: {
-    title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты",
+    title: "Геннадий Андреев · AI Creator", toLight: "Светлая тема", toDark: "Тёмная тема", scopes: "Скоупы", scWave: "Вейвформ · яркость", scVec: "Вектороскоп", scHist: "Гистограмма RGB", noSignal: "НЕТ СИГНАЛА", nav: "Разделы", navReel: "Шоурил", navWorks: "AI-работы", navAbout: "Обо мне", navContact: "Контакты", navPrices: "Прайс", prTitle: "Прайс", prSub: "видеомонтаж и AI-видеопродакшн", prSvc: "Услуга", prWhat: "Что входит", prCost: "Стоимость", prTerms: "Условия", prWrite: "Обсудить проект в Telegram", prPdf: "Скачать прайс · PDF",
     tabInspector: "Информация", tabMeta: "Метаданные", mClip: "Клип", mAbout: "О работе", mCredits: "Роль и инструменты", mAll: "Все работы", mChapters: "Главы шоурила", mFile: "Файл", mDur: "Длительность", mRes: "Кадр", mFps: "Частота", mCodec: "Кодек", mYear: "Год", mRole: "Роль", mTools: "Инструменты", mNda: "Проект под NDA:", mNdaText: "заказчик и детали не раскрываются, показ согласован.", mNow: "в мониторе", program: "Программа:", safe: "Рамки безопасной зоны", offline: "Медиаданные в автономном режиме",
     tStart: "К началу", tBack: "Кадр назад", tPlay: "Воспроизвести", tPause: "Пауза", tFwd: "Кадр вперёд", tNext: "Следующая работа", tMute: "Звук", tVol: "Громкость", tFull: "Во весь экран",
     hScopesTab: "Графики сигнала по кадру в мониторе. Двойной клик по графикам — пресеты цвета сайта", hWheelsTab: "Цветокоррекция сайта: тени, средние тона, света", hWave: "Вейвформ: яркость пикселей по ширине кадра, 0 — чёрный, 100 — белый", hVec: "Вектороскоп: какие цвета в кадре и насколько они насыщенные; пунктир — линия телесных тонов", hHist: "Гистограмма: сколько в кадре тёмного и светлого по каналам R, G, B", hLift: "Тени (Lift): окрашивает тёмное в интерфейсе — фон и панели. Двойной клик — сброс", hGamma: "Средние тона (Gamma): окрашивает линии, подписи, акценты. Двойной клик — сброс", hGain: "Света (Gain): окрашивает светлое — текст и яркие элементы. Двойной клик — сброс", fScopes: "Скоупы разбирают кадр из монитора: яркость, цвет и баланс каналов. Включи видео — графики оживут. Двойной клик по графикам — пресеты цвета сайта: Teal & Orange, Bleach Bypass, Noir, «плёнка 70-х».", fWheels: "Колёса красят сам сайт: тяни точку — оттенок, ползунок — яркость. Двойной клик — сброс.", copyright: "© 2026 Геннадий Андреев. Все права защищены.", cwReset: "Сброс", hReset: "Сбросить пресет и колёса — вернуть исходные цвета сайта", resetDone: "Цвета сайта сброшены", cwLum: "Яркость", cwShadows: "Тени", cwMids: "Средние тона", cwHighs: "Света", gameNote: "секретный уровень", pinkOn: "Pink unlocked 💗", impTitle: "Импорт медиаданных", razorOn: "Лезвие (C) · кликни по клипу · V — выделение", razorOff: "Инструмент «Выделение» (V)", kSpace: "Пробел", kShuttle: "шаттл", kPlay: "плей/пауза", kClip: "пред./след. работа", kFrame: "по кадрам", kVol: "громкость",
@@ -975,7 +1059,7 @@ const UI = {
     soundOn: "Звук включён", viewsTitle: "Просмотры сайта", openImages: "Открыть все изображения →", openFolder: "Папка · открыть →", allFolders: "Все папки", close: "Закрыть", prev: "Предыдущее", next: "Следующее", soundOff: "Звук выключен", noFull: "Полный экран недоступен", noVideo: "видео ещё не загружено"
   },
   en: {
-    title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact",
+    title: "Gennady Andreev · AI Creator", toLight: "Light theme", toDark: "Dark theme", scopes: "Scopes", scWave: "Waveform · luma", scVec: "Vectorscope", scHist: "RGB histogram", noSignal: "NO SIGNAL", nav: "Sections", navReel: "Showreel", navWorks: "AI work", navAbout: "About", navContact: "Contact", navPrices: "Rates", prTitle: "Rates", prSub: "video editing and AI video production", prSvc: "Service", prWhat: "What’s included", prCost: "Price", prTerms: "Terms", prWrite: "Discuss a project on Telegram", prPdf: "Download rates · PDF (RU)",
     tabInspector: "Info", tabMeta: "Metadata", mClip: "Clip", mAbout: "About", mCredits: "Role & tools", mAll: "All works", mChapters: "Showreel chapters", mFile: "File", mDur: "Duration", mRes: "Frame", mFps: "Frame rate", mCodec: "Codec", mYear: "Year", mRole: "Role", mTools: "Tools", mNda: "NDA project:", mNdaText: "client and details are confidential; showing is approved.", mNow: "in monitor", program: "Program:", safe: "Safe-area guides", offline: "Media offline",
     tStart: "Go to start", tBack: "Previous frame", tPlay: "Play", tPause: "Pause", tFwd: "Next frame", tNext: "Next work", tMute: "Sound", tVol: "Volume", tFull: "Full screen",
     hScopesTab: "Signal graphs of the frame in the monitor. Double-click the graphs for site colour presets", hWheelsTab: "Site colour correction: shadows, midtones, highlights", hWave: "Waveform: pixel brightness across the frame width, 0 is black, 100 is white", hVec: "Vectorscope: which colours are in the frame and how saturated; the dashed line is the skin-tone line", hHist: "Histogram: how much dark and bright there is in the R, G, B channels", hLift: "Shadows (Lift): tints the dark parts of the UI — background and panels. Double-click to reset", hGamma: "Midtones (Gamma): tints lines, labels and accents. Double-click to reset", hGain: "Highlights (Gain): tints the bright parts — text and highlights. Double-click to reset", fScopes: "Scopes analyse the frame in the monitor: brightness, colour and channel balance. Play the video and they come alive. Double-click the graphs for site colour presets: Teal & Orange, Bleach Bypass, Noir, Film ’70s.", fWheels: "The wheels grade the site itself: drag the dot to tint, the slider sets brightness. Double-click resets.", copyright: "© 2026 Gennady Andreev. All rights reserved.", cwReset: "Reset", hReset: "Reset the preset and wheels — back to the original site colours", resetDone: "Site colours reset", cwLum: "Luma", cwShadows: "Shadows", cwMids: "Midtones", cwHighs: "Highlights", gameNote: "secret level", pinkOn: "Pink unlocked 💗", impTitle: "Importing media", razorOn: "Razor (C) · click a clip · V — selection", razorOff: "Selection tool (V)", kSpace: "Space", kShuttle: "shuttle", kPlay: "play/pause", kClip: "prev/next work", kFrame: "frame by frame", kVol: "volume",
@@ -1019,6 +1103,32 @@ const seq = [
 ].map(c => ({ ...c, start: 0 })); /* на таймлайне всегда одна работа — та, что выбрана в «Проекте» или меню */
 let T = 0, t = 0, cur = null, playing = false, filter = "all";
 const vid = $("#lVid");
+
+/* ---------- анимации ---------- */
+const noMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let introPending = document.documentElement.classList.contains("intro"), tlAnim = introPending;
+setTimeout(() => document.documentElement.classList.remove("intro"), 1700);
+/* имя — по буквам из-под маски, роль — как набор титра; после анимации возвращается обычный текст */
+function titleReveal(h1, role) {
+  const name = h1.textContent, words = name.split(" "); h1.setAttribute("aria-label", name); h1.textContent = ""; let k = 0;
+  words.forEach((w, wi) => { const ws = el("span", "nm-w"); ws.setAttribute("aria-hidden", "true");
+    [...w].forEach(ch => { const l = el("span", "nm-l", ch); l.style.animationDelay = (.4 + k++ * .035) + "s"; ws.append(l); });
+    h1.append(ws); if (wi < words.length - 1) h1.append(" "); });
+  setTimeout(() => { if (h1.isConnected && h1.querySelector(".nm-w")) { h1.textContent = name; h1.removeAttribute("aria-label"); } }, 400 + k * 35 + 700);
+  const rt = role.textContent; role.style.minHeight = role.offsetHeight ? role.offsetHeight + "px" : "1.5em"; role.textContent = ""; role.classList.add("typing"); let i = 0;
+  const tick = () => { if (!role.isConnected) return; role.textContent = rt.slice(0, ++i); if (i < rt.length) setTimeout(tick, 26); else role.classList.remove("typing"); };
+  setTimeout(tick, 300);
+}
+/* скользящий индикатор: одна плашка переезжает к активной кнопке; следит за сменой класса/aria-pressed и текста */
+function slideThumb(box, sel, fit) {
+  if (!box) return; box.classList.add("has-thumb"); const th = el("i", "sl-thumb"); th.setAttribute("aria-hidden", "true"); box.prepend(th);
+  const place = () => { const a = box.querySelector(sel); if (!a || !a.offsetWidth) { th.style.opacity = 0; return; }
+    const g = fit ? fit(a) : { x: a.offsetLeft, y: a.offsetTop, w: a.offsetWidth, h: a.offsetHeight };
+    th.style.opacity = 1; th.style.width = g.w + "px"; th.style.height = g.h + "px"; th.style.transform = `translate(${g.x}px, ${g.y}px)`; };
+  new MutationObserver(place).observe(box, { attributes: true, subtree: true, childList: true, characterData: true, attributeFilter: ["class", "aria-pressed", "hidden"] });
+  addEventListener("resize", place); document.fonts?.ready?.then(place); place();
+  requestAnimationFrame(() => requestAnimationFrame(() => th.classList.add("live")));
+}
 
 /* ---------- inspector ---------- */
 function section(title, badge, open, body) {
@@ -1075,6 +1185,7 @@ $("#tabMetaBtn").onclick = () => setTab(true);
 function renderInspector() {
   const root = $("#inspector"); root.textContent = "";
   const hero = el("div", "hero-name"); hero.append(el("div", "hero-role", tr(CFG.role)), el("h1", "", tr(CFG.name)), el("p", "", tr(CFG.summary)));
+  if (introPending) { introPending = false; titleReveal(hero.children[1], hero.children[0]); }
   const props = CFG.props.map(([k, v]) => { const r = el("div", "prop"); r.append(el("span", "sw", "◷"), el("span", "k", tr(k)), el("span", "v", tr(v))); return r; });
   const skillGroups = CFG.skills.map(([g, items]) => { const w = el("div", "sk"), c = el("div", "chips");
     items.forEach(s => c.append(el("span", "chip", s))); w.append(el("div", "sk-h", tr(g)), c); return w; });
@@ -1193,12 +1304,14 @@ document.querySelectorAll(".filt").forEach(f => f.onclick = () => setFilter(f.da
 /* ---------- timeline ---------- */
 function layout() {
   const c = cur || seq[0]; T = c.dur;
+  const an = tlAnim && !noMotion, d0 = document.documentElement.classList.contains("intro") ? .6 : 0; tlAnim = false;
   const pct = x => (x / T * 100) + "%";
   const v1 = $("#laneV1"), v2 = $("#laneV2"), a1 = $("#laneA1"), ru = $("#ruler");
   [v1, v2, a1, ru].forEach(n => n.textContent = "");
 
   {
     const b = el("button", "clip"); b.dataset.i = seq.indexOf(c);
+    if (an) { b.classList.add("in-drop"); b.style.animationDelay = d0 + "s"; b.addEventListener("animationend", () => { b.classList.remove("in-drop"); b.style.animationDelay = ""; }, { once: true }); }
     b.style.left = pct(c.start); b.style.width = `calc(${pct(c.dur)} - 2px)`; b.style.setProperty("--cc", `var(${c.color})`);
     const md = MEDIA[c.src];
     if (c.type === "image") { b.classList.add("still"); b.style.backgroundImage = `url("${c.poster}")`; }
@@ -1211,14 +1324,15 @@ function layout() {
   const reel = c, chs = c.kind === "reel" ? CFG.chapters || [] : [];
   chs.forEach((ch, i) => {
     const end = i + 1 < chs.length ? chs[i + 1].t : reel.dur, b = el("button", "clip v2 chap"); b.dataset.ch = i;
+    if (an) { b.classList.add("in-chap"); b.style.animationDelay = (d0 + .18 + i * .05) + "s"; b.addEventListener("animationend", () => { b.classList.remove("in-chap"); b.style.animationDelay = ""; }, { once: true }); }
     b.style.left = pct(reel.start + ch.t); b.style.width = `calc(${pct(end - ch.t)} - 2px)`;
     b.style.setProperty("--cc", `var(${COLORS[i % COLORS.length]})`);
     b.append(el("span", "cn", `${ch.n} ${tr(ch)}`)); b.title = `${ch.n} — ${tr(ch)} · ${tcf(ch.t)}`; v2.append(b);
   });
-  if (!chs.length) { const adj = el("div", "clip v2"); adj.style.left = "0"; adj.style.right = "0";
+  if (!chs.length) { const adj = el("div", "clip v2"); if (an) { adj.classList.add("in-chap"); adj.style.animationDelay = (d0 + .18) + "s"; } adj.style.left = "0"; adj.style.right = "0";
     adj.style.setProperty("--cc", "#4a4d55"); adj.append(el("span", "cn", L("adj"))); v2.append(adj); }
 
-  const au = el("div", "clip audio"); au.style.left = "0"; au.style.right = "0";
+  const au = el("div", "clip audio"); if (an) { au.classList.add("in-wave"); au.style.animationDelay = (d0 + .12) + "s"; } au.style.left = "0"; au.style.right = "0";
   const cv = el("canvas"); au.append(cv, el("span", "cn", "Music mix")); a1.append(au);
   requestAnimationFrame(() => { drawWave(cv); drawStrip(); });
 
@@ -1295,7 +1409,7 @@ function openClip(c, at = 0) {
   if (!c) return;
   if (c === cur) { setTime(at, true); return; }
   dissolveFrom(); if (rate !== 1) setRate(1);
-  cur = c; t = 0; layout(); showClip(c); setTime(at, true);
+  cur = c; t = 0; tlAnim = true; layout(); showClip(c); setTime(at, true);
 }
 function showClip(c) {
   queueScopes(); $("#screen").classList.toggle("no-pp", !c.src || c.type === "image");
@@ -1497,6 +1611,26 @@ $("#bFull").onclick = () => {
 }
 $("#safeBtn").onclick = e => { const s = $("#safe"); s.hidden = !s.hidden; e.currentTarget.classList.toggle("on", !s.hidden); e.currentTarget.setAttribute("aria-pressed", !s.hidden); };
 vid.addEventListener("ended", () => { if (playing) { t = T; setPlaying(false); render(); } });
+
+/* ---------- окно «Прайс» ---------- */
+let prFocus = null;
+function renderPrices() {
+  const P = CFG.prices, body = $("#prBody"); let h = "";
+  P.groups.forEach(g => {
+    h += `<h3>${tr(g.title)}</h3><table class="pr-table"><thead><tr><th>${L("prSvc")}</th><th>${L("prWhat")}</th><th>${L("prCost")}</th></tr></thead><tbody>`;
+    g.rows.forEach(r => h += `<tr>${r.map(c => `<td>${tr(c)}</td>`).join("")}</tr>`);
+    h += "</tbody></table>"; if (g.note) h += `<p class="pr-note">${tr(g.note)}</p>`;
+  });
+  h += `<h3>${L("prTerms")}</h3><ul class="pr-terms">${P.terms.map(x => `<li>${tr(x)}</li>`).join("")}</ul>`;
+  h += `<div class="pr-cta"><a class="main" href="https://t.me/b1ohazard" target="_blank" rel="noopener"><svg viewBox="0 0 16 16"><path d="M14.6 2.2 1.9 7.1c-.9.3-.9.8-.2 1l3.2 1 1.2 3.8c.2.4.1.6.5.6.3 0 .4-.1.6-.3l1.6-1.5 3.3 2.4c.6.3 1 .2 1.2-.6l2.1-10c.3-1.1-.4-1.6-1.1-1.3zM5.6 9.4l6.6-4.2c.3-.2.6-.1.4.1L7 10.3l-.2 2.4z"/></svg>${L("prWrite")}</a>`
+    + `<a href="${P.pdf}" download="Andreev_Gennady_Prices.pdf"><svg viewBox="0 0 16 16"><path d="M7.2 1.5h1.6v7.1l2.4-2.4 1.1 1.1L8 11.6 3.7 7.3l1.1-1.1 2.4 2.4zM2.5 12.5h11V14h-11z"/></svg>${L("prPdf")}</a></div>`;
+  body.innerHTML = h;
+}
+function openPrices() { renderPrices(); prFocus = document.activeElement; $("#priceDlg").hidden = false; document.body.style.overflow = "hidden"; $("#prClose").focus(); }
+function closePrices() { $("#priceDlg").hidden = true; document.body.style.overflow = ""; prFocus?.focus?.(); }
+$("#prClose").onclick = closePrices;
+$("#priceDlg").addEventListener("click", e => { if (e.target.id === "priceDlg") closePrices(); });
+addEventListener("keydown", e => { if (e.key === "Escape" && !$("#priceDlg").hidden) { e.stopImmediatePropagation(); closePrices(); } }, true);
 
 /* ---------- окно «Сочетания клавиш» ---------- */
 const KB = [
@@ -1749,8 +1883,9 @@ addEventListener("keydown", e => {
 /* nav highlight */
 const navLinks = [...document.querySelectorAll(".workspaces a")];
 navLinks.forEach(a => a.addEventListener("click", e => {
-  navLinks.forEach(x => x.classList.toggle("on", x === a));
   const h = a.getAttribute("href");
+  if (h === "#prices") { e.preventDefault(); openPrices(); return; }
+  navLinks.forEach(x => x.classList.toggle("on", x === a));
   /* «Шоурил» и «AI-работы» без прокрутки открывают клип в мониторе и ставят на него плейхед */
   if (h === "#reel" || h === "#works") {
     e.preventDefault();
@@ -2007,6 +2142,10 @@ function applyTheme(next, save) {
 $("#themeBtn").onclick = () => applyTheme(ui === "light" ? "dark" : "light", true);
 
 applyLang(lang, false); applyTheme(ui, false); setTime(0); requestAnimationFrame(frame);
+slideThumb($(".lang"), 'button[aria-pressed="true"]');
+slideThumb($(".insp-tabgroup"), ".tab.on");
+slideThumb($(".filt-group"), '.filt[aria-pressed="true"]');
+slideThumb($(".workspaces"), "a.on", a => ({ x: a.offsetLeft + 10, y: a.offsetTop + a.offsetHeight + (matchMedia("(max-width:900px)").matches ? -3 : 8), w: Math.max(8, a.offsetWidth - 20), h: 3 }));
 </script>
 
 </body>
