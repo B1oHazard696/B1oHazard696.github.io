@@ -345,6 +345,26 @@ html.glitch .glitch-bars{animation:bars .95s steps(1) both}
 .cut-l,.cut-r{position:absolute;pointer-events:none;z-index:4;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 .cut-line{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 8px #fff;z-index:5;pointer-events:none;animation:cutFade .9s ease-out forwards}
 @keyframes cutFade{0%,50%{opacity:1}100%{opacity:0}}
+/* ===== заставка первого захода: телевизионная настроечная таблица + «Loading project» ===== */
+.boot{display:none}
+html.booting .boot{display:flex;flex-direction:column;position:fixed;inset:0;z-index:100;background:#000;cursor:pointer}
+html.booting,html.booting body{overflow:hidden}
+.boot.out{opacity:0;transition:opacity .45s ease;pointer-events:none}
+.boot>div[class^="bars"]{display:flex}.boot>div[class^="bars"] i{flex:1}
+.bars-top{flex:67}.bars-mid{flex:8}.bars-low{flex:25}
+.boot::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);animation:bootFlick .12s steps(2) infinite}
+@keyframes bootFlick{50%{opacity:.7}}
+.boot-box{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(88vw,420px);padding:18px 20px;border-radius:14px;z-index:1;
+  background:rgba(20,21,24,.92);border:1px solid #3a3d44;box-shadow:0 20px 60px rgba(0,0,0,.6);color:#d9dbe1;display:grid;gap:10px}
+.bb-top{display:flex;align-items:center;gap:10px}.bb-top b{font-size:14px;font-weight:500}
+.bb-dot{width:9px;height:9px;border-radius:50%;background:#e5484d;box-shadow:0 0 8px #e5484d;animation:osdBlink 1s steps(2) infinite}
+.bb-file{font-size:12px;color:#5fb0ff}
+.bb-bar{height:6px;border-radius:6px;background:#0c0d0f;overflow:hidden}
+.bb-bar em{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#3d8bfd,#5fb0ff)}
+.bb-row{display:flex;justify-content:space-between;font-size:11px;color:#8b8f99}
+.boot-skip{position:absolute;right:16px;bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:10.5px;color:rgba(255,255,255,.55);z-index:1;letter-spacing:.06em}
+/* пока идёт заставка, анимации сборки панелей стоят на паузе и стартуют после неё */
+html.booting body>*:not(.boot) *,html.booting body>*:not(.boot){animation-play-state:paused!important}
 /* ===== анимации интерфейса ===== */
 /* 1. открытие проекта: панели собираются по очереди, один раз за визит */
 html.intro .menubar{animation:introBar .5s cubic-bezier(.2,.8,.2,1) both}
@@ -708,7 +728,19 @@ html.cine .p-program.live{box-shadow:0 0 40px 2px color-mix(in srgb, var(--accen
 <div class="glitch-bars" aria-hidden="true"></div>
 <div class="vhs-veil" aria-hidden="true"><span class="vhs-play mono">PLAY ▶</span><span class="vhs-ctr mono" id="vhsCtr">SP 0:00:00</span></div>
 <div class="cine-veil" aria-hidden="true"></div>
-<script>try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("intro")){document.documentElement.classList.add("intro");sessionStorage.setItem("intro","1")}}catch(e){}</script>
+<script>try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("intro")){document.documentElement.classList.add("intro","booting");sessionStorage.setItem("intro","1")}}catch(e){}</script>
+<div class="boot" id="boot" aria-hidden="true">
+  <div class="bars-top"><i style="background:#c0c0c0"></i><i style="background:#c0c000"></i><i style="background:#00c0c0"></i><i style="background:#00c000"></i><i style="background:#c000c0"></i><i style="background:#c00000"></i><i style="background:#0000c0"></i></div>
+  <div class="bars-mid"><i style="background:#0000c0"></i><i style="background:#131313"></i><i style="background:#c000c0"></i><i style="background:#131313"></i><i style="background:#00c0c0"></i><i style="background:#131313"></i><i style="background:#c0c0c0"></i></div>
+  <div class="bars-low"><i style="background:#00214c;flex:1.25"></i><i style="background:#fff;flex:1.25"></i><i style="background:#32006a;flex:1.25"></i><i style="background:#131313;flex:1.25"></i><i style="background:#090909;flex:.42"></i><i style="background:#131313;flex:.42"></i><i style="background:#1d1d1d;flex:.42"></i><i style="background:#131313;flex:1"></i></div>
+  <div class="boot-box">
+    <div class="bb-top"><span class="bb-dot"></span><b class="mono">Loading project…</b></div>
+    <div class="bb-file mono">Andreev_Portfolio_2026.prproj</div>
+    <div class="bb-bar"><em id="bootBar"></em></div>
+    <div class="bb-row mono"><span id="bootStep">Opening sequence</span><span id="bootPct">0%</span></div>
+  </div>
+  <div class="boot-skip mono">click to skip</div>
+</div>
 <header class="menubar">
   <div class="brand">
     <span class="logo" id="initials" role="button" tabindex="0" aria-label="Дзынь!">ИФ</span>
@@ -1055,17 +1087,32 @@ const vid = $("#lVid");
 /* ---------- анимации ---------- */
 const noMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let introPending = document.documentElement.classList.contains("intro"), tlAnim = introPending;
-setTimeout(() => document.documentElement.classList.remove("intro"), 1700);
+const BOOT_MS = 3000;
+let bootLeft = document.documentElement.classList.contains("booting") ? BOOT_MS : 0;
+const bootDone = new Promise(res => {
+  if (!bootLeft) return res();
+  const bt = $("#boot"), bar = $("#bootBar"), pc = $("#bootPct"), st = $("#bootStep"), t0 = performance.now();
+  const steps = ["Opening sequence", "Linking media", "Building peak files", "Loading Lumetri presets", "Conforming audio", "Ready"];
+  let done = false;
+  const finish = () => { if (done) return; done = true; bar.style.width = "100%"; pc.textContent = "100%"; st.textContent = "Ready";
+    bt.classList.add("out"); setTimeout(() => { document.documentElement.classList.remove("booting"); bt.remove(); res(); }, 450); };
+  const tick = now => { if (done) return; const k = Math.min(1, (now - t0) / BOOT_MS), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    bar.style.width = (e * 100).toFixed(1) + "%"; pc.textContent = Math.round(e * 100) + "%"; st.textContent = steps[Math.min(steps.length - 1, Math.floor(k * (steps.length - 1)))];
+    if (k < 1) requestAnimationFrame(tick); else finish(); };
+  requestAnimationFrame(tick);
+  bt.addEventListener("click", finish); addEventListener("keydown", finish, { once: true });
+});
+bootDone.then(() => setTimeout(() => document.documentElement.classList.remove("intro"), 1700));
 /* имя — по буквам из-под маски, роль — как набор титра; после анимации возвращается обычный текст */
 function titleReveal(h1, role) {
   const name = h1.textContent, words = name.split(" "); h1.setAttribute("aria-label", name); h1.textContent = ""; let k = 0;
   words.forEach((w, wi) => { const ws = el("span", "nm-w"); ws.setAttribute("aria-hidden", "true");
     [...w].forEach(ch => { const l = el("span", "nm-l", ch); l.style.animationDelay = (.4 + k++ * .035) + "s"; ws.append(l); });
     h1.append(ws); if (wi < words.length - 1) h1.append(" "); });
-  setTimeout(() => { if (h1.isConnected && h1.querySelector(".nm-w")) { h1.textContent = name; h1.removeAttribute("aria-label"); } }, 400 + k * 35 + 700);
+  bootDone.then(() => setTimeout(() => { if (h1.isConnected && h1.querySelector(".nm-w")) { h1.textContent = name; h1.removeAttribute("aria-label"); } }, 400 + k * 35 + 700));
   const rt = role.textContent; role.style.minHeight = role.offsetHeight ? role.offsetHeight + "px" : "1.5em"; role.textContent = ""; role.classList.add("typing"); let i = 0;
   const tick = () => { if (!role.isConnected) return; role.textContent = rt.slice(0, ++i); if (i < rt.length) setTimeout(tick, 26); else role.classList.remove("typing"); };
-  setTimeout(tick, 300);
+  bootDone.then(() => setTimeout(tick, 300));
 }
 /* скользящий индикатор: одна плашка переезжает к активной кнопке; следит за сменой класса/aria-pressed и текста */
 function slideThumb(box, sel, fit) {
@@ -1899,7 +1946,7 @@ function drawScopes() {
   const [ww, wh] = [gw.canvas.width, gw.canvas.height], [vw, vh] = [gv.canvas.width, gv.canvas.height], [hw, hh] = [gh.canvas.width, gh.canvas.height];
   [gw, gv, gh].forEach(g => g.clearRect(0, 0, g.canvas.width, g.canvas.height));
   /* вектороскоп: круг, мишени цветов 75% и линия телесных тонов */
-  const cx = vw / 2, cy = vh / 2, R = Math.min(vw, vh) / 2 - 8;
+  const cx = vw / 2, cy = vh / 2, R = Math.max(2, Math.min(vw, vh) / 2 - 8);
   gv.strokeStyle = "rgba(255,255,255,.14)"; gv.lineWidth = 1;
   gv.beginPath(); gv.arc(cx, cy, R, 0, Math.PI * 2); gv.stroke();
   gv.beginPath(); gv.moveTo(cx - R, cy); gv.lineTo(cx + R, cy); gv.moveTo(cx, cy - R); gv.lineTo(cx, cy + R); gv.stroke();
